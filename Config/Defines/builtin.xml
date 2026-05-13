@@ -49,4 +49,15 @@
             <option name="constructor" value="ExternalTypeUtil.NewVector4"/>
         </mapper>
     </bean>
+<bean name="color" valueType="2" sep="," group="*">
+  <var name="value" type="string"/>
+    <mapper target="client" codeTarget="cs-bin,cs-simple-json">
+        <option name="type" value="UnityEngine.Color"/>
+        <option name="constructor" value="ExternalTypeUtil.ParseColor"/>
+    </mapper>
+    <mapper target="server" codeTarget="cs-bin,cs-dotnet-json">
+        <option name="type" value="System.Drawing.Color"/>
+        <option name="constructor" value="ExternalTypeUtil.ParseSystemColor"/>
+    </mapper>
+</bean>
 </module>

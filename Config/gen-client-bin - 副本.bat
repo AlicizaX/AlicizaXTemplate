@@ -1,4 +1,0 @@
-dotnet.exe ./Tools/Luban.dll --target client --dataTarget bin --codeTarget cs-bin --xargs outputDataDir=../Client/Assets/AssetRaw/Configs/bytes/  --xargs outputCodeDir=../Client/Assets/Scripts/Hotfix/GameProto/Config/Generate --xargs tableImporter.name=gameframex -x l10n.provider=gameframex -x l10n.textFile.keyFieldName=key  -x l10n.textFile.path=./Excels/Localization/    -x l10n.textFile.languageFieldName=ChineseSimplified ^
-  -x l10n.convertTextKeyToValue=1  --conf ./Luban.conf
-
-pause
