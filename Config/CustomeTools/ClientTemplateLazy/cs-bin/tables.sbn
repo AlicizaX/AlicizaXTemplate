@@ -1,0 +1,200 @@
+using System;
+using Luban;
+using AlicizaX;
+using Cysharp.Threading.Tasks;
+
+{{namespace_with_grace_begin __namespace}}
+
+    public interface IConfigBytesLoader
+    {
+        UniTask<ByteBuf> LoadCommonAsync(string file);
+
+        UniTask<ByteBuf> LoadLocalizedAsync(string file);
+    }
+
+    public partial interface IConfigService : IService
+    {
+        {{~for table in __tables ~}}
+        {{~if table.comment != '' ~}}
+        /// <summary>
+        /// {{escape_comment table.comment}}
+        /// </summary>
+        {{~end~}}
+        public {{table.full_name}} {{format_property_name __code_style table.name}} { get; }
+        {{~end~}}
+
+        UniTask Initialize(IConfigBytesLoader loader);
+    }
+     
+    public partial class {{__name}} : ServiceBase, IConfigService
+    {
+        private IConfigBytesLoader _loader;
+        private bool _isLoaded;
+        private readonly System.Collections.Generic.List<System.Action> _resolveLoadedRefs = new System.Collections.Generic.List<System.Action>();
+        private readonly System.Collections.Generic.List<System.Action<Func<string, string>>> _translateLoadedTables = new System.Collections.Generic.List<System.Action<Func<string, string>>>();
+
+        {{~for table in __tables ~}}
+        {{~if table.comment != '' ~}}
+        /// <summary>
+        /// {{escape_comment table.comment}}
+        /// </summary>
+        {{~end~}}
+        public {{table.full_name}} {{format_property_name __code_style table.name}} { private set; get; }
+        {{~end~}}
+
+        public async UniTask Initialize(IConfigBytesLoader loader)
+        {
+            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
+            if (_isLoaded)
+            {
+                await ReloadLocalizedAsync();
+                return;
+            }
+
+            await LoadAsync();
+        }
+
+        private async UniTask LoadAsync()
+        {
+            EnsureLoader();
+
+            if (_isLoaded)
+            {
+                return;
+            }
+
+            var loadTasks = new System.Collections.Generic.List<UniTask>();
+
+            {{~for table in __tables ~}}
+            {{format_property_name __code_style table.name}} = new {{table.full_name}}(() => LoadCommon("{{table.output_data_file}}"));
+            {{~end~}}
+
+            PostLoadAsync(ref loadTasks);
+
+            await UniTask.WhenAll(loadTasks);
+
+            ResolveLoadedRefs();
+            PostLocalizedTablesLoaded();
+            _isLoaded = true;
+            TranslateText();
+        }
+
+        private async UniTask ReloadLocalizedAsync()
+        {
+            EnsureLoader();
+
+            if (!_isLoaded)
+            {
+                await LoadAsync();
+                return;
+            }
+
+            var loadTasks = new System.Collections.Generic.List<UniTask>();
+
+            PostReloadLocalizedAsync(ref loadTasks);
+
+            await UniTask.WhenAll(loadTasks);
+
+            PostLocalizedTablesLoaded();
+            TranslateText();
+        }
+
+        internal void EnsureTableLoaded(
+            Func<bool> isLoaded,
+            System.Action load,
+            System.Action resolveRef,
+            System.Action markExplicitlyLoaded,
+            System.Action<Func<string, string>> translateText,
+            bool explicitLoad)
+        {
+            EnsureLoader();
+            if (!isLoaded())
+            {
+                load();
+                _resolveLoadedRefs.Add(resolveRef);
+                _translateLoadedTables.Add(translateText);
+                resolveRef();
+            }
+
+            if (explicitLoad)
+            {
+                markExplicitlyLoaded();
+            }
+        }
+
+        private void ResolveLoadedRefs()
+        {
+            foreach (var resolveRef in _resolveLoadedRefs)
+            {
+                resolveRef();
+            }
+            PostResolveRef();
+        }
+
+        public void TranslateText()
+        {
+            if (!_isLoaded)
+            {
+                return;
+            }
+
+            string Translator(string key)
+            {
+                string value = key;
+                PostTranslateText(key, ref value);
+                return value;
+            }
+
+            foreach (var translateText in _translateLoadedTables)
+            {
+                translateText(Translator);
+            }
+        }
+
+        internal void TranslateText(System.Action<Func<string, string>> translateText)
+        {
+            if (!_isLoaded)
+            {
+                return;
+            }
+
+            string Translator(string key)
+            {
+                string value = key;
+                PostTranslateText(key, ref value);
+                return value;
+            }
+
+            translateText(Translator);
+        }
+
+        private void EnsureLoader()
+        {
+            if (_loader == null)
+            {
+                throw new InvalidOperationException("ConfigService is not initialized. Call Initialize(loader) first.");
+            }
+        }
+
+        private ByteBuf LoadCommon(string file)
+        {
+            return _loader.LoadCommonAsync(file).GetAwaiter().GetResult();
+        }
+
+        protected override void OnInitialize()
+        {
+        }
+
+        protected override void OnDestroyService()
+        {
+            _resolveLoadedRefs.Clear();
+            _translateLoadedTables.Clear();
+        }
+
+        partial void PostLoadAsync(ref System.Collections.Generic.List<UniTask> loadTasks);
+        partial void PostReloadLocalizedAsync(ref System.Collections.Generic.List<UniTask> loadTasks);
+        partial void PostLocalizedTablesLoaded();
+        partial void PostResolveRef();
+        partial void PostTranslateText(string key, ref string value);
+    }
+{{namespace_with_grace_end __namespace}}

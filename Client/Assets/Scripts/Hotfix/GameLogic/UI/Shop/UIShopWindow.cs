@@ -1,41 +1,51 @@
 using System.Collections.Generic;
 using AlicizaX;
+using AlicizaX.Localization;
 using AlicizaX.UI;
 using AlicizaX.UI.Runtime;
+using Game.Config;
 using Game.UI;
 using GameLogic.Player;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GameLogic.UI
 {
     [Window(UILayer.UI, false, 3)]
     public class UIShopWindow : UITabWindow<ui_UIShopWindow>
     {
-        private readonly List<ShopGoodsData> _goods = new(12);
+        private readonly List<ShopGoodsData> _goods = new(1024);
         private UGList<ShopGoodsData> _goodsList;
         private IFakePlayerDataService _playerDataService;
-        private ShopCategory _category;
+        private IConfigService _configService;
 
         protected override void OnInitialize()
         {
             _goodsList = UGListCreateHelper.Create<ShopGoodsData>(baseui.ScrollViewGoodsList);
             _goodsList.RegisterItemRender<ShopGoodsItemRender>();
             _playerDataService = AppServices.Require<IFakePlayerDataService>();
+            _configService = AppServices.Require<IConfigService>();
 
             baseui.TogRecommend.onValueChanged.AddListener(OnTogRecommendChanged);
             baseui.TogItem.onValueChanged.AddListener(OnTogItemChanged);
             baseui.TogSkin.onValueChanged.AddListener(OnTogSkinChanged);
             baseui.TogPack.onValueChanged.AddListener(OnTogPackChanged);
             baseui.BtnClose.onClick.AddListener(OnBtnCloseClick);
+            if (baseui.TextCurrency is UXTextMeshPro currencyText)
+            {
+                currencyText.SetLocalization(string.Empty);
+            }
 
             baseui.TogRecommend.isOn = true;
+            RefreshStaticText();
             RefreshCurrencyText();
-            SwitchCategory(ShopCategory.Recommend);
+            SwitchCategory(EShopCategory.TEST);
         }
 
         protected override void OnRegisterEvent(EventListenerProxy proxy)
         {
             proxy.AddUIEvent<PlayerDataChangedEvent>(OnPlayerDataChanged);
+            proxy.AddUIEvent<LocalizationChangeEvent>(OnLocalizationChanged);
         }
 
         private void OnPlayerDataChanged(in PlayerDataChangedEvent evt)
@@ -43,16 +53,40 @@ namespace GameLogic.UI
             RefreshCurrencyText();
         }
 
+        private void OnLocalizationChanged(in LocalizationChangeEvent evt)
+        {
+            RefreshStaticText();
+            RefreshCurrencyText();
+            _goodsList.Adapter.NotifyDataChanged();
+        }
+
+        private void RefreshStaticText()
+        {
+            SetLocalizedText(baseui.TogRecommend, LocalizationKey.UI.SHOP_TABRECOMMEND);
+            SetLocalizedText(baseui.TogItem, LocalizationKey.UI.SHOP_TABITEM);
+            SetLocalizedText(baseui.TogSkin, LocalizationKey.UI.SHOP_TABSKIN);
+            SetLocalizedText(baseui.TogPack, LocalizationKey.UI.SHOP_TABPACK);
+        }
+
         private void RefreshCurrencyText()
         {
-            baseui.TextCurrency.text = $"信用点：{_playerDataService.Credit}";
+            baseui.TextCurrency.text = LocalizationKey.UI.SHOP_CURRENCY(_playerDataService.Credit.ToString());
+        }
+
+        private static void SetLocalizedText(Selectable selectable, string text)
+        {
+            var textMeshPro = selectable.GetComponentInChildren<TMPro.TextMeshProUGUI>(true);
+            if (textMeshPro != null)
+            {
+                textMeshPro.text = text;
+            }
         }
 
         private void OnTogRecommendChanged(bool isOn)
         {
             if (isOn)
             {
-                SwitchCategory(ShopCategory.Recommend);
+                SwitchCategory(EShopCategory.TEST);
             }
         }
 
@@ -60,7 +94,7 @@ namespace GameLogic.UI
         {
             if (isOn)
             {
-                SwitchCategory(ShopCategory.Item);
+                SwitchCategory(EShopCategory.MATERIAL);
             }
         }
 
@@ -68,7 +102,7 @@ namespace GameLogic.UI
         {
             if (isOn)
             {
-                SwitchCategory(ShopCategory.Skin);
+                SwitchCategory(EShopCategory.EQUIPMENT);
             }
         }
 
@@ -76,7 +110,7 @@ namespace GameLogic.UI
         {
             if (isOn)
             {
-                SwitchCategory(ShopCategory.Pack);
+                SwitchCategory(EShopCategory.CONSUMABLE);
             }
         }
 
@@ -85,66 +119,27 @@ namespace GameLogic.UI
             CloseSelf();
         }
 
-        private void SwitchCategory(ShopCategory category)
+        private void SwitchCategory(EShopCategory category)
         {
-            _category = category;
             BuildGoods(category);
             _goodsList.Data = _goods;
-            baseui.TextInfoTitle.text = GetCategoryTitle(category);
-            baseui.TextInfoContent.text = GetCategoryDescription(category);
         }
 
-        private void BuildGoods(ShopCategory category)
+        private void BuildGoods(EShopCategory category)
         {
             _goods.Clear();
 
-            switch (category)
+            var configs = _configService.Shop.DataList;
+            for (int i = 0; i < configs.Count; i++)
             {
-                case ShopCategory.Item:
-                    AddGoods(2001, LocalizationKey.UI.SHOP_GOODS_ITEM_MEDKIT_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_ITEM_MEDKIT_DESCRIPTION_Raw, 320, LocalizationKey.UI.SHOP_TAG_ITEM, new Color(0.45f, 0.9f, 0.62f, 1f));
-                    AddGoods(2002, LocalizationKey.UI.SHOP_GOODS_ITEM_ENERGYBATTERY_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_ITEM_ENERGYBATTERY_DESCRIPTION_Raw, 480, LocalizationKey.UI.SHOP_TAG_ITEM, new Color(0.25f, 0.75f, 1f, 1f));
-                    AddGoods(2003, LocalizationKey.UI.SHOP_GOODS_ITEM_ACCESSKEY_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_ITEM_ACCESSKEY_DESCRIPTION_Raw, 760, LocalizationKey.UI.SHOP_TAG_ITEM, new Color(0.9f, 0.82f, 0.3f, 1f));
-                    AddGoods(2004, LocalizationKey.UI.SHOP_GOODS_ITEM_SIGNALMARKER_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_ITEM_SIGNALMARKER_DESCRIPTION_Raw, 600, LocalizationKey.UI.SHOP_TAG_ITEM, new Color(0.95f, 0.55f, 0.35f, 1f));
-                    break;
-                case ShopCategory.Skin:
-                    AddGoods(3001, LocalizationKey.UI.SHOP_GOODS_SKIN_NEONCOAT_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_SKIN_NEONCOAT_DESCRIPTION_Raw, 1800, LocalizationKey.UI.SHOP_TAG_SKIN, new Color(0.18f, 0.92f, 0.88f, 1f));
-                    AddGoods(3002, LocalizationKey.UI.SHOP_GOODS_SKIN_ASHHELMET_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_SKIN_ASHHELMET_DESCRIPTION_Raw, 1500, LocalizationKey.UI.SHOP_TAG_SKIN, new Color(0.68f, 0.7f, 0.67f, 1f));
-                    AddGoods(3003, LocalizationKey.UI.SHOP_GOODS_SKIN_GHOSTMASK_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_SKIN_GHOSTMASK_DESCRIPTION_Raw, 2400, LocalizationKey.UI.SHOP_TAG_SKIN, new Color(0.85f, 0.9f, 0.82f, 1f));
-                    AddGoods(3004, LocalizationKey.UI.SHOP_GOODS_SKIN_WANDERERBADGE_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_SKIN_WANDERERBADGE_DESCRIPTION_Raw, 900, LocalizationKey.UI.SHOP_TAG_SKIN, new Color(0.95f, 0.72f, 0.32f, 1f));
-                    break;
-                case ShopCategory.Pack:
-                    AddGoods(4001, LocalizationKey.UI.SHOP_GOODS_PACK_STARTERPACK_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_PACK_STARTERPACK_DESCRIPTION_Raw, 980, LocalizationKey.UI.SHOP_TAG_PACK, new Color(0.4f, 0.82f, 1f, 1f));
-                    AddGoods(4002, LocalizationKey.UI.SHOP_GOODS_PACK_EXPLORATIONPACK_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_PACK_EXPLORATIONPACK_DESCRIPTION_Raw, 1680, LocalizationKey.UI.SHOP_TAG_PACK, new Color(0.48f, 0.9f, 0.58f, 1f));
-                    AddGoods(4003, LocalizationKey.UI.SHOP_GOODS_PACK_OUTFITPACK_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_PACK_OUTFITPACK_DESCRIPTION_Raw, 3600, LocalizationKey.UI.SHOP_TAG_PACK, new Color(0.92f, 0.48f, 1f, 1f));
-                    AddGoods(4004, LocalizationKey.UI.SHOP_GOODS_PACK_WEEKLYSUPPLY_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_PACK_WEEKLYSUPPLY_DESCRIPTION_Raw, 2200, LocalizationKey.UI.SHOP_TAG_PACK, new Color(0.95f, 0.75f, 0.34f, 1f));
-                    break;
-                default:
-                    AddGoods(1001, LocalizationKey.UI.SHOP_GOODS_RECOMMEND_DAILYSUPPLY_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_RECOMMEND_DAILYSUPPLY_DESCRIPTION_Raw, 680, LocalizationKey.UI.SHOP_TAG_HOT, new Color(0.18f, 0.92f, 0.88f, 1f));
-                    AddGoods(1002, LocalizationKey.UI.SHOP_GOODS_RECOMMEND_TACTICALMODULE_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_RECOMMEND_TACTICALMODULE_DESCRIPTION_Raw, 1280, LocalizationKey.UI.SHOP_TAG_NEW, new Color(0.58f, 0.8f, 0.55f, 1f));
-                    AddGoods(1003, LocalizationKey.UI.SHOP_GOODS_RECOMMEND_NIGHTOUTFIT_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_RECOMMEND_NIGHTOUTFIT_DESCRIPTION_Raw, 2100, LocalizationKey.UI.SHOP_TAG_DISCOUNT, new Color(0.7f, 0.55f, 1f, 1f));
-                    AddGoods(1004, LocalizationKey.UI.SHOP_GOODS_RECOMMEND_CREDITCRATE_NAME_Raw, LocalizationKey.UI.SHOP_GOODS_RECOMMEND_CREDITCRATE_DESCRIPTION_Raw, 300, LocalizationKey.UI.SHOP_TAG_RECOMMEND, new Color(0.95f, 0.78f, 0.32f, 1f));
-                    break;
-            }
+                var config = configs[i];
+                if (config.Type != category || config.ItemId_Ref == null)
+                {
+                    continue;
+                }
 
-            for (int i = 0; i < 800; i++)
-            {
-                int baseId = (int)category * 1000 + 50 + i;
-                int displayIndex = i + 1;
-                AddGoods(baseId, LocalizationKey.UI.SHOP_GOODS_TEST_NAME(displayIndex.ToString("00")), LocalizationKey.UI.SHOP_GOODS_TEST_DESCRIPTION_Raw, 520 + i * 130, GetCategoryTag(category), GetAccentColor(i));
+                _goods.Add(new ShopGoodsData(config, GetCategoryTag(category), GetAccentColor(i)));
             }
-        }
-
-        private void AddGoods(int id, string name, string description, int price, string tag, Color color)
-        {
-            _goods.Add(new ShopGoodsData
-            {
-                Id = id,
-                NameKey = name,
-                DescriptionKey = description,
-                Price = price,
-                TagKey = tag,
-                AccentColor = color,
-            });
         }
 
         private static readonly Color[] AccentColors =
@@ -157,45 +152,15 @@ namespace GameLogic.UI
 
         private static Color GetAccentColor(int index) => AccentColors[index % AccentColors.Length];
 
-        private static string GetCategoryTag(ShopCategory category)
+        private static string GetCategoryTag(EShopCategory category)
         {
             return category switch
             {
-                ShopCategory.Item => LocalizationKey.UI.SHOP_TAG_ITEM,
-                ShopCategory.Skin => LocalizationKey.UI.SHOP_TAG_SKIN,
-                ShopCategory.Pack => LocalizationKey.UI.SHOP_TAG_PACK,
-                _ => LocalizationKey.UI.SHOP_TAG_HOT
+                EShopCategory.MATERIAL => LocalizationKey.UI.SHOP_TAG_ITEM_Raw,
+                EShopCategory.EQUIPMENT => LocalizationKey.UI.SHOP_TAG_SKIN_Raw,
+                EShopCategory.CONSUMABLE => LocalizationKey.UI.SHOP_TAG_PACK_Raw,
+                _ => LocalizationKey.UI.SHOP_TAG_RECOMMEND_Raw
             };
-        }
-
-        private static string GetCategoryTitle(ShopCategory category)
-        {
-            return category switch
-            {
-                ShopCategory.Item => LocalizationKey.UI.SHOP_CATEGORY_ITEM_TITLE,
-                ShopCategory.Skin => LocalizationKey.UI.SHOP_CATEGORY_SKIN_TITLE,
-                ShopCategory.Pack => LocalizationKey.UI.SHOP_CATEGORY_PACK_TITLE,
-                _ => LocalizationKey.UI.SHOP_CATEGORY_RECOMMEND_TITLE
-            };
-        }
-
-        private static string GetCategoryDescription(ShopCategory category)
-        {
-            return category switch
-            {
-                ShopCategory.Item => LocalizationKey.UI.SHOP_CATEGORY_ITEM_DESCRIPTION_Raw,
-                ShopCategory.Skin => LocalizationKey.UI.SHOP_CATEGORY_SKIN_DESCRIPTION_Raw,
-                ShopCategory.Pack => LocalizationKey.UI.SHOP_CATEGORY_PACK_DESCRIPTION_Raw,
-                _ => LocalizationKey.UI.SHOP_CATEGORY_RECOMMEND_DESCRIPTION_Raw
-            };
-        }
-
-        private enum ShopCategory
-        {
-            Recommend = 1,
-            Item = 2,
-            Skin = 3,
-            Pack = 4
         }
     }
 }

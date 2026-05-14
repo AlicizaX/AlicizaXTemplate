@@ -173,59 +173,49 @@ public static class LocalizationKey
         public static string SHOP_BUTTONCLOSE_Raw => "UI.Shop.ButtonClose";
 
         /// <summary>
-        /// 消耗品、钥匙与功能补给，用于验证基础玩法流程。
-        /// 
-        /// 列表使用RecyclerView 虚拟滚动，切换页签时会刷新数据。
+        /// 来自 Shop 表 MATERIAL 分类的材料道具。列表数据由配置表动态读取。
         /// </summary>
         public static string SHOP_CATEGORY_ITEM_DESCRIPTION => LocalizationService.GetString("UI.Shop.Category.Item.Description");
         public static string SHOP_CATEGORY_ITEM_DESCRIPTION_Raw => "UI.Shop.Category.Item.Description";
 
         /// <summary>
-        /// 道具商城
+        /// 材料商城
         /// </summary>
         public static string SHOP_CATEGORY_ITEM_TITLE => LocalizationService.GetString("UI.Shop.Category.Item.Title");
         public static string SHOP_CATEGORY_ITEM_TITLE_Raw => "UI.Shop.Category.Item.Title";
 
         /// <summary>
-        /// 多个礼包型商城页组合在同一窗口内。
-        /// 
-        /// 当前为模拟数据，后续可以替换为配置表。
+        /// 来自 Shop 表 CONSUMABLE 分类的消耗品。列表数据由配置表动态读取。
         /// </summary>
         public static string SHOP_CATEGORY_PACK_DESCRIPTION => LocalizationService.GetString("UI.Shop.Category.Pack.Description");
         public static string SHOP_CATEGORY_PACK_DESCRIPTION_Raw => "UI.Shop.Category.Pack.Description";
 
         /// <summary>
-        /// 礼包商城
+        /// 消耗品商城
         /// </summary>
         public static string SHOP_CATEGORY_PACK_TITLE => LocalizationService.GetString("UI.Shop.Category.Pack.Title");
         public static string SHOP_CATEGORY_PACK_TITLE_Raw => "UI.Shop.Category.Pack.Title";
 
         /// <summary>
-        /// 来自多个商城类型的轮换商品。
-        /// 
-        /// 点击上方页签切换分类，再从RecyclerView 商品列表中选择供给卡。
-        /// 
-        /// 当前内容用于框架测试。
+        /// 来自 Shop 表 TEST 分类的测试道具。列表数据由配置表动态读取。
         /// </summary>
         public static string SHOP_CATEGORY_RECOMMEND_DESCRIPTION => LocalizationService.GetString("UI.Shop.Category.Recommend.Description");
         public static string SHOP_CATEGORY_RECOMMEND_DESCRIPTION_Raw => "UI.Shop.Category.Recommend.Description";
 
         /// <summary>
-        /// 每日市场
+        /// 测试商城
         /// </summary>
         public static string SHOP_CATEGORY_RECOMMEND_TITLE => LocalizationService.GetString("UI.Shop.Category.Recommend.Title");
         public static string SHOP_CATEGORY_RECOMMEND_TITLE_Raw => "UI.Shop.Category.Recommend.Title";
 
         /// <summary>
-        /// 角色外观与视觉身份商品。
-        /// 
-        /// 此页签用于验证同一个商品模板下的另一组数据。
+        /// 来自 Shop 表 EQUIPMENT 分类的装备道具。列表数据由配置表动态读取。
         /// </summary>
         public static string SHOP_CATEGORY_SKIN_DESCRIPTION => LocalizationService.GetString("UI.Shop.Category.Skin.Description");
         public static string SHOP_CATEGORY_SKIN_DESCRIPTION_Raw => "UI.Shop.Category.Skin.Description";
 
         /// <summary>
-        /// 外观商城
+        /// 装备商城
         /// </summary>
         public static string SHOP_CATEGORY_SKIN_TITLE => LocalizationService.GetString("UI.Shop.Category.Skin.Title");
         public static string SHOP_CATEGORY_SKIN_TITLE_Raw => "UI.Shop.Category.Skin.Title";
@@ -459,25 +449,25 @@ public static class LocalizationKey
         public static string SHOP_SUBTITLE_Raw => "UI.Shop.SubTitle";
 
         /// <summary>
-        /// 道具
+        /// 材料
         /// </summary>
         public static string SHOP_TABITEM => LocalizationService.GetString("UI.Shop.TabItem");
         public static string SHOP_TABITEM_Raw => "UI.Shop.TabItem";
 
         /// <summary>
-        /// 礼包
+        /// 消耗品
         /// </summary>
         public static string SHOP_TABPACK => LocalizationService.GetString("UI.Shop.TabPack");
         public static string SHOP_TABPACK_Raw => "UI.Shop.TabPack";
 
         /// <summary>
-        /// 推荐
+        /// 测试
         /// </summary>
         public static string SHOP_TABRECOMMEND => LocalizationService.GetString("UI.Shop.TabRecommend");
         public static string SHOP_TABRECOMMEND_Raw => "UI.Shop.TabRecommend";
 
         /// <summary>
-        /// 外观
+        /// 装备
         /// </summary>
         public static string SHOP_TABSKIN => LocalizationService.GetString("UI.Shop.TabSkin");
         public static string SHOP_TABSKIN_Raw => "UI.Shop.TabSkin";
@@ -495,7 +485,7 @@ public static class LocalizationKey
         public static string SHOP_TAG_HOT_Raw => "UI.Shop.Tag.Hot";
 
         /// <summary>
-        /// 道具
+        /// 材料
         /// </summary>
         public static string SHOP_TAG_ITEM => LocalizationService.GetString("UI.Shop.Tag.Item");
         public static string SHOP_TAG_ITEM_Raw => "UI.Shop.Tag.Item";
@@ -507,19 +497,19 @@ public static class LocalizationKey
         public static string SHOP_TAG_NEW_Raw => "UI.Shop.Tag.New";
 
         /// <summary>
-        /// 礼包
+        /// 消耗品
         /// </summary>
         public static string SHOP_TAG_PACK => LocalizationService.GetString("UI.Shop.Tag.Pack");
         public static string SHOP_TAG_PACK_Raw => "UI.Shop.Tag.Pack";
 
         /// <summary>
-        /// 推荐
+        /// 测试
         /// </summary>
         public static string SHOP_TAG_RECOMMEND => LocalizationService.GetString("UI.Shop.Tag.Recommend");
         public static string SHOP_TAG_RECOMMEND_Raw => "UI.Shop.Tag.Recommend";
 
         /// <summary>
-        /// 外观
+        /// 装备
         /// </summary>
         public static string SHOP_TAG_SKIN => LocalizationService.GetString("UI.Shop.Tag.Skin");
         public static string SHOP_TAG_SKIN_Raw => "UI.Shop.Tag.Skin";

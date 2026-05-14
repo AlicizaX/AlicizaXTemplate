@@ -179,65 +179,65 @@
     "sheet": "Hotfix",
     "id": 10060002,
     "key": "UI.Shop.Category.Item.Description",
-    "ChineseSimplified": "消耗品、钥匙与功能补给，用于验证基础玩法流程。\n\n列表使用RecyclerView 虚拟滚动，切换页签时会刷新数据。",
-    "English": "Consumables, keys, and utility supplies for validating the basic gameplay\nflow.\n\n\nThe list uses RecyclerView virtual scrolling and refreshes data\nwhen tabs change.",
-    "Japanese": "消耗品、キー、機能補給品で基本的なゲームプレイフローを検証します。\n\nリストはRecyclerView の仮想スクロールを使用し、タブ切り替え時にデータを更新します。"
+    "ChineseSimplified": "来自 Shop 表 MATERIAL 分类的材料道具。列表数据由配置表动态读取。",
+    "English": "Material items from the Shop table MATERIAL category. The list is loaded dynamically from configuration.",
+    "Japanese": "Shop表のMATERIALカテゴリの素材アイテムです。一覧データは設定表から動的に読み込みます。"
   },
   {
     "sheet": "Hotfix",
     "id": 10060003,
     "key": "UI.Shop.Category.Item.Title",
-    "ChineseSimplified": "道具商城",
-    "English": "Item Shop",
-    "Japanese": "アイテムショップ"
+    "ChineseSimplified": "材料商城",
+    "English": "Material Shop",
+    "Japanese": "素材ショップ"
   },
   {
     "sheet": "Hotfix",
     "id": 10060004,
     "key": "UI.Shop.Category.Pack.Description",
-    "ChineseSimplified": "多个礼包型商城页组合在同一窗口内。\n\n当前为模拟数据，后续可以替换为配置表。",
-    "English": "Multiple pack-style shop pages are combined in one window.\n\n\nThe\ncurrent data is simulated and can later be replaced by configuration tables.",
-    "Japanese": "複数のパック型ショップページを1 つのウィンドウにまとめています。\n\n現在は模擬データで、後から設定表に置き換えられます。"
+    "ChineseSimplified": "来自 Shop 表 CONSUMABLE 分类的消耗品。列表数据由配置表动态读取。",
+    "English": "Consumables from the Shop table CONSUMABLE category. The list is loaded dynamically from configuration.",
+    "Japanese": "Shop表のCONSUMABLEカテゴリの消耗品です。一覧データは設定表から動的に読み込みます。"
   },
   {
     "sheet": "Hotfix",
     "id": 10060005,
     "key": "UI.Shop.Category.Pack.Title",
-    "ChineseSimplified": "礼包商城",
-    "English": "Pack Shop",
-    "Japanese": "パックショップ"
+    "ChineseSimplified": "消耗品商城",
+    "English": "Consumable Shop",
+    "Japanese": "消耗品ショップ"
   },
   {
     "sheet": "Hotfix",
     "id": 10060006,
     "key": "UI.Shop.Category.Recommend.Description",
-    "ChineseSimplified": "来自多个商城类型的轮换商品。\n\n点击上方页签切换分类，再从RecyclerView 商品列表中选择供给卡。\n\n当前内容用于框架测试。",
-    "English": "Rotating goods from multiple shop categories.\n\n\nUse the tabs above\nto switch categories, then choose a supply card from the RecyclerView list.\n\n\nCurrent\ncontent is for framework testing.",
-    "Japanese": "複数のショップカテゴリから選ばれたローテーション商品です。\n\n上部タブでカテゴリを切り替え、RecyclerViewの商品リストから補給カードを選択します。\n\n現在の内容はフレームワークテスト用です。"
+    "ChineseSimplified": "来自 Shop 表 TEST 分类的测试道具。列表数据由配置表动态读取。",
+    "English": "Test items from the Shop table TEST category. The list is loaded dynamically from configuration.",
+    "Japanese": "Shop表のTESTカテゴリのテストアイテムです。一覧データは設定表から動的に読み込みます。"
   },
   {
     "sheet": "Hotfix",
     "id": 10060007,
     "key": "UI.Shop.Category.Recommend.Title",
-    "ChineseSimplified": "每日市场",
-    "English": "Daily Market",
-    "Japanese": "デイリーマーケット"
+    "ChineseSimplified": "测试商城",
+    "English": "Test Shop",
+    "Japanese": "テストショップ"
   },
   {
     "sheet": "Hotfix",
     "id": 10060008,
     "key": "UI.Shop.Category.Skin.Description",
-    "ChineseSimplified": "角色外观与视觉身份商品。\n\n此页签用于验证同一个商品模板下的另一组数据。",
-    "English": "Character appearance and visual identity goods.\n\n\nThis tab validates\nanother data set under the same item template.",
-    "Japanese": "キャラクター外観とビジュアル識別用の商品です。\n\nこのタブは同じ商品テンプレートで別データセットを検証します。"
+    "ChineseSimplified": "来自 Shop 表 EQUIPMENT 分类的装备道具。列表数据由配置表动态读取。",
+    "English": "Equipment items from the Shop table EQUIPMENT category. The list is loaded dynamically from configuration.",
+    "Japanese": "Shop表のEQUIPMENTカテゴリの装備アイテムです。一覧データは設定表から動的に読み込みます。"
   },
   {
     "sheet": "Hotfix",
     "id": 10060009,
     "key": "UI.Shop.Category.Skin.Title",
-    "ChineseSimplified": "外观商城",
-    "English": "Skin Shop",
-    "Japanese": "ショップ外観"
+    "ChineseSimplified": "装备商城",
+    "English": "Equipment Shop",
+    "Japanese": "装備ショップ"
   },
   {
     "sheet": "Hotfix",
@@ -539,33 +539,33 @@
     "sheet": "Hotfix",
     "id": 10060047,
     "key": "UI.Shop.TabItem",
-    "ChineseSimplified": "道具",
-    "English": "Items",
-    "Japanese": "アイテム"
+    "ChineseSimplified": "材料",
+    "English": "Materials",
+    "Japanese": "素材"
   },
   {
     "sheet": "Hotfix",
     "id": 10060048,
     "key": "UI.Shop.TabPack",
-    "ChineseSimplified": "礼包",
-    "English": "Packs",
-    "Japanese": "パック"
+    "ChineseSimplified": "消耗品",
+    "English": "Consumables",
+    "Japanese": "消耗品"
   },
   {
     "sheet": "Hotfix",
     "id": 10060049,
     "key": "UI.Shop.TabRecommend",
-    "ChineseSimplified": "推荐",
-    "English": "Recommended",
-    "Japanese": "おすすめ"
+    "ChineseSimplified": "测试",
+    "English": "Test",
+    "Japanese": "テスト"
   },
   {
     "sheet": "Hotfix",
     "id": 10060050,
     "key": "UI.Shop.TabSkin",
-    "ChineseSimplified": "外观",
-    "English": "Skins",
-    "Japanese": "外観"
+    "ChineseSimplified": "装备",
+    "English": "Equipment",
+    "Japanese": "装備"
   },
   {
     "sheet": "Hotfix",
@@ -587,9 +587,9 @@
     "sheet": "Hotfix",
     "id": 10060053,
     "key": "UI.Shop.Tag.Item",
-    "ChineseSimplified": "道具",
-    "English": "Item",
-    "Japanese": "アイテム"
+    "ChineseSimplified": "材料",
+    "English": "Material",
+    "Japanese": "素材"
   },
   {
     "sheet": "Hotfix",
@@ -603,25 +603,25 @@
     "sheet": "Hotfix",
     "id": 10060055,
     "key": "UI.Shop.Tag.Pack",
-    "ChineseSimplified": "礼包",
-    "English": "Pack",
-    "Japanese": "パック"
+    "ChineseSimplified": "消耗品",
+    "English": "Consumable",
+    "Japanese": "消耗品"
   },
   {
     "sheet": "Hotfix",
     "id": 10060056,
     "key": "UI.Shop.Tag.Recommend",
-    "ChineseSimplified": "推荐",
-    "English": "Recommended",
-    "Japanese": "おすすめ"
+    "ChineseSimplified": "测试",
+    "English": "Test",
+    "Japanese": "テスト"
   },
   {
     "sheet": "Hotfix",
     "id": 10060057,
     "key": "UI.Shop.Tag.Skin",
-    "ChineseSimplified": "外观",
-    "English": "Skin",
-    "Japanese": "外観"
+    "ChineseSimplified": "装备",
+    "English": "Equipment",
+    "Japanese": "装備"
   },
   {
     "sheet": "Hotfix",

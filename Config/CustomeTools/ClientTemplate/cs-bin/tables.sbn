@@ -1,0 +1,149 @@
+using System;
+using Luban;
+using AlicizaX;
+using Cysharp.Threading.Tasks;
+
+{{namespace_with_grace_begin __namespace}}
+
+    public interface IConfigBytesLoader
+    {
+        UniTask<ByteBuf> LoadCommonAsync(string file);
+
+        UniTask<ByteBuf> LoadLocalizedAsync(string file);
+    }
+
+    public partial interface IConfigService : IService
+    {
+        {{~for table in __tables ~}}
+        {{~if table.comment != '' ~}}
+        /// <summary>
+        /// {{escape_comment table.comment}}
+        /// </summary>
+        {{~end~}}
+        public {{table.full_name}} {{format_property_name __code_style table.name}} { get; }
+        {{~end~}}
+
+        UniTask Initialize(IConfigBytesLoader loader);
+    }
+     
+    public partial class {{__name}} : ServiceBase, IConfigService
+    {
+        private IConfigBytesLoader _loader;
+        private bool _isLoaded;
+
+        {{~for table in __tables ~}}
+        {{~if table.comment != '' ~}}
+        /// <summary>
+        /// {{escape_comment table.comment}}
+        /// </summary>
+        {{~end~}}
+        public {{table.full_name}} {{format_property_name __code_style table.name}} { private set; get; }
+        {{~end~}}
+
+        public async UniTask Initialize(IConfigBytesLoader loader)
+        {
+            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
+            if (_isLoaded)
+            {
+                await ReloadLocalizedAsync();
+                return;
+            }
+
+            await LoadAsync();
+        }
+
+        private async UniTask LoadAsync()
+        {
+            EnsureLoader();
+
+            if (_isLoaded)
+            {
+                return;
+            }
+
+            var loadTasks = new System.Collections.Generic.List<UniTask>();
+
+            {{~for table in __tables ~}}
+            {{format_property_name __code_style table.name}} = new {{table.full_name}}(() => _loader.LoadCommonAsync("{{table.output_data_file}}"));
+            loadTasks.Add({{format_property_name __code_style table.name}}.LoadAsync());
+            {{~end~}}
+
+            PostLoadAsync(ref loadTasks);
+
+            await UniTask.WhenAll(loadTasks);
+
+            ResolveRef();
+            PostLocalizedTablesLoaded();
+            _isLoaded = true;
+            TranslateText();
+        }
+
+        private async UniTask ReloadLocalizedAsync()
+        {
+            EnsureLoader();
+
+            if (!_isLoaded)
+            {
+                await LoadAsync();
+                return;
+            }
+
+            var loadTasks = new System.Collections.Generic.List<UniTask>();
+
+            PostReloadLocalizedAsync(ref loadTasks);
+
+            await UniTask.WhenAll(loadTasks);
+
+            PostLocalizedTablesLoaded();
+            TranslateText();
+        }
+
+        private void ResolveRef()
+        {
+            {{~for table in __tables ~}}
+            {{format_property_name __code_style table.name}}.ResolveRef(this);
+            {{~end~}}
+            PostResolveRef();
+        }
+
+        public void TranslateText()
+        {
+            if (!_isLoaded)
+            {
+                return;
+            }
+
+            string Translator(string key)
+            {
+                string value = key;
+                PostTranslateText(key, ref value);
+                return value;
+            }
+            {{~for table in __tables ~}}
+            {{format_property_name __code_style table.name}}.TranslateText(Translator);
+            {{~end~}}
+        }
+
+        private void EnsureLoader()
+        {
+            if (_loader == null)
+            {
+                throw new InvalidOperationException("ConfigService is not initialized. Call Initialize(loader) first.");
+            }
+        }
+
+        protected override void OnInitialize()
+        {
+        }
+
+        protected override void OnDestroyService()
+        {
+        }
+
+        partial void PostLoadAsync(ref System.Collections.Generic.List<UniTask> loadTasks);
+        partial void PostReloadLocalizedAsync(ref System.Collections.Generic.List<UniTask> loadTasks);
+        partial void PostLocalizedTablesLoaded();
+        partial void PostResolveRef();
+        partial void PostTranslateText(string key, ref string value);
+    }
+{{namespace_with_grace_end __namespace}}

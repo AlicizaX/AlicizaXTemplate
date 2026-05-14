@@ -1,4 +1,5 @@
 using AlicizaX.UI;
+using Game.Config.Tables;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -6,31 +7,27 @@ namespace GameLogic.UI
 {
     public sealed class ShopGoodsData : ISimpleViewData
     {
-        public int Id;
-        public string NameKey;
-        public string NameArg;
-        public string DescriptionKey;
-        public int Price;
-        public string TagKey;
-        public Color AccentColor;
+        private readonly ShopConfig _shopConfig;
+        private readonly ItemConfig _itemConfig;
 
-        public string Name => GetLocalized(NameKey, NameArg);
-        public string Description => GetLocalized(DescriptionKey);
-        public string PriceText => LocalizationKey.UI.COMMON_CREDITPRICE(Price.ToString());
-        public string Tag => GetLocalized(TagKey);
-
-        private static string GetLocalized(string key, string arg = null)
+        public ShopGoodsData(ShopConfig shopConfig, string tagKey, Color accentColor)
         {
-            if (string.IsNullOrEmpty(key))
-            {
-                return string.Empty;
-            }
-
-            return string.IsNullOrEmpty(arg)
-                ? GameApp.Localization.GetString(key)
-                : GameApp.Localization.GetString(key, arg);
+            _shopConfig = shopConfig;
+            _itemConfig = shopConfig.ItemId_Ref;
+            TagKey = tagKey;
+            AccentColor = accentColor;
         }
 
+        public int Id => _shopConfig.Id;
+        public int ItemId => _itemConfig.Id;
+        public string Name => _itemConfig.Name;
+        public string Description => _itemConfig.Desc;
+        public int Price => _itemConfig.Price;
+        public string Icon => _itemConfig.Icon;
+        private string TagKey { get; }
+        public string Tag => GameApp.Localization.GetString(TagKey);
+        public Color AccentColor { get; }
+        public string PriceText => LocalizationKey.UI.COMMON_CREDITPRICE(Price.ToString());
     }
 
     public sealed class ShopGoodsItemRender : ItemRender<ShopGoodsData, UIShopGoodsItemViewHolder>
@@ -43,6 +40,7 @@ namespace GameLogic.UI
             baseui.DescriptionText.text = data.Description;
             baseui.PriceText.text = data.PriceText;
             baseui.TagText.text = data.Tag;
+            baseui.ItemIcon.SetSprite(data.Icon);
             baseui.Icon.color = data.AccentColor;
             baseui.Background.color = new Color(0.035f, 0.04f, 0.04f, 0.9f);
             baseui.SelectedFrame.color = new Color(data.AccentColor.r, data.AccentColor.g, data.AccentColor.b, 0.18f);

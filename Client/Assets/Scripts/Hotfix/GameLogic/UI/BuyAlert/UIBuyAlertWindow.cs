@@ -28,7 +28,7 @@ namespace GameLogic.UI
         protected override void OnOpen()
         {
             _goodsData = UserData as ShopGoodsData;
-            _unitPrice = _goodsData.Price;
+            _unitPrice = _goodsData?.Price ?? 0;
             _quantity = 1;
             RefreshView();
         }
@@ -48,12 +48,12 @@ namespace GameLogic.UI
 
             if (_playerDataService.TryBuy(_goodsData, _quantity, out int totalPrice))
             {
-                Log.Info($"确认购买：{_goodsData.Name} x{_quantity}，总价 {totalPrice} 信用点");
+                Log.Info(LocalizationKey.Log.BUY_CONFIRMED(_goodsData.Name, _quantity.ToString(), totalPrice.ToString()));
                 CloseSelf();
                 return;
             }
 
-            Log.Info($"信用点不足，无法购买：{_goodsData.Name} x{_quantity}");
+            Log.Info(LocalizationKey.Log.BUY_INSUFFICIENT(_goodsData.Name, _quantity.ToString()));
         }
 
         private void OnBtnMinusClick()
@@ -95,9 +95,17 @@ namespace GameLogic.UI
 
         private void RefreshView()
         {
-            baseui.TextTitle.text = "购买确认";
-            baseui.TextItemName.text = _goodsData != null ? _goodsData.Name : "未知道具";
-            baseui.ImgItemIcon.color = _goodsData != null ? _goodsData.AccentColor : Color.white;
+            baseui.TextTitle.text = LocalizationKey.UI.BUY_TITLE;
+            baseui.TextItemName.text = _goodsData != null ? _goodsData.Name : LocalizationKey.UI.BUY_UNKNOWNITEM;
+            if (_goodsData != null)
+            {
+                baseui.ImgItemIcon.SetSprite(_goodsData.Icon);
+                baseui.ImgItemIcon.color = _goodsData.AccentColor;
+            }
+            else
+            {
+                baseui.ImgItemIcon.color = Color.white;
+            }
             baseui.InputQuantity.contentType = TMP_InputField.ContentType.IntegerNumber;
             baseui.InputQuantity.SetTextWithoutNotify(_quantity.ToString());
             RefreshTotalPrice();
@@ -105,7 +113,8 @@ namespace GameLogic.UI
 
         private void RefreshTotalPrice()
         {
-            baseui.TextTotalPrice.text = $"总价格：{_unitPrice * _quantity} 信用点";
+            string totalPrice = LocalizationKey.UI.COMMON_CREDITPRICE((_unitPrice * _quantity).ToStringNonAlloc());
+            baseui.TextTotalPrice.text = LocalizationKey.UI.BUY_TOTALPRICE(totalPrice);
         }
     }
 }
