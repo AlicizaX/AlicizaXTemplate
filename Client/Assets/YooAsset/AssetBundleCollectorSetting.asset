@@ -77,13 +77,29 @@ MonoBehaviour:
       AssetTags: Configs
       ActiveRuleName: EnableGroup
       Collectors:
-      - CollectPath: Assets/Bundles/Configs
-        CollectorGUID: dd2928019aef34248af368b99bc53bea
+      - CollectPath: Assets/Bundles/Configs/bytes
+        CollectorGUID: afddbfe87a53e9049bf031ee18842f87
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: WEBGL_PRELOAD
+        UserData: 
+      - CollectPath: Assets/Bundles/Configs/sciptableObject
+        CollectorGUID: 1023078965d7ae54c9aeb300a44e9ee9
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+      - CollectPath: Assets/Bundles/Configs/json
+        CollectorGUID: c68e4b7f243cf484bac9c36ec1ee5a4f
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
         UserData: 
     - GroupName: DLL
       GroupDesc: "\u4EE3\u7801"

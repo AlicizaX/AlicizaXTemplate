@@ -1,0 +1,642 @@
+[
+  {
+    "sheet": "Hotfix",
+    "id": 10010001,
+    "key": "Log.Buy.Confirmed",
+    "ChineseSimplified": "确认购买：{0} x{1}，总价 {2}",
+    "English": "Purchase confirmed: {0} x{1}, total {2}",
+    "Japanese": "購入確認：{0} x{1}、合計 {2}"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10010002,
+    "key": "Log.Buy.Insufficient",
+    "ChineseSimplified": "信用点不足，无法购买：{0}x{1}",
+    "English": "Not enough credits to buy: {0} x{1}",
+    "Japanese": "クレジット不足のため購入不可：{0}x{1}"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10020001,
+    "key": "Log.Home.BagClick",
+    "ChineseSimplified": "点击背包按钮",
+    "English": "Bag button clicked",
+    "Japanese": "バッグボタンをクリック"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10020002,
+    "key": "Log.Home.ExitClick",
+    "ChineseSimplified": "点击退出按钮",
+    "English": "Exit button clicked",
+    "Japanese": "終了ボタンをクリック"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10020003,
+    "key": "Log.Home.RoleClick",
+    "ChineseSimplified": "点击角色属性按钮",
+    "English": "Character button clicked",
+    "Japanese": "キャラクターボタンをクリック"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10020004,
+    "key": "Log.Home.TestTipsClick",
+    "ChineseSimplified": "点击测试提示按钮",
+    "English": "Test tips button clicked",
+    "Japanese": "テストヒントボタンをクリック"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10030001,
+    "key": "UI.Buy.ButtonConfirm",
+    "ChineseSimplified": "确认购买",
+    "English": "Confirm",
+    "Japanese": "購入する"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10030002,
+    "key": "UI.Buy.FooterHint",
+    "ChineseSimplified": "输入数量或使用 +/- 调整购买数量",
+    "English": "Enter a quantity or use +/- to adjust it",
+    "Japanese": "数量を入力、または +/- で調整"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10030003,
+    "key": "UI.Buy.QuantityPlaceholder",
+    "ChineseSimplified": "数量",
+    "English": "Quantity",
+    "Japanese": "数量"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10030004,
+    "key": "UI.Buy.Title",
+    "ChineseSimplified": "购买确认",
+    "English": "Confirm Purchase",
+    "Japanese": "購入確認"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10030005,
+    "key": "UI.Buy.TotalPrice",
+    "ChineseSimplified": "总价格：{0}",
+    "English": "Total Price: {0}",
+    "Japanese": "合計価格：{0}"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10030006,
+    "key": "UI.Buy.UnknownItem",
+    "ChineseSimplified": "未知道具",
+    "English": "Unknown Item",
+    "Japanese": "不明なアイテム"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10040001,
+    "key": "UI.Common.CreditPrice",
+    "ChineseSimplified": "{0} 信用点",
+    "English": "{0} Credits",
+    "Japanese": "{0} クレジット"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10050001,
+    "key": "UI.Home.ButtonBag",
+    "ChineseSimplified": "背包",
+    "English": "Bag",
+    "Japanese": "バッグ"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10050002,
+    "key": "UI.Home.ButtonExit",
+    "ChineseSimplified": "退出",
+    "English": "Exit",
+    "Japanese": "終了"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10050003,
+    "key": "UI.Home.ButtonRole",
+    "ChineseSimplified": "角色",
+    "English": "Character",
+    "Japanese": "キャラクター"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10050004,
+    "key": "UI.Home.ButtonShop",
+    "ChineseSimplified": "商店",
+    "English": "Shop",
+    "Japanese": "ショップ"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10050005,
+    "key": "UI.Home.ButtonTips",
+    "ChineseSimplified": "提示",
+    "English": "Tips",
+    "Japanese": "ヒント"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10050006,
+    "key": "UI.Home.FooterHint",
+    "ChineseSimplified": "点击按钮测试 UI 逻辑 / ESC 返回",
+    "English": "Click buttons to test UI logic / ESC to return",
+    "Japanese": "ボタンで UI ロジックをテスト/ ESC で戻る"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10050007,
+    "key": "UI.Home.NoticeContent",
+    "ChineseSimplified": "欢迎进入测试主界面。右上角可以打开商店、背包、角色属性和测试提示。\n\n当前界面用于验证UI 框架、按钮绑定和默认过场动画。",
+    "English": "Welcome to the test home screen. Use the top-right buttons to open Shop,\nBag, Character, and Test Tips.\n\n\nThis screen verifies the UI framework,\nbutton binding, and default transition animation.",
+    "Japanese": "テスト用メイン画面へようこそ。右上のボタンからショップ、バッグ、キャラクター、テストヒントを開けます。\n\nこの画面はUI フレームワーク、ボタンバインド、デフォルト遷移アニメーションの確認用です。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10050008,
+    "key": "UI.Home.NoticeTitle",
+    "ChineseSimplified": "任务公告",
+    "English": "Mission Notice",
+    "Japanese": "ミッション告知"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060001,
+    "key": "UI.Shop.ButtonClose",
+    "ChineseSimplified": "退出",
+    "English": "Exit",
+    "Japanese": "終了"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060002,
+    "key": "UI.Shop.Category.Item.Description",
+    "ChineseSimplified": "消耗品、钥匙与功能补给，用于验证基础玩法流程。\n\n列表使用RecyclerView 虚拟滚动，切换页签时会刷新数据。",
+    "English": "Consumables, keys, and utility supplies for validating the basic gameplay\nflow.\n\n\nThe list uses RecyclerView virtual scrolling and refreshes data\nwhen tabs change.",
+    "Japanese": "消耗品、キー、機能補給品で基本的なゲームプレイフローを検証します。\n\nリストはRecyclerView の仮想スクロールを使用し、タブ切り替え時にデータを更新します。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060003,
+    "key": "UI.Shop.Category.Item.Title",
+    "ChineseSimplified": "道具商城",
+    "English": "Item Shop",
+    "Japanese": "アイテムショップ"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060004,
+    "key": "UI.Shop.Category.Pack.Description",
+    "ChineseSimplified": "多个礼包型商城页组合在同一窗口内。\n\n当前为模拟数据，后续可以替换为配置表。",
+    "English": "Multiple pack-style shop pages are combined in one window.\n\n\nThe\ncurrent data is simulated and can later be replaced by configuration tables.",
+    "Japanese": "複数のパック型ショップページを1 つのウィンドウにまとめています。\n\n現在は模擬データで、後から設定表に置き換えられます。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060005,
+    "key": "UI.Shop.Category.Pack.Title",
+    "ChineseSimplified": "礼包商城",
+    "English": "Pack Shop",
+    "Japanese": "パックショップ"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060006,
+    "key": "UI.Shop.Category.Recommend.Description",
+    "ChineseSimplified": "来自多个商城类型的轮换商品。\n\n点击上方页签切换分类，再从RecyclerView 商品列表中选择供给卡。\n\n当前内容用于框架测试。",
+    "English": "Rotating goods from multiple shop categories.\n\n\nUse the tabs above\nto switch categories, then choose a supply card from the RecyclerView list.\n\n\nCurrent\ncontent is for framework testing.",
+    "Japanese": "複数のショップカテゴリから選ばれたローテーション商品です。\n\n上部タブでカテゴリを切り替え、RecyclerViewの商品リストから補給カードを選択します。\n\n現在の内容はフレームワークテスト用です。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060007,
+    "key": "UI.Shop.Category.Recommend.Title",
+    "ChineseSimplified": "每日市场",
+    "English": "Daily Market",
+    "Japanese": "デイリーマーケット"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060008,
+    "key": "UI.Shop.Category.Skin.Description",
+    "ChineseSimplified": "角色外观与视觉身份商品。\n\n此页签用于验证同一个商品模板下的另一组数据。",
+    "English": "Character appearance and visual identity goods.\n\n\nThis tab validates\nanother data set under the same item template.",
+    "Japanese": "キャラクター外観とビジュアル識別用の商品です。\n\nこのタブは同じ商品テンプレートで別データセットを検証します。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060009,
+    "key": "UI.Shop.Category.Skin.Title",
+    "ChineseSimplified": "外观商城",
+    "English": "Skin Shop",
+    "Japanese": "ショップ外観"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060010,
+    "key": "UI.Shop.Currency",
+    "ChineseSimplified": "信用点：{0}",
+    "English": "Credits: {0}",
+    "Japanese": "クレジット：{0}"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060011,
+    "key": "UI.Shop.FooterHint",
+    "ChineseSimplified": "点击商品记录测试购买日志/ ESC 返回",
+    "English": "Click an item to test purchase logs / ESC to return",
+    "Japanese": "商品をクリックして購入ログをテスト/ ESC で戻る"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060012,
+    "key": "UI.Shop.Goods.Item.AccessKey.Description",
+    "ChineseSimplified": "用于锁定区域的临时授权卡。",
+    "English": "A temporary authorization card for locked areas.",
+    "Japanese": "ロック区域用の一時認証カードです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060013,
+    "key": "UI.Shop.Goods.Item.AccessKey.Name",
+    "ChineseSimplified": "通行密钥",
+    "English": "Access Key",
+    "Japanese": "通行キー"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060014,
+    "key": "UI.Shop.Goods.Item.EnergyBattery.Description",
+    "ChineseSimplified": "原型设备可复用的备用电池。",
+    "English": "A reusable spare battery for prototype devices.",
+    "Japanese": "試作装置用の再利用可能な予備電池です。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060015,
+    "key": "UI.Shop.Goods.Item.EnergyBattery.Name",
+    "ChineseSimplified": "能量电池",
+    "English": "Energy Battery",
+    "Japanese": "エネルギー電池"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060016,
+    "key": "UI.Shop.Goods.Item.Medkit.Description",
+    "ChineseSimplified": "用于实地测试的即时恢复补给。",
+    "English": "Instant recovery supplies for field testing.",
+    "Japanese": "フィールドテスト用の即時回復補給品です。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060017,
+    "key": "UI.Shop.Goods.Item.Medkit.Name",
+    "ChineseSimplified": "急救包",
+    "English": "Medkit",
+    "Japanese": "救急キット"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060018,
+    "key": "UI.Shop.Goods.Item.SignalMarker.Description",
+    "ChineseSimplified": "为导航测试记录一个临时位置点。",
+    "English": "Records a temporary location point for navigation tests.",
+    "Japanese": "ナビゲーションテスト用の一時位置を記録します。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060019,
+    "key": "UI.Shop.Goods.Item.SignalMarker.Name",
+    "ChineseSimplified": "信号标记",
+    "English": "Signal Marker",
+    "Japanese": "信号マーカー"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060020,
+    "key": "UI.Shop.Goods.Pack.ExplorationPack.Description",
+    "ChineseSimplified": "探索循环所需的消耗品与钥匙。",
+    "English": "Consumables and keys needed for exploration loops.",
+    "Japanese": "探索ループに必要な消耗品とキーです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060021,
+    "key": "UI.Shop.Goods.Pack.ExplorationPack.Name",
+    "ChineseSimplified": "探索礼包",
+    "English": "Exploration Pack",
+    "Japanese": "探索パック"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060022,
+    "key": "UI.Shop.Goods.Pack.OutfitPack.Description",
+    "ChineseSimplified": "三件外观组合的折扣套装。",
+    "English": "A discounted bundle of three appearance items.",
+    "Japanese": "3 種の外観アイテムをまとめた割引セットです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060023,
+    "key": "UI.Shop.Goods.Pack.OutfitPack.Name",
+    "ChineseSimplified": "外观礼包",
+    "English": "Outfit Pack",
+    "Japanese": "外観パック"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060024,
+    "key": "UI.Shop.Goods.Pack.StarterPack.Description",
+    "ChineseSimplified": "用于首次流程验证的基础道具包。",
+    "English": "A basic item pack for first-flow validation.",
+    "Japanese": "初回フロー検証用の基本アイテムパックです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060025,
+    "key": "UI.Shop.Goods.Pack.StarterPack.Name",
+    "ChineseSimplified": "新手礼包",
+    "English": "Starter Pack",
+    "Japanese": "スターターパック"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060026,
+    "key": "UI.Shop.Goods.Pack.WeeklySupply.Description",
+    "ChineseSimplified": "按商城周期刷新的限时礼包。",
+    "English": "A limited-time pack refreshed on the shop cycle.",
+    "Japanese": "ショップ周期で更新される期間限定パックです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060027,
+    "key": "UI.Shop.Goods.Pack.WeeklySupply.Name",
+    "ChineseSimplified": "每周补给",
+    "English": "Weekly Supply",
+    "Japanese": "ウィークリー補給"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060028,
+    "key": "UI.Shop.Goods.Recommend.CreditCrate.Description",
+    "ChineseSimplified": "用于商城列表测试的模拟货币包。",
+    "English": "A mock currency pack for shop list testing.",
+    "Japanese": "ショップリストテスト用の模擬通貨パックです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060029,
+    "key": "UI.Shop.Goods.Recommend.CreditCrate.Name",
+    "ChineseSimplified": "信用点箱",
+    "English": "Credit Crate",
+    "Japanese": "クレジット箱"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060030,
+    "key": "UI.Shop.Goods.Recommend.DailySupply.Description",
+    "ChineseSimplified": "核心消耗品的每日折扣组合。",
+    "English": "A daily discount bundle of core consumables.",
+    "Japanese": "主要消耗品のデイリー割引セットです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060031,
+    "key": "UI.Shop.Goods.Recommend.DailySupply.Name",
+    "ChineseSimplified": "每日补给",
+    "English": "Daily Supply",
+    "Japanese": "デイリー補給"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060032,
+    "key": "UI.Shop.Goods.Recommend.NightOutfit.Description",
+    "ChineseSimplified": "适配暗色菜单场景的高对比外观。",
+    "English": "A high-contrast outfit suited for dark menu scenes.",
+    "Japanese": "暗いメニューシーン向けの高コントラスト外観です。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060033,
+    "key": "UI.Shop.Goods.Recommend.NightOutfit.Name",
+    "ChineseSimplified": "夜行外观",
+    "English": "Night Ops Outfit",
+    "Japanese": "ナイト作戦外観"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060034,
+    "key": "UI.Shop.Goods.Recommend.TacticalModule.Description",
+    "ChineseSimplified": "用于验证购买流程的可复用模块。",
+    "English": "A reusable module for validating the purchase flow.",
+    "Japanese": "購入フロー検証用の再利用可能なモジュールです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060035,
+    "key": "UI.Shop.Goods.Recommend.TacticalModule.Name",
+    "ChineseSimplified": "战术模块",
+    "English": "Tactical Module",
+    "Japanese": "戦術モジュール"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060036,
+    "key": "UI.Shop.Goods.Skin.AshHelmet.Description",
+    "ChineseSimplified": "适合城市关卡的哑光战术头盔。",
+    "English": "A matte tactical helmet for urban levels.",
+    "Japanese": "都市ステージ向けのマットな戦術ヘルメットです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060037,
+    "key": "UI.Shop.Goods.Skin.AshHelmet.Name",
+    "ChineseSimplified": "灰烬头盔",
+    "English": "Ash Helmet",
+    "Japanese": "アッシュヘルメット"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060038,
+    "key": "UI.Shop.Goods.Skin.GhostMask.Description",
+    "ChineseSimplified": "低对比度标记的极简面具。",
+    "English": "A minimalist mask with low-contrast markings.",
+    "Japanese": "低コントラストの模様が入ったミニマルなマスクです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060039,
+    "key": "UI.Shop.Goods.Skin.GhostMask.Name",
+    "ChineseSimplified": "幽灵面具",
+    "English": "Ghost Mask",
+    "Japanese": "ゴーストマスク"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060040,
+    "key": "UI.Shop.Goods.Skin.NeonCoat.Description",
+    "ChineseSimplified": "带有青色细光带的暗色外套。",
+    "English": "A dark coat with thin cyan light strips.",
+    "Japanese": "シアンの細いライトラインが入った暗色コートです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060041,
+    "key": "UI.Shop.Goods.Skin.NeonCoat.Name",
+    "ChineseSimplified": "霓虹外套",
+    "English": "Neon Coat",
+    "Japanese": "ネオンコート"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060042,
+    "key": "UI.Shop.Goods.Skin.WandererBadge.Description",
+    "ChineseSimplified": "来自地下标识风格的小型徽章。",
+    "English": "A small badge inspired by underground signage.",
+    "Japanese": "地下標識風の小型バッジです。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060043,
+    "key": "UI.Shop.Goods.Skin.WandererBadge.Name",
+    "ChineseSimplified": "流浪徽章",
+    "English": "Wanderer Badge",
+    "Japanese": "放浪者バッジ"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060044,
+    "key": "UI.Shop.Goods.Test.Description",
+    "ChineseSimplified": "用于滚动测试的 RecyclerView 复用条目。",
+    "English": "Reusable RecyclerView item for scroll testing.",
+    "Japanese": "スクロールテスト用の RecyclerView再利用項目です。"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060045,
+    "key": "UI.Shop.Goods.Test.Name",
+    "ChineseSimplified": "测试商品 {0}",
+    "English": "Test Item {0}",
+    "Japanese": "テスト商品 {0}"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060046,
+    "key": "UI.Shop.SubTitle",
+    "ChineseSimplified": "补给终端",
+    "English": "Supply Terminal",
+    "Japanese": "補給端末"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060047,
+    "key": "UI.Shop.TabItem",
+    "ChineseSimplified": "道具",
+    "English": "Items",
+    "Japanese": "アイテム"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060048,
+    "key": "UI.Shop.TabPack",
+    "ChineseSimplified": "礼包",
+    "English": "Packs",
+    "Japanese": "パック"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060049,
+    "key": "UI.Shop.TabRecommend",
+    "ChineseSimplified": "推荐",
+    "English": "Recommended",
+    "Japanese": "おすすめ"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060050,
+    "key": "UI.Shop.TabSkin",
+    "ChineseSimplified": "外观",
+    "English": "Skins",
+    "Japanese": "外観"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060051,
+    "key": "UI.Shop.Tag.Discount",
+    "ChineseSimplified": "折扣",
+    "English": "Discount",
+    "Japanese": "割引"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060052,
+    "key": "UI.Shop.Tag.Hot",
+    "ChineseSimplified": "热门",
+    "English": "Hot",
+    "Japanese": "人気"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060053,
+    "key": "UI.Shop.Tag.Item",
+    "ChineseSimplified": "道具",
+    "English": "Item",
+    "Japanese": "アイテム"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060054,
+    "key": "UI.Shop.Tag.New",
+    "ChineseSimplified": "新品",
+    "English": "New",
+    "Japanese": "新着"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060055,
+    "key": "UI.Shop.Tag.Pack",
+    "ChineseSimplified": "礼包",
+    "English": "Pack",
+    "Japanese": "パック"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060056,
+    "key": "UI.Shop.Tag.Recommend",
+    "ChineseSimplified": "推荐",
+    "English": "Recommended",
+    "Japanese": "おすすめ"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060057,
+    "key": "UI.Shop.Tag.Skin",
+    "ChineseSimplified": "外观",
+    "English": "Skin",
+    "Japanese": "外観"
+  },
+  {
+    "sheet": "Hotfix",
+    "id": 10060058,
+    "key": "UI.Shop.Title",
+    "ChineseSimplified": "商店",
+    "English": "Shop",
+    "Japanese": "ショップ"
+  },
+  {
+    "sheet": "Main",
+    "id": 20010000,
+    "key": "Test.Test",
+    "ChineseSimplified": "测试",
+    "English": "Test",
+    "Japanese": "Test"
+  }
+]

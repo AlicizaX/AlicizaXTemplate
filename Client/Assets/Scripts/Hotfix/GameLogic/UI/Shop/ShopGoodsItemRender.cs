@@ -31,14 +31,6 @@ namespace GameLogic.UI
                 : GameApp.Localization.GetString(key, arg);
         }
 
-        // public ShopGoodsData(int id, string name, string description, int price, string tag)
-        // {
-        //     Id = id;
-        //     NameKey = name;
-        //     DescriptionKey = description;
-        //     Price = price;
-        //     TagKey = tag;
-        // }
     }
 
     public sealed class ShopGoodsItemRender : ItemRender<ShopGoodsData, UIShopGoodsItemViewHolder>
@@ -59,6 +51,11 @@ namespace GameLogic.UI
         protected override void OnPointerClick(PointerEventData eventData)
         {
             GameApp.UI.ShowUISync<UIBuyAlertWindow>(CurrentData);
+        }
+
+        protected override void OnSubmit(BaseEventData eventData)
+        {
+            base.OnSubmit(eventData);
         }
 
         protected override void OnSelectionChanged(bool selected)

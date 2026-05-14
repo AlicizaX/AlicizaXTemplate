@@ -1,0 +1,34 @@
+{
+    "name": "Input",
+    "maps": [
+        {
+            "name": "UI",
+            "id": "f864656c-fc1e-4c28-94b4-c2716e78db06",
+            "actions": [
+                {
+                    "name": "Back",
+                    "type": "Button",
+                    "id": "0f9f1067-ba6b-4497-ae94-8dc286133ca7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "c20c2a49-7345-4e3e-af7b-3ae1e2d2d90a",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Back",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

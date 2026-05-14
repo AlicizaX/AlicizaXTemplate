@@ -13,7 +13,7 @@ namespace BuildCLI
     {
         static string[] scenePath = new[] { "Assets/Scenes/Main.unity" };
 
-        [EditorToolFunction("Build/离线/EXE")]
+        [EditorToolFunction("Build/Offline-Mode/Build_Exe")]
         public static void TestBuildExe()
         {
             StandaloneBuildParameters parameter = new StandaloneBuildParameters();
@@ -28,7 +28,7 @@ namespace BuildCLI
             AppBuildHelper.BuildStandalone(parameter);
         }
 
-        [EditorToolFunction("Build/离线/AB")]
+        [EditorToolFunction("Build/Offline-Mode/Build_AB")]
         public static void BuildOfflineRes()
         {
             ResourceBuildParameter buildParameter = new ResourceBuildParameter();
@@ -39,7 +39,7 @@ namespace BuildCLI
             ResourceBuildHelper.BuildResourcePackage(buildParameter);
         }
 
-        [EditorToolFunction("Build/在线/EXE")]
+        [EditorToolFunction("Build/Online-Mode/Build_Exe")]
         public static void TestBuildOnlineExe()
         {
             StandaloneBuildParameters parameter = new StandaloneBuildParameters();
@@ -53,7 +53,7 @@ namespace BuildCLI
             AppBuildHelper.BuildStandalone(parameter);
         }
 
-        [EditorToolFunction("Build/在线/AB")]
+        [EditorToolFunction("Build/Online-Mode/Build_AB")]
         public static void TestBuildRes()
         {
             ResourceBuildParameter buildParameter = new ResourceBuildParameter();

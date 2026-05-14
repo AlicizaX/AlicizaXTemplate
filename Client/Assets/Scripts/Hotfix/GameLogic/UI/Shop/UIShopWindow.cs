@@ -147,17 +147,15 @@ namespace GameLogic.UI
             });
         }
 
-        private static Color GetAccentColor(int index)
+        private static readonly Color[] AccentColors =
         {
-            Color[] colors =
-            {
-                new(0.18f, 0.92f, 0.88f, 1f),
-                new(0.58f, 0.8f, 0.55f, 1f),
-                new(0.95f, 0.78f, 0.32f, 1f),
-                new(0.7f, 0.55f, 1f, 1f)
-            };
-            return colors[index % colors.Length];
-        }
+            new(0.18f, 0.92f, 0.88f, 1f),
+            new(0.58f, 0.8f, 0.55f, 1f),
+            new(0.95f, 0.78f, 0.32f, 1f),
+            new(0.7f, 0.55f, 1f, 1f)
+        };
+
+        private static Color GetAccentColor(int index) => AccentColors[index % AccentColors.Length];
 
         private static string GetCategoryTag(ShopCategory category)
         {
