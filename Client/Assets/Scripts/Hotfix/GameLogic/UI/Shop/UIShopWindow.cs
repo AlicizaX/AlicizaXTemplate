@@ -37,7 +37,6 @@ namespace GameLogic.UI
             }
 
             baseui.TogRecommend.isOn = true;
-            RefreshStaticText();
             RefreshCurrencyText();
             SwitchCategory(EShopCategory.TEST);
         }
@@ -45,7 +44,6 @@ namespace GameLogic.UI
         protected override void OnRegisterEvent(EventListenerProxy proxy)
         {
             proxy.AddUIEvent<PlayerDataChangedEvent>(OnPlayerDataChanged);
-            proxy.AddUIEvent<LocalizationChangeEvent>(OnLocalizationChanged);
         }
 
         private void OnPlayerDataChanged(in PlayerDataChangedEvent evt)
@@ -53,34 +51,11 @@ namespace GameLogic.UI
             RefreshCurrencyText();
         }
 
-        private void OnLocalizationChanged(in LocalizationChangeEvent evt)
-        {
-            RefreshStaticText();
-            RefreshCurrencyText();
-            _goodsList.Adapter.NotifyDataChanged();
-        }
-
-        private void RefreshStaticText()
-        {
-            SetLocalizedText(baseui.TogRecommend, LocalizationKey.UI.SHOP_TABRECOMMEND);
-            SetLocalizedText(baseui.TogItem, LocalizationKey.UI.SHOP_TABITEM);
-            SetLocalizedText(baseui.TogSkin, LocalizationKey.UI.SHOP_TABSKIN);
-            SetLocalizedText(baseui.TogPack, LocalizationKey.UI.SHOP_TABPACK);
-        }
-
         private void RefreshCurrencyText()
         {
             baseui.TextCurrency.text = LocalizationKey.UI.SHOP_CURRENCY(_playerDataService.Credit.ToString());
         }
 
-        private static void SetLocalizedText(Selectable selectable, string text)
-        {
-            var textMeshPro = selectable.GetComponentInChildren<TMPro.TextMeshProUGUI>(true);
-            if (textMeshPro != null)
-            {
-                textMeshPro.text = text;
-            }
-        }
 
         private void OnTogRecommendChanged(bool isOn)
         {
@@ -156,10 +131,10 @@ namespace GameLogic.UI
         {
             return category switch
             {
-                EShopCategory.MATERIAL => LocalizationKey.UI.SHOP_TAG_ITEM_Raw,
-                EShopCategory.EQUIPMENT => LocalizationKey.UI.SHOP_TAG_SKIN_Raw,
-                EShopCategory.CONSUMABLE => LocalizationKey.UI.SHOP_TAG_PACK_Raw,
-                _ => LocalizationKey.UI.SHOP_TAG_RECOMMEND_Raw
+                EShopCategory.MATERIAL => LocalizationKey.UI.SHOP_TAG_ITEM,
+                EShopCategory.EQUIPMENT => LocalizationKey.UI.SHOP_TAG_SKIN,
+                EShopCategory.CONSUMABLE => LocalizationKey.UI.SHOP_TAG_PACK,
+                _ => LocalizationKey.UI.SHOP_TAG_RECOMMEND
             };
         }
     }

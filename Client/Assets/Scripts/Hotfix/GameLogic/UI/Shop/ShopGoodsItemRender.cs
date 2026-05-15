@@ -14,7 +14,7 @@ namespace GameLogic.UI
         {
             _shopConfig = shopConfig;
             _itemConfig = shopConfig.ItemId_Ref;
-            TagKey = tagKey;
+            Tag = tagKey;
             AccentColor = accentColor;
         }
 
@@ -24,8 +24,7 @@ namespace GameLogic.UI
         public string Description => _itemConfig.Desc;
         public int Price => _itemConfig.Price;
         public string Icon => _itemConfig.Icon;
-        private string TagKey { get; }
-        public string Tag => GameApp.Localization.GetString(TagKey);
+        public string Tag { get;private set; }
         public Color AccentColor { get; }
         public string PriceText => LocalizationKey.UI.COMMON_CREDITPRICE(Price.ToString());
     }
@@ -34,15 +33,23 @@ namespace GameLogic.UI
     {
         public override ItemInteractionFlags InteractionFlags => ItemInteractionFlags.PointerNavigation;
 
+        private static readonly Color BackgroundColor = new(0.035f, 0.04f, 0.04f, 0.9f);
+        private string _iconLocation;
+
         protected override void OnBind(ShopGoodsData data, int index)
         {
             baseui.NameText.text = data.Name;
             baseui.DescriptionText.text = data.Description;
             baseui.PriceText.text = data.PriceText;
             baseui.TagText.text = data.Tag;
-            baseui.ItemIcon.SetSprite(data.Icon);
+            if (_iconLocation != data.Icon)
+            {
+                _iconLocation = data.Icon;
+                baseui.ItemIcon.SetSprite(data.Icon);
+            }
+
             baseui.Icon.color = data.AccentColor;
-            baseui.Background.color = new Color(0.035f, 0.04f, 0.04f, 0.9f);
+            baseui.Background.color = BackgroundColor;
             baseui.SelectedFrame.color = new Color(data.AccentColor.r, data.AccentColor.g, data.AccentColor.b, 0.18f);
         }
 
