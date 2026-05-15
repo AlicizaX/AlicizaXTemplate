@@ -70,6 +70,16 @@
       "dependencies": {},
       "hash": "061314200e2f03307c4d90b448e1de7b85431905"
     },
+    "com.coffee.ui-particle": {
+      "version": "https://github.com/mob-sakai/ParticleEffectForUGUI.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.particlesystem": "1.0.0"
+      },
+      "hash": "92fb173507ece2c135c38733deeca82a6d49cacd"
+    },
     "com.kyrylokuzyk.primetween": {
       "version": "1.3.8",
       "depth": 0,

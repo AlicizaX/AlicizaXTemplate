@@ -738,16 +738,35 @@ internal static partial class Program
 
     private static void ExportLocalizationText(string xlsxPath, string language, string outputDir)
     {
+        ExportLocalizationText([Path.GetFullPath(xlsxPath)], language, outputDir);
+    }
+
+    private static void ExportLocalizationText(IReadOnlyList<string> xlsxPaths, string language, string outputDir)
+    {
+        ExportLocalizationTextRows(LoadLocalizationTextRows(xlsxPaths), language, outputDir);
+    }
+
+    private static void ExportLocalizationTextRows(IReadOnlyList<RowData> rows, string language, string outputDir)
+    {
         if (!LanguageColumns.Contains(language, StringComparer.Ordinal))
         {
             throw new InvalidOperationException($"unsupported language: {language}");
         }
 
-        var sheetRows = LoadWorkbookRows(Path.GetFullPath(xlsxPath), null, false);
-        var rows = MergeRows(sheetRows, "Localization", false);
         var outputPath = Path.Combine(Path.GetFullPath(outputDir), string.Format(CultureInfo.InvariantCulture, LocalizationOutputFormat, language));
         WriteBinary(outputPath, BuildLanguageBytes(rows, language));
         Console.WriteLine($"[{language}] generated localization bytes: {outputPath}");
+    }
+
+    private static List<RowData> LoadLocalizationTextRows(IReadOnlyList<string> xlsxPaths)
+    {
+        var sheetRows = new List<List<RowData>>();
+        foreach (var xlsxPath in xlsxPaths)
+        {
+            sheetRows.AddRange(LoadWorkbookRows(Path.GetFullPath(xlsxPath), null, false));
+        }
+
+        return MergeRows(sheetRows, "Localization", false);
     }
 
     private static void ExportLocalizationConst(string xlsxPath, string language, string outputDir, string? editorConfigDir = null, bool writeEditor = true)
@@ -808,7 +827,140 @@ internal static partial class Program
         }
     }
 
-    private static async Task<int> RunLuban(string scriptDir, string dataOut, string codeOut, string template)
+    private static List<string> ResolveLocalizationTextFiles(string scriptDir, string sourcePath, string filePattern)
+    {
+        var fullPath = ResolvePath(scriptDir, sourcePath);
+        if (File.Exists(fullPath))
+        {
+            return [fullPath];
+        }
+
+        if (!Directory.Exists(fullPath))
+        {
+            throw new DirectoryNotFoundException($"localization text directory not found: {fullPath}");
+        }
+
+        var regex = new Regex(filePattern, RegexOptions.CultureInvariant);
+        var files = Directory
+            .EnumerateFiles(fullPath, "*.xlsx", SearchOption.TopDirectoryOnly)
+            .Where(path => !Path.GetFileName(path).StartsWith("~$", StringComparison.Ordinal))
+            .Where(path => regex.IsMatch(Path.GetFileNameWithoutExtension(path)))
+            .OrderBy(path => path, StringComparer.Ordinal)
+            .ToList();
+
+        if (files.Count == 0)
+        {
+            throw new InvalidOperationException($"no localization text xlsx matched `{filePattern}` in {fullPath}");
+        }
+
+        Console.WriteLine($"localization text files: {string.Join(", ", files.Select(Path.GetFileName))}");
+        return files;
+    }
+
+    private static string ToLubanInputPath(string scriptDir, string path)
+    {
+        var fullScriptDir = Path.GetFullPath(scriptDir);
+        var fullPath = Path.GetFullPath(path);
+        var relativePath = Path.GetRelativePath(fullScriptDir, fullPath);
+        return relativePath.Replace(Path.DirectorySeparatorChar.ToString(), "/", StringComparison.Ordinal)
+            .Replace(Path.AltDirectorySeparatorChar.ToString(), "/", StringComparison.Ordinal);
+    }
+
+    private static string WriteLubanLocalizationTextFile(string scriptDir, IReadOnlyList<RowData> rows)
+    {
+        var path = Path.Combine(scriptDir, "Temp", "l10n_text_provider.xlsx");
+        var directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        WriteKeyOnlyXlsx(path, rows.Select(row => row.Key));
+        return path;
+    }
+
+    private static void WriteKeyOnlyXlsx(string path, IEnumerable<string> keys)
+    {
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
+
+        using var archive = ZipFile.Open(path, ZipArchiveMode.Create);
+        WriteZipEntry(archive, "[Content_Types].xml", """
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+              <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+              <Default Extension="xml" ContentType="application/xml"/>
+              <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+              <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+            </Types>
+            """);
+        WriteZipEntry(archive, "_rels/.rels", """
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+              <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+            </Relationships>
+            """);
+        WriteZipEntry(archive, "xl/workbook.xml", """
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+              <sheets>
+                <sheet name="Sheet1" sheetId="1" r:id="rId1"/>
+              </sheets>
+            </workbook>
+            """);
+        WriteZipEntry(archive, "xl/_rels/workbook.xml.rels", """
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+              <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+            </Relationships>
+            """);
+
+        var sheet = new StringBuilder();
+        sheet.AppendLine("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>""");
+        sheet.AppendLine("""<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">""");
+        sheet.AppendLine("""  <sheetData>""");
+        sheet.AppendLine("""    <row r="1"><c r="A1" t="inlineStr"><is><t>##var</t></is></c><c r="B1" t="inlineStr"><is><t>key</t></is></c></row>""");
+        sheet.AppendLine("""    <row r="2"><c r="A2" t="inlineStr"><is><t>##type</t></is></c><c r="B2" t="inlineStr"><is><t>string</t></is></c></row>""");
+        sheet.AppendLine("""    <row r="3"><c r="A3" t="inlineStr"><is><t>##group</t></is></c><c r="B3" t="inlineStr"><is><t>c</t></is></c></row>""");
+        sheet.AppendLine("""    <row r="4"><c r="A4" t="inlineStr"><is><t>##</t></is></c></row>""");
+
+        var rowIndex = 5;
+        foreach (var key in keys)
+        {
+            sheet.Append("    <row r=\"").Append(rowIndex.ToString(CultureInfo.InvariantCulture)).AppendLine("\">");
+            sheet.Append("      <c r=\"B").Append(rowIndex.ToString(CultureInfo.InvariantCulture)).AppendLine("\" t=\"inlineStr\"><is><t>");
+            sheet.Append(SecurityElementEscape(key));
+            sheet.AppendLine("""</t></is></c>""");
+            sheet.AppendLine("""    </row>""");
+            rowIndex++;
+        }
+
+        sheet.AppendLine("""  </sheetData>""");
+        sheet.AppendLine("""</worksheet>""");
+        WriteZipEntry(archive, "xl/worksheets/sheet1.xml", sheet.ToString());
+    }
+
+    private static void WriteZipEntry(ZipArchive archive, string entryName, string content)
+    {
+        var entry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
+        using var stream = entry.Open();
+        using var writer = new StreamWriter(stream, new UTF8Encoding(false));
+        writer.Write(content);
+    }
+
+    private static string SecurityElementEscape(string value)
+    {
+        return value
+            .Replace("&", "&amp;", StringComparison.Ordinal)
+            .Replace("<", "&lt;", StringComparison.Ordinal)
+            .Replace(">", "&gt;", StringComparison.Ordinal)
+            .Replace("\"", "&quot;", StringComparison.Ordinal)
+            .Replace("'", "&apos;", StringComparison.Ordinal);
+    }
+
+    private static async Task<int> RunLuban(string scriptDir, string dataOut, string codeOut, string template, string l10nTextFile)
     {
         var args = new[]
         {
@@ -821,7 +973,7 @@ internal static partial class Program
             "-x", $"outputDataDir={dataOut}",
             "-x", $"outputCodeDir={codeOut}",
             "-x", "l10n.provider=default",
-            "-x", "l10n.textFile.path=./Excels/Localization/Localization.xlsx",
+            "-x", $"l10n.textFile.path={ToLubanInputPath(scriptDir, l10nTextFile)}",
             "-x", "l10n.textFile.keyFieldName=key",
             "-x", "l10n.textListFile=texts.txt",
         };
@@ -867,14 +1019,27 @@ internal static partial class Program
         var l10nTextOut = paths.GetValueOrDefault("l10n_text_out") ?? paths.GetValueOrDefault("data_out") ?? tableDataOut;
         var l10nConstOut = paths.GetValueOrDefault("l10n_const_out") ?? paths.GetValueOrDefault("data_out") ?? tableDataOut;
         var codeOut = paths["code_out"] ?? throw new InvalidOperationException("paths.code_out is required");
-        var l10nTextXlsx = paths.GetValueOrDefault("l10n_text_xlsx") ?? "./Excels/Localization/Localization.xlsx";
+        var l10nTextXlsx = paths.GetValueOrDefault("l10n_text_xlsx") ?? "./Excels/Localization";
+        var l10nTextFilePattern = paths.GetValueOrDefault("l10n_text_file_pattern") ?? "^Localization(?!Const$).*$";
         var l10nConstXlsx = paths.GetValueOrDefault("l10n_const_xlsx") ?? paths.GetValueOrDefault("l10n_xlsx") ?? "./Excels/Localization/LocalizationConst.xlsx";
         var l10nEditor = paths.GetValueOrDefault("l10n_editor_out") ?? "../Client/Assets/Editor/Config";
         var l10nKeyCodeOut = paths.GetValueOrDefault("l10n_key_code_out") ?? DefaultLocalizationKeyCodeOut;
         var l10nKeyCommentLanguage = paths.GetValueOrDefault("l10n_key_comment_language") ?? paths.GetValueOrDefault("l10n_comment_language") ?? DefaultLocalizationKeyCommentLanguage;
         var l10nConstOutRule = paths.GetValueOrDefault("l10n_const_out_rule") ?? "";
+        var l10nTextFiles = ResolveLocalizationTextFiles(scriptDir, l10nTextXlsx, l10nTextFilePattern);
+        var l10nTextRows = LoadLocalizationTextRows(l10nTextFiles);
+        var lubanL10nTextFile = WriteLubanLocalizationTextFile(scriptDir, l10nTextRows);
 
-        var lubanExitCode = await RunLuban(scriptDir, tableDataOut, codeOut, template);
+        int lubanExitCode;
+        try
+        {
+            lubanExitCode = await RunLuban(scriptDir, tableDataOut, codeOut, template, lubanL10nTextFile);
+        }
+        finally
+        {
+            RemoveFileIfExists(lubanL10nTextFile);
+        }
+
         if (lubanExitCode != 0)
         {
             return 1;
@@ -885,7 +1050,7 @@ internal static partial class Program
         for (var index = 0; index < languages.Count; index++)
         {
             var language = languages[index];
-            ExportLocalizationText(ResolvePath(scriptDir, l10nTextXlsx), language, ResolvePath(scriptDir, l10nTextOut));
+            ExportLocalizationTextRows(l10nTextRows, language, ResolvePath(scriptDir, l10nTextOut));
             ExportLocalizationConst(
                 ResolvePath(scriptDir, l10nConstXlsx),
                 language,

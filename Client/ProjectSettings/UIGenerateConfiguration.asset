@@ -64,6 +64,8 @@ MonoBehaviour:
     componentType: UnityEngine.UI.Image
   - uiElementRegex: Dropdown
     componentType: TMPro.TMP_Dropdown
+  - uiElementRegex: Tog
+    componentType: UnityEngine.UI.UXToggle
   UIScriptGenerateConfigs:
   - ProjectName: MainProject
     NameSpace: Game.UI
