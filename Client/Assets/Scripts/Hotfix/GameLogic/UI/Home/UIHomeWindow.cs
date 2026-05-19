@@ -63,7 +63,7 @@ namespace GameLogic.UI
 
         private async UniTask SwitchLanguage()
         {
-            Debug.Log("切换语言"+GameApp.Localization.Language);
+            Debug.Log("切换语言" + GameApp.Localization.Language);
             await AppServices.Require<IConfigService>().SwitchLanguageAsync();
             GameApp.Localization.ApplyLanguage();
             LocalizationChangeEvent.Publisher(GameApp.Localization.Language);
@@ -91,7 +91,7 @@ namespace GameLogic.UI
 
         private void OnBtnExitClick()
         {
-            Utility.Platform.Quit();
+            Log.Info("Quit Game");
         }
     }
 }

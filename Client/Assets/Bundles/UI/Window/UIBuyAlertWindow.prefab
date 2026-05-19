@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enter a quantity or use +/- to adjust it
+  m_text: "\u8F93\u5165\u6570\u91CF\u6216\u4F7F\u7528 +/- \u8C03\u6574\u8D2D\u4E70\u6570\u91CF"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -441,6 +441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 119dba6c69bcc804fbd5866a8029f845, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _transitionPlayerComponent: {fileID: 3007316011584194513}
   mBtnClose: {fileID: 6279154131588904896}
   mBtnConfirm: {fileID: 3477416080354867628}
   mBtnMinus: {fileID: 1334982133771492798}
@@ -580,7 +581,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_SelectedColor: {r: 0.8784314, g: 0.08627451, b: 0.08627451, a: 0.68235296}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -923,7 +924,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_SelectedColor: {r: 0.8773585, g: 0.086908154, b: 0.086908154, a: 0.68235296}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -2477,7 +2478,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Confirm
+  m_text: "\u786E\u8BA4\u8D2D\u4E70"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}

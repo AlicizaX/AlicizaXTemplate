@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Shop
+  m_text: "\u5546\u5E97"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -199,7 +199,7 @@ MonoBehaviour:
     m_NormalColor: {r: 0.4339623, g: 0.4339623, b: 0.4339623, a: 0.49411765}
     m_HighlightedColor: {r: 0.43529412, g: 0.43529412, b: 0.43529412, a: 0.6}
     m_PressedColor: {r: 0.43529412, g: 0.43529412, b: 0.43529412, a: 0.6}
-    m_SelectedColor: {r: 0.43529412, g: 0.43529412, b: 0.43529412, a: 0.6}
+    m_SelectedColor: {r: 1, g: 0, b: 0, a: 0.6}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -314,7 +314,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 0
+    m_Mode: 3
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -441,7 +441,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -763,7 +763,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Character
+  m_text: "\u89D2\u8272"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -943,6 +943,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3334fa9160927c9448729aefda906b67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _transitionPlayerComponent: {fileID: 3259763076922183672}
   mBtnBag: {fileID: 8599430375733818942}
   mBtnExit: {fileID: 5077209145104049990}
   mBtnRole: {fileID: 7966806373771437446}
@@ -1299,7 +1300,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 0
+    m_Mode: 3
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -1459,7 +1460,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 0
+    m_Mode: 3
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -1625,7 +1626,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0.24705882}
+  m_Color: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0.21176471}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1763,7 +1764,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 0
+    m_Mode: 3
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -2103,9 +2104,9 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.09019608}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0.09019608}
+    m_PressedColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0.09019608}
+    m_SelectedColor: {r: 0.745283, g: 0.17928976, b: 0.17928976, a: 0.13725491}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -2206,7 +2207,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Exit
+  m_text: "\u9000\u51FA"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -2337,7 +2338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.6039216}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2873,7 +2874,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Bag
+  m_text: "\u80CC\u5305"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -3009,7 +3010,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Tips
+  m_text: "\u63D0\u793A"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}

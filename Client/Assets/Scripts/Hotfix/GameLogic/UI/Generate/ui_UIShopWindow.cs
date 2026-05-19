@@ -31,8 +31,16 @@ namespace Game.UI
 		public Image ImgTabPanel => mImgTabPanel;
 
 		[SerializeField]
+		private RecyclerView mScrollViewGoodsLinerList;
+		public RecyclerView ScrollViewGoodsLinerList => mScrollViewGoodsLinerList;
+
+		[SerializeField]
 		private RecyclerView mScrollViewGoodsList;
 		public RecyclerView ScrollViewGoodsList => mScrollViewGoodsList;
+
+		[SerializeField]
+		private RecyclerView mScrollViewGoodsLoopList;
+		public RecyclerView ScrollViewGoodsLoopList => mScrollViewGoodsLoopList;
 
 		[SerializeField]
 		private UXTextMeshPro mTextCurrency;

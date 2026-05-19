@@ -10,13 +10,6 @@ using UnityEngine;
 
 namespace GameLogic
 {
-    public class UXLocalizationHelper : IUXLocalizationHelper
-    {
-        public string GetString(string key)
-        {
-            return GameApp.Localization.GetString(key);
-        }
-    }
 
     public static class HotfixEntry
     {
@@ -34,7 +27,6 @@ namespace GameLogic
         {
             Log.Info("HotFix Logic Entry!");
             _hotfixAssembly = (List<Assembly>)objects[0];
-            UXComponentExtensionsHelper.SetLocalizationHelper(new UXLocalizationHelper());
             ConfigService = AppServices.App.Register<IConfigService>(new ConfigService());
             await ConfigService.Initialize(new ConfigBytesLoader());
 

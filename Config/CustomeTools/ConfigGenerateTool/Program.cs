@@ -420,6 +420,14 @@ internal static partial class Program
         }
     }
 
+    private static void RemoveDirectoryIfEmpty(string path)
+    {
+        if (Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any())
+        {
+            Directory.Delete(path);
+        }
+    }
+
     private static void WriteEditorJson(string path, IReadOnlyList<RowData> rows)
     {
         var data = rows.Select(row => new EditorJsonRow
@@ -1038,6 +1046,7 @@ internal static partial class Program
         finally
         {
             RemoveFileIfExists(lubanL10nTextFile);
+            RemoveDirectoryIfEmpty(Path.GetDirectoryName(lubanL10nTextFile) ?? "");
         }
 
         if (lubanExitCode != 0)

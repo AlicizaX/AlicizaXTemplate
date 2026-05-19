@@ -3,10 +3,12 @@ using AlicizaX;
 using AlicizaX.Localization;
 using AlicizaX.UI;
 using AlicizaX.UI.Runtime;
+using Cysharp.Threading.Tasks;
 using Game.Config;
 using Game.UI;
 using GameLogic.Player;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace GameLogic.UI
@@ -14,15 +16,19 @@ namespace GameLogic.UI
     [Window(UILayer.UI, false, 3)]
     public class UIShopWindow : UITabWindow<ui_UIShopWindow>
     {
-        private readonly List<ShopGoodsData> _goods = new(1024);
+        private readonly Dictionary<EShopCategory, List<ShopGoodsData>> _goodsByCategory = new();
         private UGList<ShopGoodsData> _goodsList;
+        private UGList<ShopGoodsData> _goodsLinerList;
+        private UGLoopList<ShopGoodsData> _goodsLoopList;
         private IFakePlayerDataService _playerDataService;
         private IConfigService _configService;
+        private int _lastCredit = int.MinValue;
 
         protected override void OnInitialize()
         {
             _goodsList = UGListCreateHelper.Create<ShopGoodsData>(baseui.ScrollViewGoodsList);
-            _goodsList.RegisterItemRender<ShopGoodsItemRender>();
+            _goodsLinerList = UGListCreateHelper.Create<ShopGoodsData>(baseui.ScrollViewGoodsLinerList);
+            _goodsLoopList = UGListCreateHelper.CreateLoop<ShopGoodsData>(baseui.ScrollViewGoodsLoopList);
             _playerDataService = AppServices.Require<IFakePlayerDataService>();
             _configService = AppServices.Require<IConfigService>();
 
@@ -31,14 +37,16 @@ namespace GameLogic.UI
             baseui.TogSkin.onValueChanged.AddListener(OnTogSkinChanged);
             baseui.TogPack.onValueChanged.AddListener(OnTogPackChanged);
             baseui.BtnClose.onClick.AddListener(OnBtnCloseClick);
-            if (baseui.TextCurrency is UXTextMeshPro currencyText)
-            {
-                currencyText.SetLocalization(string.Empty);
-            }
 
             baseui.TogRecommend.isOn = true;
             RefreshCurrencyText();
             SwitchCategory(EShopCategory.TEST);
+        }
+
+        protected override async UniTask OnOpenAsync()
+        {
+            await UniTask.Delay(3000);
+            RefreshCurrencyText();
         }
 
         protected override void OnRegisterEvent(EventListenerProxy proxy)
@@ -53,7 +61,7 @@ namespace GameLogic.UI
 
         private void RefreshCurrencyText()
         {
-            baseui.TextCurrency.text = LocalizationKey.UI.SHOP_CURRENCY(_playerDataService.Credit.ToString());
+            baseui.TextCurrency.SetLocalizationArgs(_playerDataService.Credit.ToStringNonAlloc());
         }
 
 
@@ -96,15 +104,29 @@ namespace GameLogic.UI
 
         private void SwitchCategory(EShopCategory category)
         {
-            BuildGoods(category);
-            _goodsList.Data = _goods;
+            var datas = GetGoods(category);
+            _goodsList.Data = datas;
+            _goodsLinerList.Data = datas;
+            _goodsLoopList.Data = datas;
         }
 
-        private void BuildGoods(EShopCategory category)
+        private List<ShopGoodsData> GetGoods(EShopCategory category)
         {
-            _goods.Clear();
+            if (_goodsByCategory.TryGetValue(category, out List<ShopGoodsData> goods))
+            {
+                return goods;
+            }
 
+            goods = BuildGoods(category);
+            _goodsByCategory[category] = goods;
+            return goods;
+        }
+
+        private List<ShopGoodsData> BuildGoods(EShopCategory category)
+        {
             var configs = _configService.Shop.DataList;
+            List<ShopGoodsData> goods = new(configs.Count);
+            string tag = GetCategoryTag(category);
             for (int i = 0; i < configs.Count; i++)
             {
                 var config = configs[i];
@@ -113,8 +135,10 @@ namespace GameLogic.UI
                     continue;
                 }
 
-                _goods.Add(new ShopGoodsData(config, GetCategoryTag(category), GetAccentColor(i)));
+                goods.Add(new ShopGoodsData(config, tag, GetAccentColor(i)));
             }
+
+            return goods;
         }
 
         private static readonly Color[] AccentColors =

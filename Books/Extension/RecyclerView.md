@@ -1,48 +1,96 @@
 # RecyclerView 列表
 
-`RecyclerView` 是扩展包里的虚拟滚动列表组件，负责列表项复用、滚动、布局、焦点导航和局部刷新。业务层通常不直接操作 `RecyclerView.SetAdapter`，而是通过 `UGList`、`UGMixedList`、`UGLoopList`、`UGGroupList` 包装类使用。
+`RecyclerView` 是 `com.alicizax.unity.ui.extension` 中的虚拟滚动列表组件，负责列表项复用、滚动、布局、吸附、滚动条和局部刷新。业务层通常通过 `UGList`、`UGMixedList`、`UGLoopList`、`UGGroupList` 使用它，而不是直接操作内部 `IAdapter`。
 
 源码位置：
 
-- `Client/Packages/com.alicizax.unity.ui.extension/Runtime/RecyclerView`
-- 项目示例：`Client/Assets/Scripts/Hotfix/GameLogic/UI/UILoadUpdate.cs`
-
-## 创建列表
-
-推荐在 Unity 菜单中创建：
-
 ```text
-GameObject/UI/UXScrollView
+Client/Packages/com.alicizax.unity.ui.extension/Runtime/RecyclerView
 ```
 
-生成的列表结构需要包含：
+## 基本结构
 
-| 对象 | 说明 |
+一个可用的 `RecyclerView` 需要以下配置：
+
+| 配置 | 说明 |
 | --- | --- |
 | `RecyclerView` | 挂在滚动区域根节点上 |
-| `Content` | 承载列表项实例的 `RectTransform` |
-| `Templates` | 一个或多个列表项模板，模板上必须挂 `ViewHolder` 子类 |
-| `LayoutManager` | 线性、网格、分页、混合等布局管理器 |
-| `Scroller` | 处理拖拽、滚轮和平滑滚动 |
-| `Scrollbar` | 可选，显示滚动条 |
+| `Content` | 承载运行时列表项实例的 `RectTransform`；未配置时会尝试使用第一个子节点 |
+| `Templates` | 一个或多个列表项模板；模板根节点必须挂 `ViewHolder` 子类 |
+| `LayoutManager` | 布局管理器，例如线性、网格、分页、混合尺寸、圆形布局 |
+| `Scroller` | 处理拖拽、滚轮、惯性、回弹和平滑滚动 |
+| `Scrollbar` | 可选滚动条组件 |
 
-在 UI Holder 生成规则中，常见映射为：
+运行时模板会被隐藏，实例由对象池创建和回收。不要直接把 `Templates` 中的模板对象当作真实显示项操作。
 
-```text
-ScrollView -> AlicizaX.UI.RecyclerView
+## 数据接口
+
+普通列表数据只需要实现空接口 `ISimpleViewData`：
+
+```csharp
+public interface ISimpleViewData
+{
+}
 ```
 
-Prefab 节点命名示例：
+多模板和分组列表使用模板下标，而不是模板名称：
 
-```text
-ScrollView@ItemList
+```csharp
+public interface IMixedViewData : ISimpleViewData
+{
+    int TemplateId { get; set; }
+}
+
+public interface IGroupViewData : IMixedViewData
+{
+    bool Expanded { get; set; }
+    int Type { get; set; }
+}
 ```
 
-生成后可在窗口中通过 `baseui.ScrollViewItemList` 访问。
+`TemplateId` 对应 `RecyclerView.Templates` 数组下标。当前代码中不存在 `TemplateName` 匹配机制。
 
-## 普通列表
+## ViewHolder
 
-数据类型实现 `ISimpleViewData`：
+列表项渲染逻辑写在 `ViewHolder<TData>` 子类中。当前模块没有独立的 `ItemRender<TData, THolder>` 类。
+
+常用成员：
+
+| 成员 | 说明 |
+| --- | --- |
+| `CurrentData` | 当前绑定的数据 |
+| `CurrentIndex` | 当前数据索引 |
+| `CurrentLayoutIndex` | 当前布局索引；循环或圆形布局中可能不同于数据索引 |
+| `CurrentBindingVersion` | 当前绑定版本，可用于异步加载回调校验 |
+| `IsBindingCurrent(version)` | 判断异步回调是否仍对应当前绑定 |
+| `SetSelect()` | 将当前 `DataIndex` 提交为列表选择项 |
+| `OnSelectionChange(bool)` | 选择状态变化回调 |
+| `OnClear()` | Holder 被回收或重新绑定前的清理回调 |
+
+如果异步加载图片，建议在 `OnBind` 记录 `CurrentBindingVersion`，回调时用 `IsBindingCurrent(version)` 判断当前 Holder 是否仍绑定同一份数据。
+
+## UGList 普通列表
+
+适用场景：背包、邮件列表、排行榜、任务子项列表等单一模板列表。
+
+### Prefab 配置
+
+```text
+ScrollView
+├── Content
+└── Templates
+    └── BagItemTemplate  // Templates[0]，挂 BagItemHolder
+```
+
+推荐配置：
+
+| 项 | 值 |
+| --- | --- |
+| `Templates` | 只放一个模板 |
+| `LayoutManager` | `LinearLayoutManager` 或 `GridLayoutManager` |
+| `Direction` | 竖向列表用 `Vertical`，横向列表用 `Horizontal` |
+
+### 数据
 
 ```csharp
 using AlicizaX.UI;
@@ -52,10 +100,11 @@ public sealed class BagItemData : ISimpleViewData
     public int ItemId;
     public string Name;
     public int Count;
+    public bool Locked;
 }
 ```
 
-列表项模板挂一个 `ViewHolder` 子类：
+### Holder
 
 ```csharp
 using AlicizaX.UI;
@@ -63,60 +112,55 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public sealed class BagItemHolder : ViewHolder
+public sealed class BagItemHolder : ViewHolder<BagItemData>
 {
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private TextMeshProUGUI countText;
-
-    public Image Icon => icon;
-    public TextMeshProUGUI NameText => nameText;
-    public TextMeshProUGUI CountText => countText;
-}
-```
-
-渲染逻辑继承 `ItemRender<TData, THolder>`：
-
-```csharp
-using AlicizaX;
-using AlicizaX.UI;
-using UnityEngine;
-using UnityEngine.EventSystems;
-
-public sealed class BagItemRender : ItemRender<BagItemData, BagItemHolder>
-{
-    public override ItemInteractionFlags InteractionFlags => ItemInteractionFlags.PointerNavigation;
+    [SerializeField] private GameObject selectedFrame;
+    [SerializeField] private GameObject lockedMask;
 
     protected override void OnBind(BagItemData data, int index)
     {
-        baseui.NameText.text = data.Name;
-        baseui.CountText.text = data.Count.ToString();
+        nameText.text = data.Name;
+        countText.text = data.Count.ToString();
+        lockedMask.SetActive(data.Locked);
     }
 
-    protected override void OnPointerClick(PointerEventData eventData)
+    protected override void OnSelectionChange(bool select)
     {
-        Log.Info($"Click item: {CurrentData.ItemId}");
-    }
-
-    protected override void OnSelectionChanged(bool selected)
-    {
-        baseui.Icon.color = selected ? Color.cyan : Color.white;
+        selectedFrame.SetActive(select);
+        icon.color = select ? Color.cyan : Color.white;
     }
 
     protected override void OnClear()
     {
-        baseui.Icon.color = Color.white;
+        selectedFrame.SetActive(false);
+        lockedMask.SetActive(false);
+        icon.color = Color.white;
+    }
+
+    public void OnClick()
+    {
+        if (!CurrentData.Locked)
+        {
+            SetSelect();
+        }
     }
 }
 ```
 
-窗口中创建并绑定列表：
+`OnClick` 可以绑定到模板上的 `Button.onClick`。如果没有按钮，也可以由其它点击组件调用这个公开方法。
+
+### 窗口使用
 
 ```csharp
 using System.Collections.Generic;
+using AlicizaX;
 using AlicizaX.UI;
 using AlicizaX.UI.Runtime;
 using Game.UI;
+using UnityEngine;
 
 [Window(UILayer.UI)]
 public sealed class BagWindow : UIWindow<ui_BagWindow>
@@ -126,8 +170,39 @@ public sealed class BagWindow : UIWindow<ui_BagWindow>
     protected override void OnInitialize()
     {
         _items = UGListCreateHelper.Create<BagItemData>(baseui.ScrollViewItemList);
-        _items.RegisterItemRender<BagItemRender>();
+        _items.OnChoiceIndexChanged += OnChoiceChanged;
+        _items.ScrollStopped += OnScrollStopped;
+
         _items.Data = CreateItems();
+        _items.ChoiceIndex = 0;
+        _items.ScrollToChoice(ScrollAlignment.Start);
+    }
+
+    protected override void OnClose()
+    {
+        if (_items == null)
+        {
+            return;
+        }
+
+        _items.OnChoiceIndexChanged -= OnChoiceChanged;
+        _items.ScrollStopped -= OnScrollStopped;
+    }
+
+    private void OnChoiceChanged(int index)
+    {
+        BagItemData data = _items.Adapter.GetData(index);
+        if (data == null)
+        {
+            return;
+        }
+
+        Log.Info($"Select item: {data.ItemId}");
+    }
+
+    private void OnScrollStopped()
+    {
+        Log.Info($"Scroll stopped at {_items.ScrollPosition}");
     }
 
     private static List<BagItemData> CreateItems()
@@ -136,97 +211,486 @@ public sealed class BagWindow : UIWindow<ui_BagWindow>
         {
             new BagItemData { ItemId = 1001, Name = "Potion", Count = 5 },
             new BagItemData { ItemId = 1002, Name = "Key", Count = 1 },
+            new BagItemData { ItemId = 1003, Name = "Gem", Count = 3, Locked = true },
         };
     }
 }
 ```
 
-## 混合模板列表
+### 常见操作
 
-一个列表有多种模板时，数据实现 `IMixedViewData`，`TemplateName` 要与模板 `ViewHolder` 类型名一致。
+```csharp
+// 替换整份数据。
+_items.Data = CreateItems();
 
-项目示例里使用了同样的写法：
+// 添加单项。
+_items.Adapter.Add(new BagItemData
+{
+    ItemId = 1004,
+    Name = "Ticket",
+    Count = 2,
+});
+
+// 修改已有数据，尺寸不变时只重绑可见项。
+BagItemData item = _items.Adapter.GetData(1);
+if (item != null)
+{
+    item.Count += 1;
+    _items.Adapter.NotifyItemChanged(1);
+}
+
+// 如果修改会影响尺寸或布局，使用 relayout。
+_items.Adapter.NotifyItemChanged(1, relayout: true);
+
+// 滚动。
+_items.ScrollToStart(0);
+_items.ScrollToCenter(20, smooth: true);
+_items.ScrollTo(20, ScrollAlignment.End, offset: 0f, smooth: true, duration: 0.3f);
+```
+
+## UGMixedList 混合模板列表
+
+适用场景：一条列表中混合标题、普通项、奖励项、广告位、分割线等不同模板。
+
+### Prefab 配置
+
+```text
+ScrollView
+├── Content
+└── Templates
+    ├── MailTextTemplate    // Templates[0]，挂 MailTextHolder
+    └── MailRewardTemplate  // Templates[1]，挂 MailRewardHolder
+```
+
+推荐使用 `MixedLayoutManager`，它会按每一项的 `TemplateId` 读取对应模板尺寸。
+
+### 数据
 
 ```csharp
 using AlicizaX.UI;
 
+public enum MailTemplate
+{
+    Text = 0,
+    Reward = 1,
+}
+
 public sealed class MailData : IMixedViewData
 {
+    public int MailId;
     public string Title;
+    public string Content;
     public bool HasAttachment;
-    public string TemplateName { get; set; }
-}
-```
+    public bool Claimed;
+    public int TemplateId { get; set; }
 
-创建数据：
-
-```csharp
-private static List<MailData> CreateMailList()
-{
-    return new List<MailData>
+    public static MailData Text(int id, string title, string content)
     {
-        new MailData
+        return new MailData
         {
-            Title = "System Mail",
-            HasAttachment = false,
-            TemplateName = nameof(MailTextHolder),
-        },
-        new MailData
+            MailId = id,
+            Title = title,
+            Content = content,
+            TemplateId = (int)MailTemplate.Text,
+        };
+    }
+
+    public static MailData Reward(int id, string title, string content, bool claimed)
+    {
+        return new MailData
         {
-            Title = "Reward Mail",
+            MailId = id,
+            Title = title,
+            Content = content,
             HasAttachment = true,
-            TemplateName = nameof(MailRewardHolder),
-        },
-    };
+            Claimed = claimed,
+            TemplateId = (int)MailTemplate.Reward,
+        };
+    }
 }
 ```
 
-注册多个渲染器：
+### Holder
 
 ```csharp
-private UGMixedList<MailData> _mails;
+using AlicizaX.UI;
+using TMPro;
+using UnityEngine;
 
-protected override void OnInitialize()
+public sealed class MailTextHolder : ViewHolder<MailData>
 {
-    _mails = UGListCreateHelper.CreateMixed<MailData>(baseui.ScrollViewMail);
-    _mails.RegisterItemRender<MailTextRender>();
-    _mails.RegisterItemRender<MailRewardRender>();
-    _mails.Data = CreateMailList();
+    [SerializeField] private TextMeshProUGUI titleText;
+    [SerializeField] private TextMeshProUGUI contentText;
+    [SerializeField] private GameObject selectedFrame;
+
+    protected override void OnBind(MailData data, int index)
+    {
+        titleText.text = data.Title;
+        contentText.text = data.Content;
+    }
+
+    protected override void OnSelectionChange(bool select)
+    {
+        selectedFrame.SetActive(select);
+    }
+
+    protected override void OnClear()
+    {
+        selectedFrame.SetActive(false);
+    }
+
+    public void OnClick()
+    {
+        SetSelect();
+    }
 }
 ```
-
-`ItemRender` 会根据自身泛型里的 `THolder` 自动匹配对应模板。
-
-## 循环列表
-
-`UGLoopList<TData>` 适合轮播、循环选择和无限滚动展示。真实数据数量来自 `GetRealCount()`，显示数量会扩展为循环列表。
 
 ```csharp
-private UGLoopList<RoleData> _roles;
+using AlicizaX.UI;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
-protected override void OnInitialize()
+public sealed class MailRewardHolder : ViewHolder<MailData>
 {
-    _roles = UGListCreateHelper.CreateLoop<RoleData>(baseui.ScrollViewRoles);
-    _roles.RegisterItemRender<RoleRender>();
-    _roles.Data = LoadRoles();
+    [SerializeField] private TextMeshProUGUI titleText;
+    [SerializeField] private TextMeshProUGUI contentText;
+    [SerializeField] private Button claimButton;
+    [SerializeField] private GameObject claimedMark;
+    [SerializeField] private GameObject selectedFrame;
+
+    protected override void OnBind(MailData data, int index)
+    {
+        titleText.text = data.Title;
+        contentText.text = data.Content;
+        claimButton.interactable = !data.Claimed;
+        claimedMark.SetActive(data.Claimed);
+    }
+
+    protected override void OnSelectionChange(bool select)
+    {
+        selectedFrame.SetActive(select);
+    }
+
+    protected override void OnClear()
+    {
+        claimButton.interactable = false;
+        claimedMark.SetActive(false);
+        selectedFrame.SetActive(false);
+    }
+
+    public void OnClick()
+    {
+        SetSelect();
+    }
 }
 ```
 
-## 分组列表
+### 窗口使用
 
-`UGGroupList<TData>` 要求数据实现 `IGroupViewData`，并且 `TData` 必须有无参构造函数。它适合任务列表、背包分类、设置页分段、成就分类这类“组头 + 子项”的列表。
+```csharp
+using System.Collections.Generic;
+using AlicizaX;
+using AlicizaX.UI;
+using AlicizaX.UI.Runtime;
+using Game.UI;
+using UnityEngine;
 
-分组列表的关键点是：业务传入的 `Data` 里只放真实子项，框架会根据子项的 `Type` 自动创建组头行。也就是说，组头行不是你手动塞进 `Data` 的数据，而是 `GroupAdapter` 在刷新时用 `new TData()` 创建出来的临时显示数据。
+[Window(UILayer.UI)]
+public sealed class MailWindow : UIWindow<ui_MailWindow>
+{
+    private UGMixedList<MailData> _mails;
 
-`IGroupViewData` 的三个字段含义如下：
+    protected override void OnInitialize()
+    {
+        _mails = UGListCreateHelper.CreateMixed<MailData>(baseui.ScrollViewMailList);
+        _mails.OnChoiceIndexChanged += OnMailSelected;
+        _mails.Data = CreateMails();
+    }
 
-| 字段 | 用在组头行 | 用在子项行 |
-| --- | --- | --- |
-| `Type` | 表示当前组的类型，例如主线、日常、成就 | 表示当前子项属于哪个组 |
-| `Expanded` | 记录这个组是否展开 | 一般不用 |
-| `TemplateName` | 由 `groupViewName` 自动写入，用来创建组头模板 | 业务自己写入，用来创建子项模板 |
+    protected override void OnClose()
+    {
+        if (_mails != null)
+        {
+            _mails.OnChoiceIndexChanged -= OnMailSelected;
+        }
+    }
 
-### 数据定义
+    private void OnMailSelected(int index)
+    {
+        MailData mail = _mails.Adapter.GetData(index);
+        if (mail == null)
+        {
+            return;
+        }
+
+        Log.Info($"Open mail: {mail.MailId}");
+    }
+
+    public void ClaimSelectedReward()
+    {
+        int index = _mails.ChoiceIndex;
+        MailData mail = _mails.Adapter.GetData(index);
+        if (mail == null || !mail.HasAttachment || mail.Claimed)
+        {
+            return;
+        }
+
+        mail.Claimed = true;
+        _mails.Adapter.NotifyItemChanged(index);
+    }
+
+    private static List<MailData> CreateMails()
+    {
+        return new List<MailData>
+        {
+            MailData.Text(1, "System Notice", "Server maintenance completed."),
+            MailData.Reward(2, "Login Reward", "Claim your daily reward.", claimed: false),
+            MailData.Text(3, "Arena Result", "You reached rank 12."),
+        };
+    }
+}
+```
+
+### 常见操作
+
+```csharp
+// 插入一个奖励邮件。TemplateId 决定使用哪个模板。
+_mails.Adapter.Insert(0, MailData.Reward(4, "Compensation", "Thanks for waiting.", claimed: false));
+
+// 修改模板类型时需要重布局，因为可见实例可能要换模板。
+MailData mail = _mails.Adapter.GetData(1);
+if (mail != null)
+{
+    mail.TemplateId = (int)MailTemplate.Reward;
+    mail.HasAttachment = true;
+    _mails.Adapter.NotifyItemChanged(1, relayout: true);
+}
+```
+
+注意：`TemplateId` 必须是 `Templates` 数组的合法下标。`Templates[0]`、`Templates[1]` 的顺序改了，数据里的枚举值也要同步调整。
+
+## UGLoopList 循环列表
+
+适用场景：轮播图、角色预览、循环选择器、无限横向滚动。
+
+`UGLoopList<TData>` 使用 `LoopAdapter<TData>`，当真实数据数量大于 0 时，显示数量返回 `int.MaxValue`。绑定时会用 `index % list.Count` 映射回真实数据。
+
+### Prefab 配置
+
+```text
+ScrollView
+├── Content
+└── Templates
+    └── BannerTemplate  // Templates[0]，挂 BannerHolder
+```
+
+推荐配置：
+
+| 项 | 值 |
+| --- | --- |
+| `LayoutManager` | `LinearLayoutManager`、`PageLayoutManager` 或 `CircleLayoutManager` |
+| `Direction` | 轮播通常用 `Horizontal` |
+| `Snap` | 通常开启 |
+| `Inertia` | 按手感决定 |
+
+### 数据
+
+```csharp
+using AlicizaX.UI;
+
+public sealed class BannerData : ISimpleViewData
+{
+    public int BannerId;
+    public string Title;
+    public string ImagePath;
+}
+```
+
+### Holder
+
+```csharp
+using AlicizaX.UI;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+public sealed class BannerHolder : ViewHolder<BannerData>
+{
+    [SerializeField] private Image image;
+    [SerializeField] private TextMeshProUGUI titleText;
+    [SerializeField] private GameObject selectedFrame;
+
+    protected override void OnBind(BannerData data, int index)
+    {
+        titleText.text = data.Title;
+
+        uint version = CurrentBindingVersion;
+        LoadImageAsync(data.ImagePath, sprite =>
+        {
+            if (IsBindingCurrent(version))
+            {
+                image.sprite = sprite;
+            }
+        });
+    }
+
+    protected override void OnSelectionChange(bool select)
+    {
+        selectedFrame.SetActive(select);
+    }
+
+    protected override void OnClear()
+    {
+        image.sprite = null;
+        selectedFrame.SetActive(false);
+    }
+
+    public void OnClick()
+    {
+        SetSelect();
+    }
+
+    private void LoadImageAsync(string path, System.Action<Sprite> onLoaded)
+    {
+        // 接入项目自己的异步图片加载逻辑。
+        onLoaded?.Invoke(null);
+    }
+}
+```
+
+### 窗口使用
+
+```csharp
+using System.Collections.Generic;
+using AlicizaX;
+using AlicizaX.UI;
+using AlicizaX.UI.Runtime;
+using Game.UI;
+using UnityEngine;
+
+[UIUpdate]
+[Window(UILayer.UI)]
+public sealed class BannerWindow : UIWindow<ui_BannerWindow>
+{
+    private UGLoopList<BannerData> _banners;
+    private float _autoScrollTimer;
+
+    protected override void OnInitialize()
+    {
+        _banners = UGListCreateHelper.CreateLoop<BannerData>(baseui.ScrollViewBannerList);
+        _banners.OnChoiceIndexChanged += OnBannerSelected;
+        _banners.ScrollStopped += OnScrollStopped;
+        _banners.Data = CreateBanners();
+
+        if (_banners.DataCount > 0)
+        {
+            _banners.ChoiceIndex = 0;
+            _banners.ScrollToIndex(0);
+        }
+    }
+
+    protected override void OnClose()
+    {
+        if (_banners == null)
+        {
+            return;
+        }
+
+        _banners.OnChoiceIndexChanged -= OnBannerSelected;
+        _banners.ScrollStopped -= OnScrollStopped;
+    }
+
+    protected override void OnUpdate()
+    {
+        if (_banners == null || _banners.DataCount <= 0)
+        {
+            return;
+        }
+
+        _autoScrollTimer += Time.deltaTime;
+        if (_autoScrollTimer < 3f)
+        {
+            return;
+        }
+
+        _autoScrollTimer = 0f;
+        int next = (_banners.ChoiceIndex + 1) % _banners.DataCount;
+        _banners.ChoiceIndex = next;
+        _banners.ScrollToCenter(next, smooth: true, duration: 0.25f);
+    }
+
+    private void OnBannerSelected(int index)
+    {
+        BannerData banner = _banners.Adapter.GetData(index);
+        if (banner != null)
+        {
+            Log.Info($"Select banner: {banner.BannerId}");
+        }
+    }
+
+    private void OnScrollStopped()
+    {
+        // 开启 Snap 时，RecyclerView 会在停止后吸附到最近项。
+        // 如果需要把当前停靠项同步成业务选择，可在这里按业务规则计算并设置 ChoiceIndex。
+    }
+
+    private static List<BannerData> CreateBanners()
+    {
+        return new List<BannerData>
+        {
+            new BannerData { BannerId = 1, Title = "Event A", ImagePath = "event_a" },
+            new BannerData { BannerId = 2, Title = "Event B", ImagePath = "event_b" },
+            new BannerData { BannerId = 3, Title = "Event C", ImagePath = "event_c" },
+        };
+    }
+}
+```
+
+### 常见操作
+
+```csharp
+// 循环列表的滚动索引传真实数据索引即可。
+_banners.ScrollToCenter(2, smooth: true);
+
+// 替换轮播数据后重新定位。
+_banners.Data = CreateBanners();
+_banners.ChoiceIndex = 0;
+_banners.ScrollToIndex(0);
+```
+
+注意：循环列表真实数据数量来自 `DataCount` 和 `Adapter.GetRealCount()`。业务逻辑不要遍历 `Adapter.GetItemCount()`，因为循环列表显示数量可能是 `int.MaxValue`。
+
+## UGGroupList 分组列表
+
+适用场景：任务分组、背包分类、设置页分段、成就分类等“组头 + 子项”的列表。
+
+`UGGroupList<TData>` 要求数据实现 `IGroupViewData`，并且 `TData` 必须有无参构造函数。创建时需要传入组头模板下标 `groupTemplateId`。
+
+### Prefab 配置
+
+```text
+ScrollView
+├── Content
+└── Templates
+    ├── QuestGroupTemplate  // Templates[0]，挂 QuestGroupHolder
+    └── QuestItemTemplate   // Templates[1]，挂 QuestItemHolder
+```
+
+推荐使用 `MixedLayoutManager`，因为组头和子项通常高度不同。
+
+### 数据
+
+原始 `Data` 只放真实子项。`GroupAdapter` 会扫描子项的 `Type`，为每个类型创建一个临时组头数据：
+
+```csharp
+new TData
+{
+    TemplateId = groupTemplateId,
+    Type = type
+};
+```
 
 ```csharp
 using AlicizaX.UI;
@@ -246,9 +710,9 @@ public sealed class QuestRowData : IGroupViewData
     public int Target;
     public bool Completed;
 
+    public int TemplateId { get; set; }
     public bool Expanded { get; set; }
     public int Type { get; set; }
-    public string TemplateName { get; set; }
 
     public QuestGroupType Group => (QuestGroupType)Type;
 
@@ -268,22 +732,13 @@ public sealed class QuestRowData : IGroupViewData
             Target = target,
             Completed = completed,
             Type = (int)group,
-            TemplateName = nameof(QuestItemHolder),
+            TemplateId = 1,
         };
     }
 }
 ```
 
-这里的 `TemplateName = nameof(QuestItemHolder)` 很重要。子项行应该指向子项模板，不能写成组头模板名。组头模板名会在创建列表时通过 `groupViewName` 传入。
-
-### 模板 Holder
-
-分组列表通常至少有两个模板：
-
-| 模板 | 作用 |
-| --- | --- |
-| `QuestGroupHolder` | 组头行，例如“主线任务”“日常任务”，负责显示展开箭头 |
-| `QuestItemHolder` | 真实任务行，负责显示任务标题、进度、领取按钮 |
+### Holder
 
 ```csharp
 using AlicizaX.UI;
@@ -291,84 +746,34 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public sealed class QuestGroupHolder : ViewHolder
+public sealed class QuestGroupHolder : ViewHolder<QuestRowData>
 {
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private Image arrow;
-    [SerializeField] private Image background;
-
-    public TextMeshProUGUI TitleText => titleText;
-    public Image Arrow => arrow;
-    public Image Background => background;
-}
-
-public sealed class QuestItemHolder : ViewHolder
-{
-    [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI progressText;
-    [SerializeField] private Button rewardButton;
-    [SerializeField] private Image selectedFrame;
-
-    public TextMeshProUGUI TitleText => titleText;
-    public TextMeshProUGUI ProgressText => progressText;
-    public Button RewardButton => rewardButton;
-    public Image SelectedFrame => selectedFrame;
-}
-```
-
-Prefab 上需要把这两个模板都放进 `RecyclerView` 的 `Templates` 数组，并且模板根节点分别挂对应的 `ViewHolder` 子类。`ItemRender<TData, THolder>` 会根据 `THolder` 类型名自动匹配模板和渲染器。
-
-### 组头渲染器
-
-组头行是框架创建的临时 `QuestRowData`，默认只有 `Type`、`TemplateName` 和 `Expanded` 是可靠的。组名建议从 `Type` 转换出来，不要依赖 `Title`，因为 `Title` 是子项数据字段，框架创建组头时不会从某个子项复制它。
-
-```csharp
-using AlicizaX;
-using AlicizaX.UI;
-using UnityEngine;
-using UnityEngine.EventSystems;
-
-public sealed class QuestGroupRender : ItemRender<QuestRowData, QuestGroupHolder>
-{
-    public override ItemInteractionFlags InteractionFlags => ItemInteractionFlags.PointerNavigation;
+    [SerializeField] private GameObject selectedFrame;
 
     protected override void OnBind(QuestRowData data, int index)
     {
-        baseui.TitleText.text = GetGroupTitle(data.Group);
-        baseui.Arrow.rectTransform.localEulerAngles = data.Expanded
+        titleText.text = GetGroupTitle(data.Group);
+        arrow.rectTransform.localEulerAngles = data.Expanded
             ? new Vector3(0f, 0f, 90f)
             : Vector3.zero;
     }
 
-    protected override void OnPointerClick(PointerEventData eventData)
+    protected override void OnSelectionChange(bool select)
     {
-        ToggleGroup();
-    }
-
-    protected override void OnSubmit(BaseEventData eventData)
-    {
-        ToggleGroup();
-    }
-
-    protected override void OnSelectionChanged(bool selected)
-    {
-        baseui.Background.color = selected
-            ? new Color(0.25f, 0.45f, 0.65f, 1f)
-            : Color.white;
+        selectedFrame.SetActive(select);
     }
 
     protected override void OnClear()
     {
-        baseui.Background.color = Color.white;
-        baseui.Arrow.rectTransform.localEulerAngles = Vector3.zero;
+        arrow.rectTransform.localEulerAngles = Vector3.zero;
+        selectedFrame.SetActive(false);
     }
 
-    private void ToggleGroup()
+    public void OnClick()
     {
-        if (Adapter is GroupAdapter<QuestRowData> adapter)
-        {
-            adapter.Activate(CurrentIndex);
-        }
+        SetSelect();
     }
 
     private static string GetGroupTitle(QuestGroupType group)
@@ -384,60 +789,45 @@ public sealed class QuestGroupRender : ItemRender<QuestRowData, QuestGroupHolder
 }
 ```
 
-`Adapter.Activate(CurrentIndex)` 在组头行上的行为是切换展开状态；在子项行上的行为是设置选择索引。这里的渲染器只用于组头，所以点击和提交都直接调用它即可。
-
-### 子项渲染器
-
-子项渲染器只处理真实任务数据，`Title`、`Current`、`Target`、`Completed` 这些业务字段都来自你传入的 `Data`。
-
 ```csharp
-using AlicizaX;
 using AlicizaX.UI;
+using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public sealed class QuestItemRender : ItemRender<QuestRowData, QuestItemHolder>
+public sealed class QuestItemHolder : ViewHolder<QuestRowData>
 {
-    public override ItemInteractionFlags InteractionFlags => ItemInteractionFlags.PointerNavigation;
+    [SerializeField] private TextMeshProUGUI titleText;
+    [SerializeField] private TextMeshProUGUI progressText;
+    [SerializeField] private Button rewardButton;
+    [SerializeField] private GameObject selectedFrame;
 
     protected override void OnBind(QuestRowData data, int index)
     {
-        baseui.TitleText.text = data.Title;
-        baseui.ProgressText.text = $"{data.Current}/{data.Target}";
-        baseui.RewardButton.interactable = data.Completed;
+        titleText.text = data.Title;
+        progressText.text = $"{data.Current}/{data.Target}";
+        rewardButton.interactable = data.Completed;
     }
 
-    protected override void OnPointerClick(PointerEventData eventData)
+    protected override void OnSelectionChange(bool select)
     {
-        OpenQuestDetail();
-    }
-
-    protected override void OnSubmit(BaseEventData eventData)
-    {
-        OpenQuestDetail();
-    }
-
-    protected override void OnSelectionChanged(bool selected)
-    {
-        baseui.SelectedFrame.gameObject.SetActive(selected);
+        selectedFrame.SetActive(select);
     }
 
     protected override void OnClear()
     {
-        baseui.SelectedFrame.gameObject.SetActive(false);
-        baseui.RewardButton.interactable = false;
+        selectedFrame.SetActive(false);
+        rewardButton.interactable = false;
     }
 
-    private void OpenQuestDetail()
+    public void OnClick()
     {
-        Log.Info($"Open quest detail: {CurrentData.QuestId}");
+        SetSelect();
     }
 }
 ```
 
-如果详情打开逻辑属于窗口层，也可以只在 `OnChoiceIndexChanged` 里处理子项选择。点击列表项时框架会先更新 `ChoiceIndex`，再回调 `OnPointerClick`。
-
-### 窗口中创建分组列表
+### 窗口使用
 
 ```csharp
 using System.Collections.Generic;
@@ -445,25 +835,33 @@ using AlicizaX;
 using AlicizaX.UI;
 using AlicizaX.UI.Runtime;
 using Game.UI;
+using UnityEngine;
 
 [Window(UILayer.UI)]
 public sealed class QuestWindow : UIWindow<ui_QuestWindow>
 {
+    private const int GroupTemplateId = 0;
+
     private UGGroupList<QuestRowData> _quests;
 
     protected override void OnInitialize()
     {
         _quests = UGListCreateHelper.CreateGroup<QuestRowData>(
-            baseui.ScrollViewQuest,
-            groupViewName: nameof(QuestGroupHolder));
+            baseui.ScrollViewQuestList,
+            groupTemplateId: GroupTemplateId);
 
-        _quests.RegisterItemRender<QuestGroupRender>();
-        _quests.RegisterItemRender<QuestItemRender>();
         _quests.OnChoiceIndexChanged += OnQuestChoiceChanged;
-
         _quests.Data = CreateQuestRows();
 
-        ExpandGroupByType(QuestGroupType.Main);
+        ExpandFirstGroup();
+    }
+
+    protected override void OnClose()
+    {
+        if (_quests != null)
+        {
+            _quests.OnChoiceIndexChanged -= OnQuestChoiceChanged;
+        }
     }
 
     private void OnQuestChoiceChanged(int displayIndex)
@@ -475,114 +873,78 @@ public sealed class QuestWindow : UIWindow<ui_QuestWindow>
 
         if (_quests.IsGroupIndex(displayIndex))
         {
+            _quests.Activate(displayIndex);
             return;
         }
 
-        OpenQuestDetail(row.QuestId);
+        Log.Info($"Open quest detail: {row.QuestId}");
     }
 
-    private void ExpandGroupByType(QuestGroupType group)
+    private void ExpandFirstGroup()
     {
-        for (int index = 0; _quests.TryGetDisplayData(index, out QuestRowData row); index++)
+        if (_quests.TryGetDisplayData(0, out _) && _quests.IsGroupIndex(0))
         {
-            if (_quests.IsGroupIndex(index) && row.Type == (int)group)
-            {
-                _quests.Expand(index);
-                return;
-            }
+            _quests.Expand(0);
         }
+    }
+
+    public void AddDailyQuest()
+    {
+        _quests.Data.Add(QuestRowData.Item(
+            QuestGroupType.Daily,
+            questId: 2003,
+            title: "完成一次钓鱼",
+            current: 0,
+            target: 1));
+
+        _quests.Adapter.NotifyDataChanged();
     }
 
     private static List<QuestRowData> CreateQuestRows()
     {
         return new List<QuestRowData>
         {
-            QuestRowData.Item(QuestGroupType.Main, 1001, "前往王城", 1, 1, true),
+            QuestRowData.Item(QuestGroupType.Main, 1001, "前往王城", 1, 1, completed: true),
             QuestRowData.Item(QuestGroupType.Main, 1002, "拜访骑士团长", 0, 1),
             QuestRowData.Item(QuestGroupType.Daily, 2001, "完成三次副本", 1, 3),
             QuestRowData.Item(QuestGroupType.Daily, 2002, "赠送一次礼物", 0, 1),
             QuestRowData.Item(QuestGroupType.Achievement, 3001, "累计登录七天", 4, 7),
         };
     }
-
-    private void OpenQuestDetail(int questId)
-    {
-        Log.Info($"Quest detail: {questId}");
-    }
 }
 ```
 
-### 为什么 `CreateGroup` 要传入 `groupViewName`
-
-`CreateGroup<TData>(recyclerView, groupViewName)` 的第二个参数不是显示文本，而是组头模板名。推荐写成：
+### 常见操作
 
 ```csharp
-UGListCreateHelper.CreateGroup<QuestRowData>(
-    baseui.ScrollViewQuest,
-    groupViewName: nameof(QuestGroupHolder));
-```
+// 展开或收起显示索引上的组头。
+_quests.Expand(0);
+_quests.Collapse(0);
+_quests.SetExpanded(0, true);
 
-它在内部有两个作用。
+// Activate：组头会切换展开，子项会设置 ChoiceIndex。
+_quests.Activate(displayIndex);
 
-第一个作用是选择组头模板。`GroupAdapter` 创建组头行时会执行类似逻辑：
-
-```csharp
-TData groupData = new TData
+// 获取当前显示列表数据。显示列表包含组头和已展开子项。
+if (_quests.TryGetDisplayData(displayIndex, out QuestRowData row))
 {
-    TemplateName = groupViewName,
-    Type = type,
-};
-```
+    bool isGroup = _quests.IsGroupIndex(displayIndex);
+}
 
-随后 `RecyclerView` 绑定显示行时，会通过 `TemplateName` 找模板。组头行的 `TemplateName` 就是 `QuestGroupHolder`，所以它会使用 `QuestGroupHolder` 模板和 `QuestGroupRender` 渲染器。子项行的 `TemplateName` 是业务数据里写的 `QuestItemHolder`，所以它会使用子项模板和 `QuestItemRender`。
-
-第二个作用是识别“这一行是不是组头”。`GroupAdapter.IsGroupIndex(index)` 会比较显示数据的 `TemplateName` 是否等于 `groupViewName`。展开、收起、删除空组时都依赖这个判断。也就是说，`groupViewName` 不仅决定显示成哪个 Prefab，还决定框架把哪些行当作分组行处理。
-
-一次完整刷新流程可以理解为：
-
-1. 业务设置 `_quests.Data = CreateQuestRows()`。
-2. `GroupAdapter` 扫描原始子项列表，发现 `Type = Main`、`Daily`、`Achievement`。
-3. 每发现一个新的 `Type`，就创建一个组头行，并把它的 `TemplateName` 设置为 `groupViewName`。
-4. 默认只显示组头行，因为新建组头的 `Expanded` 默认是 `false`。
-5. 点击组头或调用 `_quests.Expand(index)` 后，框架把同 `Type` 的子项插入到这个组头后面。
-6. `RecyclerView` 根据每一行的 `TemplateName` 创建对应模板：组头用 `QuestGroupHolder`，子项用 `QuestItemHolder`。
-
-所以 `groupViewName` 必须满足这些条件：
-
-| 要求 | 原因 |
-| --- | --- |
-| 不能为空 | 空字符串会导致 `GroupAdapter` 报错并停止刷新 |
-| 必须是组头 `ViewHolder` 类型名 | `RecyclerView` 需要用它找到组头模板 |
-| 组头模板必须在 `RecyclerView.Templates` 中 | 没有模板就无法创建组头实例 |
-| 子项 `TemplateName` 不能等于 `groupViewName` | 否则子项会被误判成组头 |
-| 需要注册组头对应的 `ItemRender` | 否则组头模板找不到渲染逻辑 |
-
-常见错误示例：
-
-```csharp
-// 错误：这里传了子项模板名，所有组头都会被创建成子项样式。
-_quests = UGListCreateHelper.CreateGroup<QuestRowData>(
-    baseui.ScrollViewQuest,
-    groupViewName: nameof(QuestItemHolder));
-
-// 错误：子项 TemplateName 和组头模板名相同，子项会被 IsGroupIndex 误认为组头。
-QuestRowData.Item(QuestGroupType.Main, 1001, "前往王城", 1, 1).TemplateName = nameof(QuestGroupHolder);
-```
-
-分组列表更新数据时，推荐替换整份数据或修改原始 `Data` 后调用 `NotifyDataChanged`，因为组头和子项的显示顺序需要重新计算。
-
-```csharp
-// 替换整份任务列表。
-_quests.Data = CreateQuestRows();
-
-// 在现有列表里增加任务。
-_quests.Data.Add(QuestRowData.Item(QuestGroupType.Daily, 2003, "完成一次钓鱼", 0, 1));
+// 分组数据变更后通常使用全量刷新，因为显示列表需要重建。
 _quests.Adapter.NotifyDataChanged();
 ```
 
+注意：
+
+1. `groupTemplateId` 是组头模板下标，不是显示文本。
+2. 子项的 `TemplateId` 不要等于 `groupTemplateId`，否则 `IsGroupIndex` 会把子项识别为组头。
+3. `UGGroupList` 的索引是显示索引，不是原始 `Data` 的子项索引。展开和收起会改变显示索引。
+4. 仅靠 `SetSelect()` 时，同一个已选中的组头再次点击不会触发 `OnChoiceIndexChanged`。如果业务要求重复点击同一组头也切换，需要让窗口层直接调用 `_quests.Activate(displayIndex)`。
+
 ## 数据更新
 
-`UGList` 暴露 `Adapter`，可以直接增删改数据并触发刷新。
+`UGListBase` 暴露 `Adapter`，可以直接增删改数据并刷新。
 
 ```csharp
 _items.Adapter.Add(new BagItemData
@@ -594,6 +956,7 @@ _items.Adapter.Add(new BagItemData
 
 _items.Adapter.RemoveAt(0);
 _items.Adapter.NotifyItemChanged(1);
+_items.Adapter.NotifyItemChanged(1, relayout: true);
 _items.Adapter.NotifyDataChanged();
 ```
 
@@ -601,92 +964,76 @@ _items.Adapter.NotifyDataChanged();
 
 | 场景 | 推荐 API |
 | --- | --- |
-| 替换整个列表 | `_items.Data = newList` |
-| 只更新可见项数据 | `_items.Adapter.NotifyItemChanged(index)` |
-| 更新项尺寸或布局 | `_items.Adapter.NotifyItemChanged(index, relayout: true)` |
-| 添加项 | `_items.Adapter.Add(data)` |
-| 批量添加 | `_items.Adapter.AddRange(datas)` |
+| 替换整份数据 | `_items.Data = newList` |
+| 可见项内容变化且尺寸不变 | `_items.Adapter.NotifyItemChanged(index)` |
+| 可见项尺寸或模板变化 | `_items.Adapter.NotifyItemChanged(index, relayout: true)` |
+| 一段可见项内容变化 | `_items.Adapter.NotifyItemRangeChanged(index, count)` |
+| 添加单项 | `_items.Adapter.Add(data)` |
+| 插入单项 | `_items.Adapter.Insert(index, data)` |
+| 删除单项 | `_items.Adapter.RemoveAt(index)` |
 | 清空列表 | `_items.Adapter.Clear()` |
+| 反转顺序 | `_items.Adapter.Reverse()` |
 
-## 滚动和焦点
+`AddRange`、`InsertRange`、`RemoveAll`、`Sort` 当前是 `internal`，不要在程序集外文档示例中当作公开 API 使用。
+
+## 选择、滚动和事件
+
+`ChoiceIndex` 是业务选择索引。它只会在显式设置、`SetSelect()` 或分组子项 `Activate(index)` 时变化。
 
 ```csharp
-_items.ScrollToStart(0);
-_items.ScrollToCenter(20, smooth: true);
-_items.ScrollTo(100, ScrollAlignment.Center, offset: 0f, smooth: true);
+_items.ChoiceIndex = 3;
+_items.ClearChoice();
 
-bool focused = _items.TryFocus(10, smooth: true);
-_items.CommitFocusToChoice();
+_items.ScrollToIndex(10);
+_items.ScrollToStart(10, offset: 0f, smooth: true);
+_items.ScrollToCenter(10, offset: 0f, smooth: true, duration: 0.3f);
+_items.ScrollToEnd(10);
+_items.ScrollTo(10, ScrollAlignment.Center, offset: 0f, smooth: true);
 _items.ScrollToChoice(ScrollAlignment.Center, smooth: true);
 ```
 
-索引含义：
-
-| 属性 | 说明 |
-| --- | --- |
-| `FocusIndex` | 当前 EventSystem 导航焦点所在的数据索引 |
-| `CurrentIndex` | RecyclerView 内部跟踪的滚动定位索引 |
-| `ChoiceIndex` | 业务选择索引，点击或提交时变更 |
-
-事件订阅：
+事件：
 
 ```csharp
-protected override void OnInitialize()
-{
-    _items.OnChoiceIndexChanged += OnChoiceChanged;
-    _items.ScrollStopped += OnScrollStopped;
-}
-
-private void OnChoiceChanged(int index)
-{
-    Log.Info($"Choice changed: {index}");
-}
-
-private void OnScrollStopped()
-{
-    Log.Info("Scroll stopped.");
-}
+_items.OnChoiceIndexChanged += index => { };
+_items.ScrollValueChanged += position => { };
+_items.ScrollStopped += () => { };
+_items.ScrollDraggingChanged += dragging => { };
 ```
 
-## ItemRender 生命周期
+当前 `UGList` 没有 `FocusIndex`、`TryFocus`、`CommitFocusToChoice` 这些 API。
 
-| 方法 | 调用时机 |
-| --- | --- |
-| `OnHolderAttached()` | 渲染器首次附加到某个 Holder 时 |
-| `OnBind(TData, int)` | Holder 被绑定到新数据时 |
-| `OnSelectionChanged(bool)` | 业务选择状态变化时 |
-| `OnClear()` | 当前数据绑定被清理或复用前 |
-| `OnHolderDetached()` | 渲染器从 Holder 分离时 |
+## Inspector 配置
 
-建议：
-
-1. `OnBind` 只做数据到 UI 的赋值。
-2. 按钮监听、一次性缓存放在 `OnHolderAttached`。
-3. 与当前数据相关的临时状态在 `OnClear` 里重置。
-4. 需要异步加载图片时，记录 `CurrentBindingVersion`，回调时用 `IsBindingCurrent(version)` 判断 Holder 是否仍然绑定同一份数据。
-
-## Inspector 常用配置
+`RecyclerView` 的主要配置项：
 
 | 配置 | 说明 |
 | --- | --- |
-| `Direction` | 垂直、水平或自定义方向 |
-| `Alignment` | 列表项在交叉轴上的对齐方式 |
-| `Spacing` | 列表项间距 |
-| `Padding` | 内容区域内边距 |
-| `Scroll` | 一直可滚动、禁用滚动或仅内容溢出时滚动 |
+| `Direction` | `Vertical`、`Horizontal`、`Custom` |
+| `Alignment` | `Left`、`Center`、`Top` |
+| `Spacing` | 项间距 |
+| `Padding` | 内容内边距 |
+| `MovementType` | `Elastic` 回弹或 `Clamped` 硬限制 |
+| `Scroll` | `AlwaysDisable`、`AlwaysEnable`、`WhenScrollable` |
 | `Snap` | 停止滚动后吸附到最近项 |
-| `ScrollbarVisibility` | 一直隐藏、一直显示或仅内容可滚动时显示 |
-| `Templates` | 列表项模板数组 |
+| `Inertia` | 是否启用惯性滑动 |
+| `DecelerationRate` | 惯性减速率，范围 `[0.001, 0.999]`，值越小减速越快 |
+| `ScrollSpeed` | 平滑滚动速度系数 |
+| `WheelSpeed` | 鼠标滚轮速度系数 |
+| `ScrollbarVisibility` | `AlwaysHide`、`AlwaysShow`、`WhenScrollable` |
+| `Templates` | 模板数组，混合和分组列表通过下标选择模板 |
 
 布局类型：
 
 | 类型 | 说明 |
 | --- | --- |
-| `LinearLayoutManager` | 单列或单行列表 |
-| `GridLayoutManager` | 网格列表 |
-| `PageLayoutManager` | 分页列表 |
-| `MixedLayoutManager` | 混合尺寸或混合模板列表 |
-| `CircleLayoutManager` | 圆形布局 |
+| `LinearLayoutManager` | 单列或单行列表，所有项使用第一个模板尺寸 |
+| `GridLayoutManager` | 网格列表，`cellCount` 控制每行或每列数量 |
+| `PageLayoutManager` | 分页列表，继承线性布局并对可见项做缩放动画 |
+| `MixedLayoutManager` | 多模板或不同尺寸列表，按每项 `TemplateId` 读取模板长度 |
+| `CircleLayoutManager` | 圆形布局，使用虚拟布局区间并按角度摆放 |
+
+滚动条在 `WhenScrollable` 模式下只会在内容尺寸大于视口尺寸时显示并允许交互。对 `Direction.Custom`，溢出检测不生效。
 
 ## API 速查
 
@@ -695,20 +1042,25 @@ private void OnScrollStopped()
 | `UGListCreateHelper.Create<T>(RecyclerView)` | 创建普通列表 |
 | `UGListCreateHelper.CreateMixed<T>(RecyclerView)` | 创建混合模板列表 |
 | `UGListCreateHelper.CreateLoop<T>(RecyclerView)` | 创建循环列表 |
-| `UGListCreateHelper.CreateGroup<T>(RecyclerView, string)` | 创建分组列表 |
-| `UGList.Data` | 替换数据源 |
-| `UGList.Adapter.RegisterItemRender<T>()` | 注册渲染器 |
-| `UGList.ChoiceIndex` | 获取或设置业务选择 |
-| `UGList.TryFocus(int, bool, ScrollAlignment)` | 聚焦指定项 |
-| `UGList.ScrollTo(int, ScrollAlignment, float, bool, float)` | 滚动到指定项 |
-| `Adapter.NotifyItemChanged(int, bool)` | 局部刷新或重布局 |
-| `ItemRender.OnBind(TData, int)` | 绑定数据 |
-| `ItemRender.OnSelectionChanged(bool)` | 更新选中表现 |
+| `UGListCreateHelper.CreateGroup<T>(RecyclerView, int)` | 创建分组列表，第二个参数是组头模板下标 |
+| `UGListBase.Data` | 替换数据源并刷新 |
+| `UGListBase.DataCount` | 原始数据数量 |
+| `UGListBase.ChoiceIndex` | 获取或设置业务选择 |
+| `UGListBase.HasChoice` | 是否已有选择 |
+| `UGListBase.ScrollPosition` | 当前滚动位置 |
+| `UGListBase.ScrollTo(...)` | 按对齐方式滚动到索引 |
+| `UGListBase.ScrollToChoice(...)` | 滚动到当前选择 |
+| `Adapter.GetData(index)` | 获取原始数据 |
+| `Adapter.NotifyDataChanged()` | 重新布局并刷新 |
+| `Adapter.NotifyItemChanged(index, relayout)` | 重绑可见项或重新布局 |
+| `RecyclerView.TrimInactivePool()` | 裁剪对象池中的非活动实例 |
+| `RecyclerView.PoolStats` | 开发环境下查看对象池统计 |
 
 ## 注意事项
 
-1. 模板对象会在运行时隐藏并作为对象池来源，不要把模板当作真实显示项直接操作。
-2. 混合模板列表必须保证 `TemplateName` 与 `ViewHolder` 类型名匹配。
-3. `ItemRender` 必须有无参构造函数，框架会通过反射创建实例。
-4. `RecyclerView` 相关方法必须在 Unity 主线程调用。
-5. 列表项尺寸会影响布局计算，动态改变尺寸后需要使用 `relayout: true` 刷新。
+1. `Templates` 必须非空，且每个模板都必须挂 `ViewHolder` 子类。
+2. 混合模板和分组列表的 `TemplateId` 必须是合法的模板数组下标。
+3. 分组列表的 `groupTemplateId` 必须是组头模板下标，子项不要使用同一个模板下标，除非业务确实希望它被识别为组头。
+4. 动态改变列表项尺寸或模板后，需要使用 `relayout: true` 或 `NotifyDataChanged()`。
+5. `ScrollMode.AlwaysDisable` 会阻止 `ScrollTo` 定位。
+6. 所有 Unity 对象和 UI 操作都应在 Unity 主线程执行。

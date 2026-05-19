@@ -41,7 +41,10 @@ public static class LubanConfigGenerate
     {
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         if (isWindows)
-            Execute(Path.Combine(ConfigPath, name + ".bat"), template);
+        {
+            string batPath = Path.Combine(ConfigPath, name + ".bat");
+            Execute("cmd.exe", $"/V:ON /C \"call \"\"{batPath}\"\" {template} & set EXITCODE=!ERRORLEVEL! & echo. & pause & exit /b !EXITCODE!\"");
+        }
         else
             Execute("bash", $"\"{Path.Combine(ConfigPath, name + ".sh")}\" {template}");
     }
@@ -56,7 +59,7 @@ public static class LubanConfigGenerate
                 Arguments = arguments,
                 WorkingDirectory = ConfigPath,
                 UseShellExecute = true,
-                WindowStyle = ProcessWindowStyle.Normal
+                WindowStyle = ProcessWindowStyle.Normal,
             };
 
             using (var process = Process.Start(startInfo))
