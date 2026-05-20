@@ -350,7 +350,6 @@ GameObject:
   - component: {fileID: 2914238141745871181}
   - component: {fileID: 3359130541274150081}
   - component: {fileID: 3007316011584194513}
-  - component: {fileID: 2160604916644879652}
   m_Layer: 5
   m_Name: UIBuyAlertWindow
   m_TagString: Untagged
@@ -482,28 +481,6 @@ MonoBehaviour:
   slideDistance: 120
   toastDistance: 40
   closedScale: 0.94
---- !u!114 &2160604916644879652
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2060376945812149439}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85e4995cea5647b46995bb92b329207d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _defaultSelectable: {fileID: 3477416080354867628}
-  _holder: {fileID: 3359130541274150081}
-  _bakedSelectables:
-  - {fileID: 6279154131588904896}
-  - {fileID: 1334982133771492798}
-  - {fileID: 8404598126191817093}
-  - {fileID: 4734241163188317333}
-  - {fileID: 3477416080354867628}
-  _rememberLastSelection: 0
-  _blockLowerScopes: 1
 --- !u!1 &2606438380772363430
 GameObject:
   m_ObjectHideFlags: 0
