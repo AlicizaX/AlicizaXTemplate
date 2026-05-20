@@ -123,6 +123,64 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &46660924
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 46660926}
+  - component: {fileID: 46660925}
+  m_Layer: 0
+  m_Name: '[UXNavigationManager]'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &46660925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46660924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d755cbf1369cfc4288d7b1261c523bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
+  _modeChangeProcessor:
+    rid: 2030763250591989778
+  _modeChangeProcessorTypeName: AlicizaX.UI.UXNavigation.DefaultUXNavigationModeChangeProcessor
+  references:
+    version: 2
+    RefIds:
+    - rid: 2030763250591989778
+      type: {class: DefaultUXNavigationModeChangeProcessor, ns: AlicizaX.UI.UXNavigation, asm: AlicizaX.UI.Extension}
+      data:
+        m_KeyboardDeselectOnBackgroundClick: 1
+        m_GamepadDeselectOnBackgroundClick: 1
+        m_KeyboardCursorVisible: 1
+        m_GamepadCursorVisible: 0
+--- !u!4 &46660926
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46660924}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1006.31836, y: 963.7228, z: 159.4016}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &954605699
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,3 +288,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 1560299182}
   - {fileID: 954605702}
+  - {fileID: 46660926}
