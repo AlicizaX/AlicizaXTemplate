@@ -32,7 +32,7 @@ namespace GameLogic.UI
         public string PriceText { get; }
     }
 
-    public sealed class UIShopGoodsItemViewHolder : ViewHolder<ShopGoodsData>, IPointerClickHandler
+    public sealed class UIShopGoodsItemViewHolder : ViewHolder<ShopGoodsData>, IPointerClickHandler,IRecyclerViewNavigationViewHolder
     {
         private static readonly Color BackgroundColor = new(0.035f, 0.04f, 0.04f, 0.9f);
 
@@ -84,6 +84,16 @@ namespace GameLogic.UI
                 SetSelect();
                 GameApp.UI.ShowUISync<UIBuyAlertWindow>(CurrentData);
             }
+        }
+
+        public void HandleNavigationFocused(bool focused)
+        {
+            OnSelectionChange(focused);
+        }
+
+        public bool HandleNavigationMove(MoveDirection direction)
+        {
+            return false;
         }
     }
 }

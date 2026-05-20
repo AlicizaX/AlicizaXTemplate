@@ -136,6 +136,7 @@ MonoBehaviour:
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_localizationID: 10050004
   m_localizationKey: UI.Home.ButtonShop
+  m_localizationFormatArgs: []
 --- !u!1 &901675699257454640
 GameObject:
   m_ObjectHideFlags: 0
@@ -834,6 +835,7 @@ MonoBehaviour:
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_localizationID: 10050003
   m_localizationKey: UI.Home.ButtonRole
+  m_localizationFormatArgs: []
 --- !u!1 &2925661357764734874
 GameObject:
   m_ObjectHideFlags: 0
@@ -848,6 +850,7 @@ GameObject:
   - component: {fileID: 6856588170432960206}
   - component: {fileID: 3268640359497331672}
   - component: {fileID: 3259763076922183672}
+  - component: {fileID: 2058815979515405440}
   m_Layer: 5
   m_Name: UIHomeWindow
   m_TagString: Untagged
@@ -978,6 +981,29 @@ MonoBehaviour:
   slideDistance: 120
   toastDistance: 40
   closedScale: 0.94
+--- !u!114 &2058815979515405440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2925661357764734874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85e4995cea5647b46995bb92b329207d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _defaultSelectable: {fileID: 5339333089336403222}
+  _holder: {fileID: 3268640359497331672}
+  _bakedSelectables:
+  - {fileID: 5339333089336403222}
+  - {fileID: 8599430375733818942}
+  - {fileID: 7966806373771437446}
+  - {fileID: 7848496680210931646}
+  - {fileID: 5077209145104049990}
+  - {fileID: 331801688049960707}
+  _rememberLastSelection: 0
+  _blockLowerScopes: 1
 --- !u!1 &3353888472002653388
 GameObject:
   m_ObjectHideFlags: 0
@@ -2278,6 +2304,7 @@ MonoBehaviour:
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_localizationID: 10050002
   m_localizationKey: UI.Home.ButtonExit
+  m_localizationFormatArgs: []
 --- !u!1 &5796944451290305027
 GameObject:
   m_ObjectHideFlags: 0
@@ -2945,6 +2972,7 @@ MonoBehaviour:
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_localizationID: 10050001
   m_localizationKey: UI.Home.ButtonBag
+  m_localizationFormatArgs: []
 --- !u!1 &9066661303960329366
 GameObject:
   m_ObjectHideFlags: 0
@@ -3081,3 +3109,4 @@ MonoBehaviour:
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_localizationID: 10050005
   m_localizationKey: UI.Home.ButtonTips
+  m_localizationFormatArgs: []

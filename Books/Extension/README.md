@@ -21,6 +21,7 @@
 | [UXDraggable](UXDraggable.md) | 拖拽事件转发、可拖拽弹窗 |
 | [HotkeyComponent](HotkeyComponent.md) | Input System 快捷键绑定、优先级规则 |
 | [RecyclerView](RecyclerView.md) | 虚拟列表、`ViewHolder`、`ItemRender`、普通列表、循环列表、混合模板列表和分组列表 |
+| [RecyclerView.Navigation](RecyclerView.Navigation.md) | RecyclerView 手柄/键盘导航、虚拟焦点、ViewHolder 导航接口和 UXNavigation 接入 |
 | [InputGlyph](InputGlyph.md) | Input System 按键图标、设备识别、按键重绑定、输入读取工具 |
 | [Navigation](Navigation.md) | 多输入设备 UI 焦点管理、`UXNavigationScope`、顶层 Scope 选择、导航压制和光标策略 |
 

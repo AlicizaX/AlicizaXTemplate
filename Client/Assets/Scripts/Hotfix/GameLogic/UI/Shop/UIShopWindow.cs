@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using AlicizaX;
 using AlicizaX.Localization;
 using AlicizaX.UI;
@@ -22,7 +23,6 @@ namespace GameLogic.UI
         private UGLoopList<ShopGoodsData> _goodsLoopList;
         private IFakePlayerDataService _playerDataService;
         private IConfigService _configService;
-        private int _lastCredit = int.MinValue;
 
         protected override void OnInitialize()
         {
@@ -105,7 +105,7 @@ namespace GameLogic.UI
         private void SwitchCategory(EShopCategory category)
         {
             var datas = GetGoods(category);
-            _goodsList.Data = datas;
+            _goodsList.Data = datas.Take(16).ToList();
             _goodsLinerList.Data = datas;
             _goodsLoopList.Data = datas;
         }
