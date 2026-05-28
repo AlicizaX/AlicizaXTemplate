@@ -1,29 +1,27 @@
 # MemoryPool 模块
 
-MemoryPool 是框架提供的轻量级普通 C# 对象缓存池，适合缓存频繁创建、释放的临时数据对象，例如事件参数、加载请求、战斗结算数据、UI 列表项数据等。被池化的对象需要实现 `IMemory`，并在 `Clear()` 中把对象状态恢复到可复用状态。
+`MemoryPool` 是框架提供的 C# 对象池，用于复用频繁创建和释放的临时对象，例如事件参数、加载请求、战斗结算数据、UI 列表项数据等。
 
 源码位置：
 
 - `Client/Packages/com.alicizax.unity.framework/Runtime/MemoryPool`
+- Inspector：`Client/Packages/com.alicizax.unity.framework/Editor/Inspector/MemoryPoolComponentInspector.cs`
 
 ## 使用前提
 
-1. 需要被池化的类型必须是引用类型。
-2. 类型必须实现 `IMemory`。
-3. 类型必须有无参构造函数。
-4. 使用完成后必须调用 `MemoryPool.Release` 归还对象。
+池对象必须继承 `MemoryObject`，不能只是实现 `IMemory`。
 
 ```csharp
 using AlicizaX;
 
-public sealed class BattleDamageInfo : IMemory
+public sealed class BattleDamageInfo : MemoryObject
 {
     public int AttackerId;
     public int TargetId;
     public int Damage;
     public bool Critical;
 
-    public void Clear()
+    public override void Clear()
     {
         AttackerId = 0;
         TargetId = 0;
@@ -33,29 +31,27 @@ public sealed class BattleDamageInfo : IMemory
 }
 ```
 
-## 获取和归还对象
+硬性要求：
 
-最常用的方式是泛型 API。对象从池中取出后可能是复用对象，所以业务字段必须重新赋值。
+- 类型必须是 `class`。
+- 类型必须继承 `MemoryObject`。
+- 类型不能是 `abstract`。
+- 类型不能是 open generic。
+- 类型必须有 public 无参构造函数。
+- 使用完成后必须调用 `MemoryPool.Release` 归还。
+
+## 获取和归还
+
+推荐使用泛型 API：
 
 ```csharp
-using AlicizaX;
-using UnityEngine;
+BattleDamageInfo info = MemoryPool.Acquire<BattleDamageInfo>();
+info.AttackerId = 1001;
+info.TargetId = 2001;
+info.Damage = 350;
+info.Critical = true;
 
-public sealed class MemoryPoolExample : MonoBehaviour
-{
-    private void Start()
-    {
-        BattleDamageInfo info = MemoryPool.Acquire<BattleDamageInfo>();
-        info.AttackerId = 1001;
-        info.TargetId = 2001;
-        info.Damage = 350;
-        info.Critical = true;
-
-        Debug.Log($"Damage: {info.Damage}");
-
-        MemoryPool.Release(info);
-    }
-}
+MemoryPool.Release(info);
 ```
 
 也可以直接使用类型专属池：
@@ -68,184 +64,175 @@ BattleDamageInfo info = MemoryPool<BattleDamageInfo>.Acquire();
 MemoryPool<BattleDamageInfo>.Release(info);
 ```
 
-## 预热对象
-
-如果某类对象会在短时间内大量使用，可以在加载阶段预热，减少运行时临时分配。
+动态类型入口：
 
 ```csharp
-using AlicizaX;
-using UnityEngine;
-
-public sealed class BattlePrewarm : MonoBehaviour
-{
-    private void Awake()
-    {
-        MemoryPool.Add<BattleDamageInfo>(128);
-        MemoryPool<BattleDamageInfo>.SetCapacity(256, 1024);
-    }
-}
+IMemory memory = MemoryPool.Acquire(typeof(BattleDamageInfo));
+MemoryPool.Release(memory);
 ```
 
-`SetCapacity(softCapacity, hardCapacity)` 中：
+重复使用动态类型时建议缓存 `MemoryPoolHandle`，避免反复走 Type 入口。
 
-- `softCapacity`：自适应保留对象数量的上限。
-- `hardCapacity`：池内最多保留的未使用对象数量。
+## MemoryPoolComponentInspector 配置参数
 
-释放对象时，如果未使用对象数量已经达到硬上限，新归还的对象会在执行 `Clear()` 后被丢弃，不再进入池。
+这些参数在 `MemoryPoolSetting` 组件上配置。运行时 Inspector 也可以直接修改全局值。
 
-## 动态类型句柄
+### Idle Trim
 
-如果类型在运行时才确定，优先缓存 `MemoryPoolHandle`，不要在热路径里反复调用 `Acquire(Type)`。
+| 参数 | 默认值 | 作用 | 限制 |
+|---|---:|---|---|
+| `Short Decay Start` | `1800` | 池空闲多少帧后开始缩容。60 FPS 下约 30 秒。 | `>= 0` |
+| `Long Decay Start` | `7200` | 池空闲多少帧后加速降低历史峰值预测。60 FPS 下约 2 分钟。 | `>= Short Decay Start` |
+| `Zero Free Start` | `7200` | 池空闲多少帧后允许 `TargetFreeReserve` 最低降到 `0`。到达前仍保留 `MinKeep=4`。 | `>= Long Decay Start` |
+| `Unschedule Idle` | `18000` | 池空闲多少帧后允许停止 Tick，减少 CPU 调度成本。 | `>= Zero Free Start` |
+| `Auto Trim Native` | `18000` | 池空闲多少帧后，如果 `Using=0`、`Unused=0`、`Constructed=0`，自动释放 native metadata。`-1` 表示关闭自动 Trim。 | `-1` 或 `>= Zero Free Start` |
 
-```csharp
-using System;
-using AlicizaX;
+默认三段式策略：
 
-public sealed class RuntimeMemoryFactory
-{
-    private readonly MemoryPoolHandle _handle;
+- 0 到 30 秒：正常保留缓存。
+- 30 秒后：开始逐帧缩容空闲对象。
+- 2 分钟后：允许空闲对象最终降到 `0`。
+- 5 分钟后：如果池已经完全空，释放 native metadata。
 
-    public RuntimeMemoryFactory(Type memoryType)
-    {
-        _handle = MemoryPool.GetHandle(memoryType);
-    }
+注意：只要池重新发生 `Acquire`、`Release` 或仍有 `Using > 0`，`IdleFrames` 会被重置或保持活跃状态，冷池倒计时不会继续推进。
 
-    public IMemory Acquire()
-    {
-        return _handle.Acquire();
-    }
+### Capacity
 
-    public void Release(IMemory memory)
-    {
-        _handle.Release(memory);
-    }
-}
+| 参数 | 默认值 | 作用 | 限制 |
+|---|---:|---|---|
+| `Soft Free Limit` | `128` | 默认空闲缓存软上限。新池使用该值，运行时修改会同步到已创建池。 | `>= 4` |
+| `Hard Free Limit` | `512` | 默认空闲缓存硬上限。释放对象时，如果空闲数已达到硬上限，对象会被驱逐，不回到 free 队列。 | `>= Soft Free Limit` |
+
+`Hard Free Limit` 不是正在使用对象的上限。`Acquire` 不能失败，所以池里没有空闲对象时仍会应急 `new T()` 返回对象。硬上限只限制“归还后最多缓存多少空闲对象”。
+
+## Inspector 调试面板
+
+运行时选中场景里的 `MemoryPoolSetting` 组件，可以看到调试面板。
+
+### Configuration
+
+- `Memory Pool Count`：已经注册过的池类型数量。注意这是注册表数量，不等于当前缓存对象数量。
+- `Show Full Class Name`：显示完整类型名，方便定位同名类。
+- `Show Empty Pools`：默认关闭。关闭时隐藏 `Unused=0 && Using=0 && PageCap=0` 的空池。打开后可以看到只剩注册表 handle 的池类型。
+
+空池仍出现在统计里的原因：某个类型一旦被 materialize，注册表会保留这个类型的 handle。即使对象和 native metadata 都清掉了，handle 仍用于后续 O(1) 再访问。这不是内存泄露。
+
+### Overview
+
+- `Total Cached`：所有池当前空闲对象总数，对应各池 `Unused` 之和。
+- `Total In Use`：所有池当前借出未归还对象总数，对应各池 `Using` 之和。
+- `Total Page Capacity`：所有池当前活跃 page 可容纳 slot 总数，对应各池 `PageCap` 之和。
+
+判断是否存在明显泄露，优先看 `Total In Use`。如果场景退出、业务结束、窗口关闭后该值长期不回到 `0`，说明有对象没有归还。
+
+### Pools 列表字段
+
+| 字段 | 含义 | 分析方式 |
+|---|---|---|
+| `Unused` | 当前池内空闲对象数量。 | 长期很高表示缓存较多，不一定泄露。超过冷却时间后应逐步下降。 |
+| `Using` | 当前借出未归还对象数量。 | 泄露排查第一字段。业务结束后长期大于 0，基本就是未归还。 |
+| `Acquire` | 累计获取次数。 | 与 `Release` 对比，判断归还是否匹配。 |
+| `Release` | 累计归还次数。 | 正常情况下长期应接近 `Acquire`。差值通常接近当前 `Using`。 |
+| `Created` | 累计创建对象次数。 | 持续增长说明池容量不足、对象峰值上升，或释放太慢导致频繁 miss。 |
+| `Target` | 当前目标空闲保留数量，即 `TargetFreeReserve`。 | 活跃期会升高，冷却后会下降。到 `Zero Free Start` 后允许降到 0。 |
+| `MaxCap` | 当前硬空闲缓存上限。 | 归还时超过该值会直接驱逐。 |
+| `Idle` | 当前空闲帧数。 | 判断是否进入冷池阶段。发生获取/归还/仍有借出时不会持续增长。 |
+| `PageCap` | 当前活跃 page 的 slot 容量。 | `Unused=0 && Using=0 && PageCap=0` 表示对象和 native metadata 都已经清干净，只剩注册表 handle。 |
+
+## 如何判断是否泄露
+
+### 1. 看 `Using`
+
+业务结束后等待几帧，如果某个池：
+
+- `Using > 0`
+- `Release` 没追上 `Acquire`
+- 对应对象逻辑上已经不应该存在
+
+这是真正的高概率泄露：对象借出后没有 `Release`。
+
+处理方式：沿着该类型的 `Acquire` 调用点检查所有异常分支、提前 return、取消流程、对象生命周期结束点，确保最终都会调用 `MemoryPool.Release`。
+
+### 2. 区分缓存和泄露
+
+`Unused > 0` 不是泄露。它表示对象已经归还，当前只是缓存起来等待复用。
+
+默认策略下，如果池不再使用：
+
+- 约 30 秒后开始缩容。
+- 约 2 分钟后目标空闲允许降到 0。
+- 缩容速度受当前 `MemoryPoolPhase` 的 evict budget 控制，不会一帧全部释放。
+- 约 5 分钟后，如果完全空池，会自动 Trim native metadata。
+
+### 3. 看 `PageCap`
+
+`PageCap > 0` 表示该池仍持有活跃 page 或 native metadata。
+
+常见情况：
+
+- `Using > 0`：不能释放，正常。
+- `Unused > 0`：还有空闲缓存，正常。
+- `Using=0 && Unused=0 && PageCap>0`：对象已经清完，但 metadata 还没自动 Trim；达到 `Auto Trim Native` 后会清，或手动点 `Trim Native`。
+- `Using=0 && Unused=0 && PageCap=0`：已经清干净，不是泄露。默认会被 `Show Empty Pools` 隐藏。
+
+### 4. 看 `Created`
+
+`Created` 持续上涨通常说明运行时发生 miss：
+
+- 短时间峰值超过当前空闲缓存。
+- `Soft Free Limit` 太低。
+- 高频对象没有提前预热。
+- 对象被归还得太晚，导致后续请求拿不到 free 对象。
+
+如果目标是运行时零分配，压测时应关注 `Created` 是否在稳定阶段继续增长。稳定阶段继续增长就是性能问题。
+
+### 5. 看 `Acquire - Release`
+
+粗略判断：
+
+```text
+Acquire - Release ~= Using
 ```
 
-## 严格检查
+如果差值持续扩大，且 `Using` 也持续上升，基本是未归还。
 
-`MemoryPool.EnableStrictCheck` 可以检查重复归还对象。严格检查会额外维护对象集合，性能开销较大，建议只在编辑器或开发包中开启。
+如果差值短时间扩大后又回落，是正常高峰。
 
-项目中也提供了 `MemoryPoolSetting` 组件，可通过 Inspector 配置严格检查策略：
+## 调试按钮
 
-- `AlwaysEnable`：总是开启。
-- `OnlyEnableWhenDevelopment`：仅开发包开启。
-- `OnlyEnableInEditor`：仅编辑器开启。
-- `AlwaysDisable`：总是关闭。
+- `Clear Cached`：清理所有池的空闲缓存。仍在使用的对象不会被强行归零，会进入 tombstone 路径，等归还时再驱逐。
+- `Trim Native`：在没有借出对象的池上释放 native metadata。`Using > 0` 的池不会被强行释放。
+- `Reset Stats`：重置统计计数，例如 `Acquire`、`Release`、`Created`，方便重新压测一段业务。
 
-```csharp
-#if UNITY_EDITOR
-MemoryPool.EnableStrictCheck = true;
-#endif
-```
+推荐排查流程：
 
-## 查看池信息
+1. 进入目标业务前点 `Reset Stats`。
+2. 执行业务流程。
+3. 退出业务后观察 `Using` 是否回到 0。
+4. 等待冷却，观察 `Unused` 是否下降。
+5. 如需确认 metadata 是否能释放，点 `Trim Native` 或等待 `Auto Trim Native`。
+6. 打开 `Show Empty Pools`，确认空池是否只是 `Unused=0 && Using=0 && PageCap=0` 的注册表残留。
 
-可以使用 `GetAllMemoryPoolInfos` 获取所有已注册内存池的快照信息。
-
-```csharp
-using AlicizaX;
-using UnityEngine;
-
-public sealed class MemoryPoolDebugExample : MonoBehaviour
-{
-    private readonly MemoryPoolInfo[] _infos = new MemoryPoolInfo[64];
-
-    private void Update()
-    {
-        int count = MemoryPool.GetAllMemoryPoolInfos(_infos);
-        for (int i = 0; i < count; i++)
-        {
-            MemoryPoolInfo info = _infos[i];
-            Debug.Log($"{info.Type.Name} Unused={info.UnusedCount}, Using={info.UsingCount}, Created={info.CreateCount}");
-        }
-    }
-}
-```
-
-常用字段：
-
-- `UnusedCount`：池内未使用对象数。
-- `UsingCount`：已取出未归还对象数。
-- `AcquireCount`：累计获取次数。
-- `ReleaseCount`：累计归还次数。
-- `CreateCount`：累计创建次数。
-- `HighWaterMark`：当前自适应保留目标。
-- `MaxCapacity`：软容量。
-- `PoolArrayLength`：内部数组长度。
-
-## 手动释放和压缩
+## 手动清理 API
 
 ```csharp
-// 移除 BattleDamageInfo 池中 32 个未使用对象。
+// 降低某一类型的目标保留数量，并按预算淘汰多余 free 对象。
 MemoryPool.Remove<BattleDamageInfo>(32);
 
-// 清空某一类对象池。
+// 清空某一类型对象池。
 MemoryPool.RemoveAll<BattleDamageInfo>();
 
-// 压缩某一类对象池内部数组。
+// 触发某一类型对象池淘汰多余 free 对象。
 MemoryPool.Compact<BattleDamageInfo>();
 
-// 清空所有内存池。
+// 清空所有对象池。
 MemoryPool.ClearAll();
 
-// 压缩所有内存池。
+// 触发所有对象池压缩。
 MemoryPool.CompactAll();
+
+// 释放所有可释放池的 native metadata。
+MemoryPool.TrimAllNativeMetadata();
 ```
 
-`RootModule` 在框架关闭时会调用 `MemoryPool.ClearAll()`，通常业务代码不需要在退出游戏时手动清理全部内存池。
-
-## 完整示例：事件参数复用
-
-```csharp
-using AlicizaX;
-using UnityEngine;
-
-public sealed class PlayerLevelUpEventArgs : IMemory
-{
-    public int PlayerId;
-    public int OldLevel;
-    public int NewLevel;
-
-    public static PlayerLevelUpEventArgs Create(int playerId, int oldLevel, int newLevel)
-    {
-        PlayerLevelUpEventArgs args = MemoryPool.Acquire<PlayerLevelUpEventArgs>();
-        args.PlayerId = playerId;
-        args.OldLevel = oldLevel;
-        args.NewLevel = newLevel;
-        return args;
-    }
-
-    public void Clear()
-    {
-        PlayerId = 0;
-        OldLevel = 0;
-        NewLevel = 0;
-    }
-}
-
-public sealed class LevelSystem : MonoBehaviour
-{
-    public void NotifyLevelUp(int playerId, int oldLevel, int newLevel)
-    {
-        PlayerLevelUpEventArgs args = PlayerLevelUpEventArgs.Create(playerId, oldLevel, newLevel);
-
-        try
-        {
-            Debug.Log($"Player {args.PlayerId}: {args.OldLevel} -> {args.NewLevel}");
-        }
-        finally
-        {
-            MemoryPool.Release(args);
-        }
-    }
-}
-```
-
-## 注意事项
-
-- 不要在归还对象后继续持有和访问该对象。
-- `Clear()` 只负责重置对象状态，不要在里面写业务派发逻辑。
-- 对象取出后要完整重新赋值，不要依赖上一次使用留下的字段。
-- 热路径优先使用 `MemoryPool<T>.Acquire()`、`MemoryPool.Acquire<T>()` 或缓存后的 `MemoryPoolHandle`。
-- 需要检测重复归还时开启严格检查，但不要在正式性能敏感环境长期启用。
+通常业务代码不需要在退出场景时手动清理全部池，框架生命周期会统一处理。手动清理主要用于调试、压测和低内存场景。
