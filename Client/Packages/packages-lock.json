@@ -27,7 +27,8 @@
       "source": "embedded",
       "dependencies": {
         "com.tuyoogame.yooasset": "2.3.18",
-        "com.cysharp.zstring": "2.6.0"
+        "com.cysharp.zstring": "2.6.0",
+        "com.alicizax.unity.cysharp.unitask": "2.5.10"
       }
     },
     "com.alicizax.unity.ui.extension": {

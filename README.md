@@ -44,6 +44,26 @@ AlicizaX 是一套面向 Unity 项目的框架模板，围绕启动流程、资�
 
 > 项目中包含 HybridCLR、YooAsset、UniTask、Luban 等依赖。首次打开工程后，请等待 Unity 完成包导入、脚本编译和资源索引刷新。
 
+## 新工程安装
+
+在一个新的 Unity 工程中，先把 AlicizaX scoped registry 添加到项目的 `Packages/manifest.json`：
+
+```json
+{
+  "scopedRegistries": [
+    {
+      "name": "AlicizaX",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.alicizax.unity"
+      ]
+    }
+  ]
+}
+```
+
+然后在 Unity Package Manager 中安装 **AlicizaX Framework**。安装器会自动检查并补齐框架需要的 OpenUPM registry 与相关依赖配置，随后可通过 `AlicizaX/Installer` 导入 Normal 或 Hybrid 模板。
+
 ## 快速开始
 
 建议从框架快速入门开始阅读：
