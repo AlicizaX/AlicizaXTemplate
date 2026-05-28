@@ -13,3 +13,6 @@
 [submodule "Client/Packages/com.alicizax.unity.editor.extension"]
 	path = Client/Packages/com.alicizax.unity.editor.extension
 	url = https://github.com/AlicizaX/com.alicizax.unity.editor.extension.git
+[submodule "Client/Packages/com.alicizax.unity.installer"]
+	path = Client/Packages/com.alicizax.unity.installer
+	url = https://github.com/AlicizaX/FramworkInstaller.git

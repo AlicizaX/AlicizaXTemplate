@@ -46,23 +46,13 @@ AlicizaX 是一套面向 Unity 项目的框架模板，围绕启动流程、资�
 
 ## 新工程安装
 
-在一个新的 Unity 工程中，先把 AlicizaX scoped registry 添加到项目的 `Packages/manifest.json`：
+在一个新的 Unity 工程中，先通过 Unity Package Manager 的 Git URL 方式安装安装器包：
 
-```json
-{
-  "scopedRegistries": [
-    {
-      "name": "AlicizaX",
-      "url": "https://package.openupm.com",
-      "scopes": [
-        "com.alicizax.unity"
-      ]
-    }
-  ]
-}
+```text
+https://github.com/AlicizaX/FramworkInstaller.git
 ```
 
-然后在 Unity Package Manager 中安装 **AlicizaX Framework**。安装器会自动检查并补齐框架需要的 OpenUPM registry 与相关依赖配置，随后可通过 `AlicizaX/Installer` 导入 Normal 或 Hybrid 模板。
+安装完成后，点击 Unity 菜单 `AlicizaX/Installer` 打开安装器。安装器会先自动检查并补齐所需的 OpenUPM scoped registry 与 scopes，然后点击 **Install Core** 安装 `com.alicizax.unity.framework`。Core 安装完成后，安装器会解锁 Normal / Hybrid 模板导入入口，再根据项目需要安装对应模板。
 
 ## 快速开始
 

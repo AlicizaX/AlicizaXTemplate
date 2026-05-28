@@ -54,12 +54,13 @@
         "com.kyrylokuzyk"
       ]
     },
-    {
-      "name": "OpenUPM",
+        {
+      "name": "AlicizaX",
       "url": "https://package.openupm.com",
       "scopes": [
         "com.cysharp",
-        "com.tuyoogame"
+        "com.tuyoogame",
+        "com.alicizax.unity"
       ]
     }
   ]

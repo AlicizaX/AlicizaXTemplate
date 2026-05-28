@@ -31,6 +31,12 @@
         "com.alicizax.unity.cysharp.unitask": "2.5.10"
       }
     },
+    "com.alicizax.unity.installer": {
+      "version": "file:com.alicizax.unity.installer",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.alicizax.unity.ui.extension": {
       "version": "file:com.alicizax.unity.ui.extension",
       "depth": 0,
