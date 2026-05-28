@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.alicizax.unity.cysharp.zstring": "https://github.com/AlicizaX/com.alicizax.unity.cysharp.zstring.git",
     "com.code-philosophy.hybridclr": "https://gitee.com/focus-creative-games/hybridclr_unity.git",
     "com.code-philosophy.luban": "https://github.com/AlicizaX/luban_unity.git",
     "com.coffee.ui-particle": "https://github.com/mob-sakai/ParticleEffectForUGUI.git",
@@ -53,8 +52,15 @@
       "url": "https://registry.npmjs.org",
       "scopes": [
         "com.kyrylokuzyk"
-      ],
-      "overrideBuiltIns": false
+      ]
+    },
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.cysharp",
+        "com.tuyoogame"
+      ]
     }
   ]
 }
