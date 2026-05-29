@@ -1,4 +1,3 @@
-
 <div align="center">
 
 ![AlicizaX Logo](Books/src/AlicizaXLogo.png)
@@ -139,6 +138,18 @@ Aliciza/
 5. [UI](Books/UI.md)
 6. [UI Extension](Books/Extension/README.md)
 7. 按业务需要继续阅读 Audio、Scene、Localization、Timer、Event、ObjectPool 等模块文档。
+
+## 🌟 开源项目推荐
+
+| 项目            | 描述                                         | 链接 |
+|---------------|--------------------------------------------|------|
+| **TEngine**   | 本框架源于此鼻祖框架 高性能、易用、设计干净、 有多款已上线商业项目验证 ⭐⭐⭐⭐⭐     | [GitHub](https://github.com/Alex-Rachel/TEngine) |
+| **YooAsset**  | 商业级经历百万 DAU 游戏验证的资源管理系统                    | [GitHub](https://github.com/tuyoogame/YooAsset) |
+| **HybridCLR** | 特性完整、零成本、高性能、低内存的近乎完美的 Unity 全平台原生 C# 热更方案 | [GitHub](https://github.com/focus-creative-games/hybridclr) |
+| **Luban**     | 最佳游戏配置解决方案                                 | [GitHub](https://github.com/focus-creative-games/luban) |
+| **Fantasy**   | 源于 ETServer 但极为简洁，更好上手的商业级服务器框架            | [GitHub](https://github.com/qq362946/Fantasy) |
+
+
 
 ## 贡献
 
