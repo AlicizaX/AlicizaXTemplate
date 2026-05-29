@@ -17,8 +17,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.unity.2d.sprite": "1.0.0",
-        "com.alicizax.unity.framework": ""
+        "com.unity.2d.sprite": "1.0.0"
       }
     },
     "com.alicizax.unity.framework": {
@@ -29,7 +28,7 @@
         "com.tuyoogame.yooasset": "2.3.18",
         "com.cysharp.zstring": "2.6.0",
         "com.alicizax.unity.cysharp.unitask": "2.5.10",
-        "com.unity.nuget.newtonsoft-json": ""
+        "com.unity.nuget.newtonsoft-json": "3.2.2"
       }
     },
     "com.alicizax.unity.installer": {
@@ -42,9 +41,7 @@
       "version": "file:com.alicizax.unity.ui.extension",
       "depth": 0,
       "source": "embedded",
-      "dependencies": {
-        "com.alicizax.unity.framework": ""
-      }
+      "dependencies": {}
     },
     "com.code-philosophy.hybridclr": {
       "version": "https://gitee.com/focus-creative-games/hybridclr_unity.git",
@@ -146,8 +143,8 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.nuget.newtonsoft-json": {
-      "version": "3.2.1",
-      "depth": 0,
+      "version": "3.2.2",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
