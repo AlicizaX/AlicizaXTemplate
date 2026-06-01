@@ -20,9 +20,7 @@ namespace Unity.Startup.Procedure
                     new ProcedureInitPackageState(),
                     new ProcedureDownloadBundleState(),
                     new ProcedurePatchDoneState(),
-#if ENABLE_HYBRIDCLR
                     new ProcedureLoadAssembly(),
-#endif
                     new ProcedureUpdateFinishState(),
                 },
                 typeof(ProcedureEntryState)

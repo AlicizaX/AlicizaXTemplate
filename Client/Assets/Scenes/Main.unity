@@ -219,7 +219,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Entry
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 7354290124713579766, guid: 8e4808bf30e54a8439a661bfa35ee982, type: 3}
+      propertyPath: _playMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7354290124713579766, guid: 8e4808bf30e54a8439a661bfa35ee982, type: 3}
+      propertyPath: idleAssetExpireTime
+      value: 60
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 555190332568712345, guid: 8e4808bf30e54a8439a661bfa35ee982, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

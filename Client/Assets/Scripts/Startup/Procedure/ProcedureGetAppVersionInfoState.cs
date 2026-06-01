@@ -26,9 +26,9 @@ namespace Unity.Startup.Procedure
             try
             {
                 currentTryCount++;
-                if (StartupSetting.Version != AppVersion.GameVersion)
+                if (StartupSetting.Version != Application.version)
                 {
-                    Log.Warning($"Version inconsistency : {AppVersion.GameVersion}->{StartupSetting.Version} ");
+                    Log.Warning($"Version inconsistency : {Application.version}->{StartupSetting.Version} ");
                     Utility.Platform.Quit();
 #if !UNITY_EDITOR
                     Utility.Platform.OpenURL(StartupSetting.AppDownloadUrl);

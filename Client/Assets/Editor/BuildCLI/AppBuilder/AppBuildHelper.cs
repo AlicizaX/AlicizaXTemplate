@@ -84,10 +84,6 @@ public static class AppBuildHelper
         {
             Debug.LogError($"构建过程中发生异常: {e.Message}\n{e.StackTrace}");
         }
-        finally
-        {
-            DeleteBuilderSettingInfo();
-        }
     }
 
     private static void ApplyAndroidSpecificSettings(AndroidBuildParameters androidParams)
@@ -172,21 +168,6 @@ public static class AppBuildHelper
         appBuilderSetting.DecryptionServices = buildParameters.DecryptionServices;
         File.WriteAllText(AppBuilderSettingPath, Utility.Json.ToJson(appBuilderSetting));
         AssetDatabase.ImportAsset(AppBuilderSettingPath, ImportAssetOptions.ForceUpdate);
-    }
-
-    public static void DeleteBuilderSettingInfo()
-    {
-        const string AppBuilderSettingPath = "Assets/Resources/ServiceDynamicBindInfo.bytes";
-        if (AssetDatabase.LoadAssetAtPath<TextAsset>(AppBuilderSettingPath) != null)
-        {
-            AssetDatabase.DeleteAsset(AppBuilderSettingPath);
-        }
-        else if (File.Exists(AppBuilderSettingPath))
-        {
-            File.Delete(AppBuilderSettingPath);
-        }
-
-        AssetDatabase.Refresh();
     }
 
     private static void HandleBuildReport(UnityEditor.Build.Reporting.BuildReport report)

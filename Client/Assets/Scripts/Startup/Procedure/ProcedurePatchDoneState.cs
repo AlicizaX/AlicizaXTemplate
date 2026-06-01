@@ -17,12 +17,7 @@ namespace Unity.Startup.Procedure
         private void ClearCacheCompleted(AsyncOperationBase obj)
         {
             Log.Info($"清理包裹缓存完成");
-#if ENABLE_HYBRIDCLR
             SwitchProcedure<ProcedureLoadAssembly>();
-
-#else
-            SwitchProcedure<ProcedureUpdateFinishState>();
-#endif
         }
     }
 }

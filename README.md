@@ -2,8 +2,6 @@
 
 ![AlicizaX Logo](Books/src/AlicizaXLogo.png)
 
-**模块化 Unity 框架模板，覆盖启动流程、热更新、资源管理与 UI 工作流。**
-
 [![Unity Version](https://img.shields.io/badge/Unity-2022.3.20%2B-blue.svg?style=flat-square)](https://unity.com/)
 [![License](https://img.shields.io/github/license/AlicizaX/AlicizaXTemplate?style=flat-square)](https://github.com/AlicizaX/AlicizaXTemplate)
 [![Last Commit](https://img.shields.io/github/last-commit/AlicizaX/AlicizaXTemplate?style=flat-square)](https://github.com/AlicizaX/AlicizaXTemplate)
@@ -14,7 +12,7 @@
 
 ## 简介
 
-AlicizaX 是一套面向 Unity 项目的框架模板，围绕启动流程、资源管理、UI 开发、热更新、对象池、事件、计时器等常用模块做了封装。项目目标是提供一套结构清晰、易于接入、方便裁剪的基础工程，而不是把所有业务形态都固化进框架。
+AlicizaX 是一套面向 Unity 项目的框架模板，围绕PC/主机适配、资源管理、UI 开发、热更新、对象池、事件、计时器等常用模块做了封装。项目目标是提供一套结构清晰、易于接入、方便裁剪的基础工程，而不是把所有业务形态都固化进框架。
 - Unity | 2022.3.x 或更高版本
 
 ## 主要能力

@@ -138,7 +138,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_IsOn: 1
+  m_IsOn: 0
   hoverAudioClip: {fileID: 0}
   clickAudioClip: {fileID: 0}
 --- !u!1 &430710209671375489
@@ -3847,7 +3847,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_IsOn: 0
+  m_IsOn: 1
   hoverAudioClip: {fileID: 0}
   clickAudioClip: {fileID: 0}
 --- !u!1 &4861193423713299861
