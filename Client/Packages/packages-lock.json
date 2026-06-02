@@ -12,6 +12,12 @@
       "source": "embedded",
       "dependencies": {}
     },
+    "com.alicizax.unity.debugger": {
+      "version": "file:com.alicizax.unity.debugger",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.alicizax.unity.editor.extension": {
       "version": "file:com.alicizax.unity.editor.extension",
       "depth": 0,

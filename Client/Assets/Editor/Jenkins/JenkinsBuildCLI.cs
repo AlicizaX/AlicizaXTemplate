@@ -1,7 +1,5 @@
 using System.IO;
 using AlicizaX.Editor.Extension;
-using AlicizaX;
-using AlicizaX.Debugger.Runtime;
 using UnityEditor;
 using UnityEngine;
 using YooAsset;
@@ -18,7 +16,6 @@ namespace BuildCLI
         {
             StandaloneBuildParameters parameter = new StandaloneBuildParameters();
             parameter.DevelopBuild = false;
-            parameter.ShowDebugWnd = DebuggerActiveWindowType.AlwaysOpen;
             parameter.OutPutPath = "../Build";
             parameter.FileName = "AlicizaX.exe";
             parameter.Scenes = scenePath;
@@ -44,7 +41,6 @@ namespace BuildCLI
         {
             StandaloneBuildParameters parameter = new StandaloneBuildParameters();
             parameter.DevelopBuild = false;
-            parameter.ShowDebugWnd = DebuggerActiveWindowType.AlwaysOpen;
             parameter.OutPutPath = "../Build";
             parameter.FileName = "SAOK.exe";
             parameter.Scenes = scenePath;

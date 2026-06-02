@@ -163,7 +163,6 @@ public static class AppBuildHelper
         const string AppBuilderSettingPath = "Assets/Resources/ServiceDynamicBindInfo.bytes";
         ServiceDynamicBindInfo appBuilderSetting = new ServiceDynamicBindInfo();
         appBuilderSetting.Language = buildParameters.Language;
-        appBuilderSetting.DebuggerActiveWindowType = buildParameters.ShowDebugWnd;
         appBuilderSetting.ResMode = buildParameters.ResMode;
         appBuilderSetting.DecryptionServices = buildParameters.DecryptionServices;
         File.WriteAllText(AppBuilderSettingPath, Utility.Json.ToJson(appBuilderSetting));

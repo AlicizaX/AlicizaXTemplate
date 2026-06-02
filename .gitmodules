@@ -16,3 +16,6 @@
 [submodule "Client/Packages/com.alicizax.unity.installer"]
 	path = Client/Packages/com.alicizax.unity.installer
 	url = https://github.com/AlicizaX/FramworkInstaller.git
+[submodule "Client/Packages/com.alicizax.unity.debugger"]
+	path = Client/Packages/com.alicizax.unity.debugger
+	url = https://github.com/AlicizaX/com.alicizax.unity.debugger.git

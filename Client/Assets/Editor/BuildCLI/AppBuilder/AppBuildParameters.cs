@@ -1,4 +1,3 @@
-using AlicizaX.Debugger.Runtime;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,7 +5,6 @@ public interface IBuildParameters
 {
     BuildTarget BuildTarget { get; }
     string OutPutPath { get; set; }
-    DebuggerActiveWindowType ShowDebugWnd { get; set; }
     bool DevelopBuild { get; set; }
     int ResMode { get; set; }
     string FileName { get; set; }
@@ -23,7 +21,6 @@ public class AndroidBuildParameters : IBuildParameters
     // 通用参数
     public BuildTarget BuildTarget => BuildTarget.Android;
     public string OutPutPath { get; set; }
-    public DebuggerActiveWindowType ShowDebugWnd { get; set; }
     public bool DevelopBuild { get; set; }
     public int ResMode { get; set; }
     public string FileName { get; set; }
@@ -65,7 +62,6 @@ public class StandaloneBuildParameters : IBuildParameters
     // 通用参数
     public BuildTarget BuildTarget => BuildTarget.StandaloneWindows64;
     public string OutPutPath { get; set; }
-    public DebuggerActiveWindowType ShowDebugWnd { get; set; }
     public bool DevelopBuild { get; set; }
     public int ResMode { get; set; }
     public string FileName { get; set; }
