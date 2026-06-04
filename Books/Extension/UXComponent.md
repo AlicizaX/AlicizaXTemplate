@@ -1,11 +1,17 @@
 # UXComponent 扩展组件
 
-`UXComponent` 提供一组基于 UGUI 的增强控件。它们主要解决按钮音效、子节点状态切换、Toggle 分组、渐变图片、状态绑定、快捷键触发和本地化文本等问题。
+`UXComponent` 提供一组基于 UGUI 的增强控件。它们主要解决按钮音效、子节点状态切换、Toggle 分组、渐变图片、状态绑定和本地化文本等问题。快捷键、导航和 InputGlyph 已拆到独立输入扩展包中。
 
 源码位置：
 
 - `Client/Packages/com.alicizax.unity.ui.extension/Runtime/UXComponent`
 - 编辑器入口：`Client/Packages/com.alicizax.unity.ui.extension/Editor/UX`
+
+可选输入扩展：
+
+- 本地包：`file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`
+- Unity Package Manager 显示路径：`com.alicizax.unity.input@file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`
+- 需要 `HotkeyComponent`、`Navigation` 或 `InputGlyph` 时再安装；只使用基础 UX 控件时不需要安装 input 包。
 
 ## 模块划分
 
@@ -17,7 +23,7 @@
 | [UXTextMeshPro](UXTextMeshPro.md) | 本地化 key 绑定、本地化适配器注入 |
 | [UXController](UXController.md) | `UXController` 多状态管理、`UXBinding` 属性绑定 |
 | [UXDraggable](UXDraggable.md) | 拖拽事件转发、可拖拽弹窗 |
-| [HotkeyComponent](HotkeyComponent.md) | Input System 快捷键绑定、优先级规则 |
+| [HotkeyComponent](HotkeyComponent.md) | 可选 input 包：Input System 快捷键绑定、优先级规则 |
 
 ## 适配器注入
 
@@ -40,12 +46,14 @@ UXComponentExtensionsHelper.SetLocalizationHelper(new UXLocalizationAdapter());
 | 宏 | 影响范围 |
 | --- | --- |
 | `TEXTMESHPRO_SUPPORT` | `UXTextMeshPro` |
-| `INPUTSYSTEM_SUPPORT` | `HotkeyComponent`、`UXNavigationScope`、`UXNavigationRuntime` |
-| `INPUTSYSTEM_SUPPORT && UX_NAVIGATION` | Navigation 模块全部类型 |
+| `INPUTSYSTEM_SUPPORT` | 由 `com.alicizax.unity.input` 自动生成，用于 input 包内的 `HotkeyComponent`、`Navigation`、`InputGlyph` |
+| `UXNAVIGATION_SUPPORT` | UI extension 检测到 `com.alicizax.unity.input` 后自动生成，用于 RecyclerView.Navigation 接入 |
+
+不需要在 Player Settings 手动添加 `INPUTSYSTEM_SUPPORT`、`UX_NAVIGATION` 或 `UXNAVIGATION_SUPPORT`。需要输入相关功能时，安装 `com.unity.inputsystem` 和 `com.alicizax.unity.input` 即可。
 
 ## 注意事项
 
 1. `UXButton`、`UXToggle` 等类型在 `UnityEngine.UI` 命名空间下，和 Unity UGUI 控件同一套使用方式。
 2. `UXButton` 不继承 Unity `Button`，但保留了 `Button.ButtonClickedEvent` 类型的 `onClick`，业务调用方式基本一致。
-3. `HotkeyComponent` 只转发到 `ISubmitHandler`，目标组件必须实现提交接口，例如 `UXButton`、`UXToggle`。
+3. `HotkeyComponent` 位于 `com.alicizax.unity.input`，只转发到 `ISubmitHandler`，目标组件必须实现提交接口，例如 `UXButton`、`UXToggle`。
 4. `UXImage.FlipMode.Horziontal` 的拼写来自源码枚举，代码里需要使用这个实际名称。

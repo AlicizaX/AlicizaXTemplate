@@ -8,7 +8,9 @@
 Client/Packages/com.alicizax.unity.ui.extension/Runtime/RecyclerView/Navigation
 ```
 
-编译条件：导航代码受 `#if INPUTSYSTEM_SUPPORT && UX_NAVIGATION` 保护。需要启用 Unity Input System，并在 Scripting Define Symbols 中添加 `UX_NAVIGATION`。
+依赖说明：RecyclerView 导航入口仍在 `com.alicizax.unity.ui.extension` 内，但依赖 `com.alicizax.unity.input` 提供的 `UXNavigationScope`。需要先安装 UI extension；如果列表需要手柄/键盘导航，再安装本地包 `file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`。
+
+编译条件：导航代码受 `#if INPUTSYSTEM_SUPPORT && UXNAVIGATION_SUPPORT` 保护。`INPUTSYSTEM_SUPPORT` 会在检测到 `com.unity.inputsystem` 后自动生成，`UXNAVIGATION_SUPPORT` 会在 UI extension 检测到 `com.alicizax.unity.input` 后自动生成，不需要在 Scripting Define Symbols 中手动添加宏。
 
 ## 核心类型
 
@@ -60,7 +62,6 @@ ScrollView
 只有模板 `ViewHolder` 实现 `IRecyclerViewNavigationViewHolder`，该模板对应的数据项才会被导航。未实现接口的模板会被跳过，适合分组标题、分隔线、装饰项等不可聚焦项。
 
 ```csharp
-#if INPUTSYSTEM_SUPPORT && UX_NAVIGATION
 using AlicizaX.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -91,7 +92,6 @@ public sealed class BagItemHolder : ViewHolder<BagItemData>, IRecyclerViewNaviga
         return false;
     }
 }
-#endif
 ```
 
 焦点样式完全由 `HandleNavigationFocused` 内部实现。导航系统不会创建独立焦点框，也不会调用 `ViewHolder.ApplySelection`，避免混淆业务选中和导航焦点。

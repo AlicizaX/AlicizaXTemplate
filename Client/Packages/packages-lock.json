@@ -1,11 +1,5 @@
 {
   "dependencies": {
-    "com.alicizax.unity.animationflow": {
-      "version": "file:com.alicizax.unity.animationflow",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.alicizax.unity.cysharp.unitask": {
       "version": "file:com.alicizax.unity.cysharp.unitask",
       "depth": 0,
@@ -36,6 +30,12 @@
         "com.alicizax.unity.cysharp.unitask": "2.5.10",
         "com.unity.nuget.newtonsoft-json": "3.2.2"
       }
+    },
+    "com.alicizax.unity.input": {
+      "version": "file:com.alicizax.unity.input",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.alicizax.unity.installer": {
       "version": "file:com.alicizax.unity.installer",
@@ -133,7 +133,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.7.0",
+      "version": "1.6.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {

@@ -4,9 +4,13 @@
 
 源码位置：
 
-- `Client/Packages/com.alicizax.unity.ui.extension/Runtime/UXComponent`
+- 本地包：`file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`
+- 源码目录：`Client/Packages/com.alicizax.unity.input/Runtime/Hotkey`
+- 编辑器目录：`Client/Packages/com.alicizax.unity.input/Editor/Hotkey`
 
-编译条件：需要工程启用 `INPUTSYSTEM_SUPPORT` 宏。
+安装说明：先安装 `com.alicizax.unity.ui.extension`。如果项目需要快捷键、导航或 InputGlyph，再安装 `com.alicizax.unity.input`。Unity Package Manager 中本地包会显示为 `com.alicizax.unity.input@file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`。
+
+编译条件：不需要手动添加宏。`com.alicizax.unity.input` 的 asmdef 会在检测到 `com.unity.inputsystem` 后自动生成 `INPUTSYSTEM_SUPPORT`，`HotkeyComponent` 受 `#if INPUTSYSTEM_SUPPORT` 保护。
 
 ## 配置方式
 
@@ -125,7 +129,7 @@ public sealed class ConfirmWindow : UIWindow<ui_ConfirmWindow>
 
 ## 快捷键不触发排查清单
 
-1. 工程是否启用了 `INPUTSYSTEM_SUPPORT`。
+1. 是否已安装 `com.alicizax.unity.input` 和 `com.unity.inputsystem`。
 2. `HotkeyAction` 是否为空，Input Action 是否能正常触发。
 3. `Component` 是否实现 `ISubmitHandler`。
 4. 按钮是否处于激活和可交互状态。

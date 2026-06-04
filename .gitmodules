@@ -1,6 +1,3 @@
-[submodule "Client/Packages/com.alicizax.unity.animationflow"]
-	path = Client/Packages/com.alicizax.unity.animationflow
-	url = https://github.com/AlicizaX/com.alicizax.unity.animationflow.git
 [submodule "Client/Packages/com.alicizax.unity.cysharp.unitask"]
 	path = Client/Packages/com.alicizax.unity.cysharp.unitask
 	url = https://github.com/AlicizaX/com.alicizax.unity.cysharp.unitask.git
@@ -19,3 +16,6 @@
 [submodule "Client/Packages/com.alicizax.unity.debugger"]
 	path = Client/Packages/com.alicizax.unity.debugger
 	url = https://github.com/AlicizaX/com.alicizax.unity.debugger.git
+[submodule "Client/Packages/com.alicizax.unity.input"]
+	path = Client/Packages/com.alicizax.unity.input
+	url = https://github.com/AlicizaX/com.alicizax.unity.input.git

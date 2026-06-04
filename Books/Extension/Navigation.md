@@ -4,31 +4,48 @@
 
 源码位置：
 
-- `Client/Packages/com.alicizax.unity.ui.extension/Runtime/UXComponent/Navigation`
+- 本地包：`file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`
+- 源码目录：`Client/Packages/com.alicizax.unity.input/Runtime/Navigation`
+- 编辑器目录：`Client/Packages/com.alicizax.unity.input/Editor/Navigation`
 
-编译条件：所有文件均受 `#if INPUTSYSTEM_SUPPORT && UX_NAVIGATION` 保护，需要同时启用 Input System 包和 `UX_NAVIGATION` 宏才会参与编译。
+安装说明：先安装 `com.alicizax.unity.ui.extension`。如果项目需要导航、快捷键或 InputGlyph，再安装 `com.alicizax.unity.input`。Unity Package Manager 中本地包会显示为 `com.alicizax.unity.input@file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`。
+
+编译条件：不再需要手动添加 `UX_NAVIGATION`。`com.alicizax.unity.input` 的 asmdef 会在检测到 `com.unity.inputsystem` 后自动生成 `INPUTSYSTEM_SUPPORT`，导航文件受 `#if INPUTSYSTEM_SUPPORT` 保护。
 
 ## 核心概念
 
 | 概念 | 类型 | 说明 |
 | --- | --- | --- |
-| 输入模式 | `UXInputMode` | 当前使用的输入设备类别：Pointer / Keyboard / Gamepad / Touch |
-| 输入模式服务 | `UXInputModeService` | 检测设备输入并维护 `CurrentMode`，设备切换时广播 `OnModeChanged` |
-| 导航运行时 | `UXNavigationRuntime` | 全局单例，管理所有 `UXNavigationScope`，决定哪个 Scope 是当前顶层焦点域 |
+| 输入模式 | `UXInputMode` | 当前使用的输入设备类别：Keyboard / Gamepad / Touch |
+| 输入模式监听 | `UXNavigationModeListener` | 自动检测设备输入并维护 `CurrentMode`，设备切换时广播 `OnModeChanged` |
+| 导航管理器 | `UXNavigationManager` | 管理所有 `UXNavigationScope`，决定哪个 Scope 是当前顶层焦点域，并执行模式切换处理器 |
 | 导航域 | `UXNavigationScope` | 挂在窗口或面板根节点上，定义一个焦点域，管理域内的 `Selectable` 列表 |
 | 导航跳过标记 | `UXNavigationSkip` | 挂在节点上，让该节点子树内的所有 `UXNavigationScope` 被排除在导航系统之外 |
+| 模式切换处理器 | `IUXNavigationModeChangeProcessor` | 当输入模式或顶层 Scope 变化时执行项目自定义逻辑，例如鼠标显示、背景点击失焦策略 |
 
 ## 使用前提
 
-1. 工程已安装 `com.unity.inputsystem` 并切换到 Input System 输入后端。
-2. 在 Player Settings 的 Scripting Define Symbols 中添加 `UX_NAVIGATION`。
-3. 启动场景中存在 `EventSystem`（UGUI 标准要求）。
+1. 工程已安装 `com.alicizax.unity.ui.extension`。
+2. 需要导航功能时，再安装本地包 `file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`。
+3. 工程已安装 `com.unity.inputsystem` 并切换到 Input System 输入后端。
+4. 启动场景中存在 `EventSystem`（UGUI 标准要求）。
+5. 启动场景或常驻服务节点上存在 `UXNavigationManager`。
 
-`UXInputModeService` 和 `UXNavigationRuntime` 均为懒加载单例，首次访问时自动创建并标记 `DontDestroyOnLoad`，无需手动挂载。
+`UXNavigationModeListener` 会在 `BeforeSceneLoad` 自动创建并标记 `DontDestroyOnLoad`。`UXNavigationManager` 是导航域管理器，需要作为项目服务或常驻组件挂载；它会在初始化时收集已加载的 `UXNavigationScope`。
 
 ## 快速接入
 
-### 1. 为窗口添加导航域
+### 1. 添加导航管理器
+
+在启动场景或常驻服务节点上添加：
+
+```text
+Add Component > UI > UX Navigation Manager
+```
+
+默认 `Processor Type` 是 `DefaultUXNavigationModeChangeProcessor`，可配置键盘/手柄模式下鼠标是否显示，以及是否禁止空白区域点击导致失焦。
+
+### 2. 为窗口添加导航域
 
 在窗口 Prefab 的根节点（或需要独立焦点域的面板根节点）上挂 `UXNavigationScope`。
 
@@ -38,18 +55,15 @@ Inspector 常用配置：
 | --- | --- |
 | `Default Selectable` | 进入该域时默认聚焦的控件 |
 | `Holder` | 绑定 `UIHolderObjectBase`，窗口打开/关闭时自动触发刷新 |
-| `Baked Selectables` | 编辑器烘焙的静态 `Selectable` 列表，点击 Inspector 上的 Refresh 按钮生成 |
-| `Runtime Selectable Capacity` | 运行时动态注册列表的初始容量，默认 16 |
+| `Baked Selectables` | 编辑器烘焙的静态 `Selectable` 列表，点击 Inspector 上的刷新按钮生成 |
 | `Remember Last Selection` | 是否记住上次选中的控件，下次进入时恢复 |
-| `Require Selection When Gamepad` | 手柄/键盘模式下强制保持一个选中项 |
 | `Block Lower Scopes` | 为 `true` 时，压制所有优先级更低的 Scope 的导航，防止焦点泄漏 |
-| `Auto Select First Available` | 没有默认项或上次选中项时，自动选中第一个可用控件 |
 
-### 2. 烘焙静态 Selectable 列表
+### 3. 烘焙静态 Selectable 列表
 
 在 Inspector 中点击 `UXNavigationScope` 组件上的 **Refresh** 按钮，系统会扫描子树内所有 `Selectable` 并写入 `_bakedSelectables`。静态窗口只需烘焙一次；如果 Prefab 结构变化，重新点击即可。
 
-### 3. 动态注册运行时控件
+### 4. 动态注册运行时控件
 
 虚拟列表等运行时生成的控件需要手动注册：
 
@@ -80,22 +94,24 @@ public sealed class VirtualListItem : MonoBehaviour
 }
 ```
 
-### 4. 监听输入模式变化
+### 5. 监听输入模式变化
 
 ```csharp
+using AlicizaX.UI.UXNavigation;
+using UnityEngine;
 using UnityEngine.UI;
 
 public sealed class CursorVisibilityController : MonoBehaviour
 {
     private void OnEnable()
     {
-        UXInputModeService.OnModeChanged += OnModeChanged;
-        Refresh(UXInputModeService.CurrentMode);
+        UXNavigationModeListener.OnModeChanged += OnModeChanged;
+        Refresh(UXNavigationModeListener.CurrentMode);
     }
 
     private void OnDisable()
     {
-        UXInputModeService.OnModeChanged -= OnModeChanged;
+        UXNavigationModeListener.OnModeChanged -= OnModeChanged;
     }
 
     private void OnModeChanged(UXInputMode mode)
@@ -105,40 +121,43 @@ public sealed class CursorVisibilityController : MonoBehaviour
 
     private void Refresh(UXInputMode mode)
     {
-        // 手柄模式下隐藏鼠标光标，切回指针模式时恢复。
-        bool showCursor = mode == UXInputMode.Pointer || mode == UXInputMode.Touch;
+        // 手柄模式下隐藏鼠标光标，切回键鼠或触屏模式时恢复。
+        bool showCursor = mode == UXInputMode.Keyboard || mode == UXInputMode.Touch;
         Cursor.visible = showCursor;
         Cursor.lockState = showCursor ? CursorLockMode.None : CursorLockMode.Locked;
     }
 }
 ```
 
-### 5. 实现光标策略
+### 6. 实现模式切换处理器
 
-当顶层 Scope 或输入模式发生变化时，`UXNavigationRuntime` 会回调 `IUXNavigationCursorPolicy`。适合在这里驱动手柄光标的显示、位置更新或动画。
+当顶层 Scope 或输入模式发生变化时，`UXNavigationManager` 会回调 `IUXNavigationModeChangeProcessor`。适合在这里驱动手柄光标显示、位置更新、动画或项目自定义失焦策略。
 
 ```csharp
-using UnityEngine.UI;
+using AlicizaX.UI.UXNavigation;
+using UnityEngine;
 
-public sealed class GamepadCursorPolicy : IUXNavigationCursorPolicy
+[System.Serializable]
+public sealed class GamepadCursorPolicy : IUXNavigationModeChangeProcessor
 {
-    public void OnNavigationContextChanged(
+    public void OnNavigationModeChanged(
         UXInputMode mode,
         UXNavigationScope previousTopScope,
         UXNavigationScope currentTopScope)
     {
-        bool isGamepad = mode == UXInputMode.Gamepad || mode == UXInputMode.Keyboard;
-        // 根据 currentTopScope 和 mode 更新手柄光标的可见性和目标位置。
+        bool isGamepad = mode == UXInputMode.Gamepad;
+        Cursor.visible = !isGamepad;
+        Cursor.lockState = isGamepad ? CursorLockMode.Locked : CursorLockMode.None;
+        // 根据 currentTopScope 和 mode 更新手柄光标的目标位置。
     }
 }
-
-// 在项目启动时注入：
-UXNavigationRuntime.SetCursorPolicy(new GamepadCursorPolicy());
 ```
+
+实现后，在 `UXNavigationManager` 的 `Processor Type` 中选择该类型。处理器需要可序列化、非 `MonoBehaviour`，并提供无参构造函数。
 
 ## 顶层 Scope 选择规则
 
-`UXNavigationRuntime` 在每次状态刷新时从所有已注册的 `UXNavigationScope` 中选出优先级最高的一个作为顶层 Scope。选择条件：
+`UXNavigationManager` 在每次状态刷新时从所有已注册的 `UXNavigationScope` 中选出优先级最高的一个作为顶层 Scope。选择条件：
 
 1. Scope 所在节点处于激活状态。
 2. Scope 所在 Canvas 处于 `UIComponent.UIShowLayer`（UI 显示层）。
@@ -219,26 +238,25 @@ HUD (UXNavigationSkip)          ← 整个 HUD 子树排除在外
 ```csharp
 public enum UXInputMode : byte
 {
-    Pointer  = 0,   // 鼠标
+    Touch    = 0,   // 触屏
     Keyboard = 1,   // 键盘
     Gamepad  = 2,   // 手柄
-    Touch    = 3,   // 触屏
 }
 ```
 
-### UXInputModeService
+### UXNavigationModeListener
 
 | API | 说明 |
 | --- | --- |
 | `static UXInputMode CurrentMode` | 当前输入模式（只读） |
 | `static event Action<UXInputMode> OnModeChanged` | 输入模式变化时触发 |
+| `static bool GamepadRequireLowFocus` | 手柄模式下是否强制保持一个可导航焦点 |
+| `static bool KeyBoardRequireLowFocus` | 键盘模式下是否强制保持一个可导航焦点 |
 
-### UXNavigationRuntime
+### UXNavigationManager
 
 | API | 说明 |
 | --- | --- |
-| `static void SetCursorPolicy(IUXNavigationCursorPolicy)` | 注入光标策略，全局只有一个 |
-| `static void NotifySelection(GameObject)` | 由 `UXNavigationScope.OnSelect` 内部调用，业务层无需直接调用 |
 | `static bool IsHolderWithinTopScope(UIHolderObjectBase)` | 判断某个 Holder 是否在当前顶层 Scope 内 |
 
 ### UXNavigationScope
@@ -252,12 +270,12 @@ public enum UXInputMode : byte
 | `bool RememberLastSelection` | 是否记住上次选中项 |
 | `int ActivationSerial` | 该 Scope 最近一次变为可用的序号，由运行时维护 |
 
-### IUXNavigationCursorPolicy
+### IUXNavigationModeChangeProcessor
 
 ```csharp
-public interface IUXNavigationCursorPolicy
+public interface IUXNavigationModeChangeProcessor
 {
-    void OnNavigationContextChanged(
+    void OnNavigationModeChanged(
         UXInputMode mode,
         UXNavigationScope previousTopScope,
         UXNavigationScope currentTopScope);
@@ -269,6 +287,6 @@ public interface IUXNavigationCursorPolicy
 1. `UXNavigationScope` 的 `_bakedSelectables` 在编辑器中烘焙，Prefab 结构变化后需要重新点击 Refresh，否则运行时可能找不到新增的控件。
 2. 运行时动态生成的控件（虚拟列表项等）必须手动调用 `RegisterSelectable` / `UnregisterSelectable`，烘焙列表不会自动感知。
 3. `BlockLowerScopes` 只压制导航，不影响鼠标点击。鼠标仍然可以点击被压制窗口的按钮，如需完全屏蔽需要配合 `CanvasGroup.blocksRaycasts`。
-4. `UXInputModeService` 对摇杆输入有噪声过滤（`sqrMagnitude >= 0.04f`），轻微抖动不会触发模式切换。合成控件（`isSynthetic`）也会被忽略，避免虚拟输入误触发。
+4. `UXNavigationModeListener` 对摇杆输入有噪声过滤（`sqrMagnitude >= 0.04f`），轻微抖动不会触发模式切换。合成控件（`synthetic`）也会被忽略，避免虚拟输入误触发。
 5. 启动时有 30 帧的设备探测窗口（`InitialDeviceProbeFrames`），用于检测已连接的手柄。在此期间输入模式可能还未稳定，不要在 `Awake` 中依赖 `CurrentMode` 的最终值。
-6. `UXNavigationRuntime` 内部有重入保护，`FlushStateIfDirty` 不会递归触发。但业务代码不应在 `IUXNavigationCursorPolicy.OnNavigationContextChanged` 回调中直接修改 Scope 的激活状态，否则会推迟到下一帧刷新。
+6. `UXNavigationManager` 内部有重入保护，`FlushStateIfDirty` 不会递归触发。但业务代码不应在 `IUXNavigationModeChangeProcessor.OnNavigationModeChanged` 回调中直接修改 Scope 的激活状态，否则会推迟到下一帧刷新。
