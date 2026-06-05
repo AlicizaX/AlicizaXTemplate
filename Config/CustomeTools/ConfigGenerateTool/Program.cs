@@ -13,7 +13,6 @@ namespace ConfigGenerate;
 
 internal static partial class Program
 {
-    private static readonly string[] LanguageColumns = ["ChineseSimplified", "English", "Japanese"];
     private static readonly string[] ConstSheetNames = ["Hotfix", "Main"];
     private const string LocalizationOutputFormat = "tables_tblocalization_{0}.bytes";
     private const string LocalizationConstOutputFormat = "tables_tblocalizationconst_{0}.bytes";
@@ -165,17 +164,17 @@ internal static partial class Program
         }
     }
 
-    private static List<RowData> ParseSheet(SheetData sheet, bool requireId)
+    private static List<RowData> ParseSheet(SheetData sheet, bool requireId, IReadOnlyList<string> languages)
     {
         Dictionary<string, int> headers;
         int dataStartRow;
         if (sheet.Get(1, 1) == "##var")
         {
-            (headers, dataStartRow) = BuildLubanHeaders(sheet, requireId);
+            (headers, dataStartRow) = BuildLubanHeaders(sheet, requireId, languages);
         }
         else
         {
-            (headers, dataStartRow) = BuildFlatHeaders(sheet, requireId);
+            (headers, dataStartRow) = BuildFlatHeaders(sheet, requireId, languages);
         }
 
         var rows = new List<RowData>();
@@ -204,9 +203,12 @@ internal static partial class Program
             }
 
             var texts = new Dictionary<string, string>(StringComparer.Ordinal);
-            foreach (var language in LanguageColumns)
+            foreach (var language in languages)
             {
-                texts[language] = sheet.Get(rowIndex, headers[language]) ?? "";
+                if (headers.TryGetValue(language, out var languageColumn))
+                {
+                    texts[language] = sheet.Get(rowIndex, languageColumn) ?? "";
+                }
             }
 
             rows.Add(new RowData(rowId, rawKey, texts, sheet.Name, rowIndex, headers["key"]));
@@ -216,7 +218,7 @@ internal static partial class Program
         return rows;
     }
 
-    private static (Dictionary<string, int> Headers, int DataStartRow) BuildFlatHeaders(SheetData sheet, bool requireId)
+    private static (Dictionary<string, int> Headers, int DataStartRow) BuildFlatHeaders(SheetData sheet, bool requireId, IReadOnlyList<string> languages)
     {
         var lookup = new Dictionary<string, int>(StringComparer.Ordinal);
         for (var col = 1; col <= sheet.MaxCol; col++)
@@ -250,11 +252,12 @@ internal static partial class Program
 
         headers["key"] = keyCol;
 
-        foreach (var language in LanguageColumns)
+        foreach (var language in languages)
         {
             if (!lookup.TryGetValue(language.ToLowerInvariant(), out var col))
             {
-                throw new InvalidOperationException($"{sheet.Name}: missing column `{language}`");
+                Console.Error.WriteLine($"warning: {sheet.Name}: missing configured language column `{language}`; values will be treated as empty");
+                continue;
             }
 
             headers[language] = col;
@@ -263,7 +266,7 @@ internal static partial class Program
         return (headers, 2);
     }
 
-    private static (Dictionary<string, int> Headers, int DataStartRow) BuildLubanHeaders(SheetData sheet, bool requireId)
+    private static (Dictionary<string, int> Headers, int DataStartRow) BuildLubanHeaders(SheetData sheet, bool requireId, IReadOnlyList<string> languages)
     {
         var dataOffset = sheet.Get(1, 2) == "id" ? 2 : 3;
         var headers = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -277,7 +280,6 @@ internal static partial class Program
         }
 
         var requiredColumns = new List<string> { "key" };
-        requiredColumns.AddRange(LanguageColumns);
         if (requireId)
         {
             requiredColumns.Insert(0, "id");
@@ -288,6 +290,14 @@ internal static partial class Program
             if (!headers.ContainsKey(column))
             {
                 throw new InvalidOperationException($"{sheet.Name}: missing column `{column}`");
+            }
+        }
+
+        foreach (var language in languages)
+        {
+            if (!headers.ContainsKey(language))
+            {
+                Console.Error.WriteLine($"warning: {sheet.Name}: missing configured language column `{language}`; values will be treated as empty");
             }
         }
 
@@ -304,7 +314,7 @@ internal static partial class Program
         return (headers, dataStartRow);
     }
 
-    private static List<List<RowData>> LoadWorkbookRows(string xlsxPath, IReadOnlyList<string>? sheetNames = null, bool requireId = true)
+    private static List<List<RowData>> LoadWorkbookRows(string xlsxPath, IReadOnlyList<string>? sheetNames, bool requireId, IReadOnlyList<string> languages)
     {
         using var workbook = XlsxWorkbook.Load(xlsxPath);
         var result = new List<List<RowData>>();
@@ -319,7 +329,7 @@ internal static partial class Program
                 continue;
             }
 
-            result.Add(ParseSheet(workbook.ReadSheet(sheetInfo), requireId));
+            result.Add(ParseSheet(workbook.ReadSheet(sheetInfo), requireId, languages));
         }
 
         return result;
@@ -377,6 +387,30 @@ internal static partial class Program
             .ToList();
     }
 
+    private static List<string> NormalizeLanguages(IEnumerable<string> languages)
+    {
+        var result = new List<string>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var language in languages.Select(language => language.Trim()).Where(language => language.Length > 0))
+        {
+            if (seen.Add(language))
+            {
+                result.Add(language);
+            }
+            else
+            {
+                Console.Error.WriteLine($"warning: duplicate configured language `{language}` ignored");
+            }
+        }
+
+        if (result.Count == 0)
+        {
+            throw new InvalidOperationException("languages section must contain at least one language");
+        }
+
+        return result;
+    }
+
     private static List<RowData> FilterRowsByKeyPrefix(List<RowData> rows, IReadOnlyList<string> keyPrefixRules)
     {
         if (keyPrefixRules.Count == 0)
@@ -399,6 +433,11 @@ internal static partial class Program
         }
 
         return buffer.ToArray();
+    }
+
+    private static bool HasLanguageData(IReadOnlyList<RowData> rows, string language)
+    {
+        return rows.Any(row => !string.IsNullOrWhiteSpace(row.Texts.GetValueOrDefault(language, "")));
     }
 
     private static void WriteBinary(string path, byte[] data)
@@ -428,16 +467,23 @@ internal static partial class Program
         }
     }
 
-    private static void WriteEditorJson(string path, IReadOnlyList<RowData> rows)
+    private static void WriteEditorJson(string path, IReadOnlyList<RowData> rows, IReadOnlyList<string> languages)
     {
-        var data = rows.Select(row => new EditorJsonRow
+        var data = rows.Select(row =>
         {
-            sheet = row.Sheet,
-            id = row.Id,
-            key = row.Key,
-            ChineseSimplified = row.Texts.GetValueOrDefault("ChineseSimplified", ""),
-            English = row.Texts.GetValueOrDefault("English", ""),
-            Japanese = row.Texts.GetValueOrDefault("Japanese", ""),
+            var item = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["sheet"] = row.Sheet,
+                ["id"] = row.Id,
+                ["key"] = row.Key,
+            };
+
+            foreach (var language in languages)
+            {
+                item[language] = row.Texts.GetValueOrDefault(language, "");
+            }
+
+            return item;
         }).ToList();
 
         var directory = Path.GetDirectoryName(path);
@@ -717,12 +763,17 @@ internal static partial class Program
 
     private static void ExportLocalizationKey(string xlsxPath, string outputFile, string commentLanguage, string? keyPrefixRules)
     {
-        if (!LanguageColumns.Contains(commentLanguage, StringComparer.Ordinal))
+        ExportLocalizationKey(xlsxPath, outputFile, commentLanguage, keyPrefixRules, [commentLanguage]);
+    }
+
+    private static void ExportLocalizationKey(string xlsxPath, string outputFile, string commentLanguage, string? keyPrefixRules, IReadOnlyList<string> languages)
+    {
+        if (!languages.Contains(commentLanguage, StringComparer.Ordinal))
         {
-            throw new InvalidOperationException($"unsupported localization key comment language: {commentLanguage}");
+            Console.Error.WriteLine($"warning: localization key comment language `{commentLanguage}` is not in configured languages; comments may be empty");
         }
 
-        var sheetRows = LoadWorkbookRows(Path.GetFullPath(xlsxPath), ConstSheetNames, true);
+        var sheetRows = LoadWorkbookRows(Path.GetFullPath(xlsxPath), ConstSheetNames, true, languages);
         var rows = MergeRows(sheetRows, "LocalizationConst", true);
         rows = FilterRowsByKeyPrefix(rows, ParsePrefixRules(keyPrefixRules));
 
@@ -746,32 +797,35 @@ internal static partial class Program
 
     private static void ExportLocalizationText(string xlsxPath, string language, string outputDir)
     {
-        ExportLocalizationText([Path.GetFullPath(xlsxPath)], language, outputDir);
+        ExportLocalizationText([Path.GetFullPath(xlsxPath)], language, outputDir, [language]);
     }
 
-    private static void ExportLocalizationText(IReadOnlyList<string> xlsxPaths, string language, string outputDir)
+    private static void ExportLocalizationText(IReadOnlyList<string> xlsxPaths, string language, string outputDir, IReadOnlyList<string> languages)
     {
-        ExportLocalizationTextRows(LoadLocalizationTextRows(xlsxPaths), language, outputDir);
+        ExportLocalizationTextRows(LoadLocalizationTextRows(xlsxPaths, languages), language, outputDir);
     }
 
-    private static void ExportLocalizationTextRows(IReadOnlyList<RowData> rows, string language, string outputDir)
+    private static bool ExportLocalizationTextRows(IReadOnlyList<RowData> rows, string language, string outputDir)
     {
-        if (!LanguageColumns.Contains(language, StringComparer.Ordinal))
+        var outputPath = Path.Combine(Path.GetFullPath(outputDir), string.Format(CultureInfo.InvariantCulture, LocalizationOutputFormat, language));
+        if (!HasLanguageData(rows, language))
         {
-            throw new InvalidOperationException($"unsupported language: {language}");
+            RemoveFileIfExists(outputPath);
+            Console.Error.WriteLine($"[{language}] warning: no localization text data found; skipped {outputPath}");
+            return false;
         }
 
-        var outputPath = Path.Combine(Path.GetFullPath(outputDir), string.Format(CultureInfo.InvariantCulture, LocalizationOutputFormat, language));
         WriteBinary(outputPath, BuildLanguageBytes(rows, language));
         Console.WriteLine($"[{language}] generated localization bytes: {outputPath}");
+        return true;
     }
 
-    private static List<RowData> LoadLocalizationTextRows(IReadOnlyList<string> xlsxPaths)
+    private static List<RowData> LoadLocalizationTextRows(IReadOnlyList<string> xlsxPaths, IReadOnlyList<string> languages)
     {
         var sheetRows = new List<List<RowData>>();
         foreach (var xlsxPath in xlsxPaths)
         {
-            sheetRows.AddRange(LoadWorkbookRows(Path.GetFullPath(xlsxPath), null, false));
+            sheetRows.AddRange(LoadWorkbookRows(Path.GetFullPath(xlsxPath), null, false, languages));
         }
 
         return MergeRows(sheetRows, "Localization", false);
@@ -779,16 +833,35 @@ internal static partial class Program
 
     private static void ExportLocalizationConst(string xlsxPath, string language, string outputDir, string? editorConfigDir = null, bool writeEditor = true)
     {
-        if (!LanguageColumns.Contains(language, StringComparer.Ordinal))
+        ExportLocalizationConst(xlsxPath, language, outputDir, editorConfigDir, writeEditor, [language]);
+    }
+
+    private static bool ExportLocalizationConst(string xlsxPath, string language, string outputDir, string? editorConfigDir, bool writeEditor, IReadOnlyList<string> languages)
+    {
+        var sheetRows = LoadWorkbookRows(Path.GetFullPath(xlsxPath), ConstSheetNames, true, languages);
+        var rows = MergeRows(sheetRows, "LocalizationConst", true);
+        var exported = ExportLocalizationConstRows(rows, language, outputDir);
+
+        if (!exported)
         {
-            throw new InvalidOperationException($"unsupported language: {language}");
+            return false;
         }
 
-        var sheetRows = LoadWorkbookRows(Path.GetFullPath(xlsxPath), ConstSheetNames, true);
-        var rows = MergeRows(sheetRows, "LocalizationConst", true);
+        if (writeEditor && !string.IsNullOrEmpty(editorConfigDir))
+        {
+            var editorJsonPath = Path.Combine(Path.GetFullPath(editorConfigDir), EditorJsonName);
+            WriteEditorJson(editorJsonPath, rows, [language]);
+            Console.WriteLine($"[{language}] generated editor json: {editorJsonPath}");
+        }
+
+        return true;
+    }
+
+    private static bool ExportLocalizationConstRows(IReadOnlyList<RowData> rows, string language, string outputDir)
+    {
         var outputPath = Path.Combine(Path.GetFullPath(outputDir), string.Format(CultureInfo.InvariantCulture, LocalizationConstOutputFormat, language));
 
-        if (rows.Count > 0)
+        if (rows.Count > 0 && HasLanguageData(rows, language))
         {
             WriteBinary(outputPath, BuildLanguageBytes(rows, language));
             Console.WriteLine($"[{language}] generated localization const bytes: {outputPath}");
@@ -796,22 +869,11 @@ internal static partial class Program
         else
         {
             RemoveFileIfExists(outputPath);
-            Console.Error.WriteLine($"[{language}] warning: no LocalizationConst rows exported");
+            Console.Error.WriteLine($"[{language}] warning: no localization const data found; skipped {outputPath}");
+            return false;
         }
 
-        if (writeEditor && !string.IsNullOrEmpty(editorConfigDir))
-        {
-            var editorJsonPath = Path.Combine(Path.GetFullPath(editorConfigDir), EditorJsonName);
-            if (rows.Count > 0)
-            {
-                WriteEditorJson(editorJsonPath, rows);
-                Console.WriteLine($"[{language}] generated editor json: {editorJsonPath}");
-            }
-            else
-            {
-                RemoveFileIfExists(editorJsonPath);
-            }
-        }
+        return true;
     }
 
     private static void AddUtf8BomToCsFiles(string codeOut)
@@ -1021,7 +1083,7 @@ internal static partial class Program
         var cfg = IniFile.Load(iniPath);
         var scriptDir = Path.GetDirectoryName(iniPath) ?? Directory.GetCurrentDirectory();
         var paths = cfg.GetSection("paths");
-        var languages = cfg.GetSection("languages").Keys.ToList();
+        var languages = NormalizeLanguages(cfg.GetSection("languages").Keys);
 
         var tableDataOut = paths.GetValueOrDefault("table_data_out") ?? paths.GetValueOrDefault("data_out") ?? "../Client/Assets/Bundles/Configs/bytes/";
         var l10nTextOut = paths.GetValueOrDefault("l10n_text_out") ?? paths.GetValueOrDefault("data_out") ?? tableDataOut;
@@ -1030,12 +1092,14 @@ internal static partial class Program
         var l10nTextXlsx = paths.GetValueOrDefault("l10n_text_xlsx") ?? "./Excels/Localization";
         var l10nTextFilePattern = paths.GetValueOrDefault("l10n_text_file_pattern") ?? "^Localization(?!Const$).*$";
         var l10nConstXlsx = paths.GetValueOrDefault("l10n_const_xlsx") ?? paths.GetValueOrDefault("l10n_xlsx") ?? "./Excels/Localization/LocalizationConst.xlsx";
-        var l10nEditor = paths.GetValueOrDefault("l10n_editor_out") ?? "../Client/Assets/Editor/Config";
+        var l10nEditor = paths.TryGetValue("l10n_editor_out", out var configuredL10nEditor)
+            ? configuredL10nEditor
+            : "../Client/Assets/Editor/Config";
         var l10nKeyCodeOut = paths.GetValueOrDefault("l10n_key_code_out") ?? DefaultLocalizationKeyCodeOut;
         var l10nKeyCommentLanguage = paths.GetValueOrDefault("l10n_key_comment_language") ?? paths.GetValueOrDefault("l10n_comment_language") ?? DefaultLocalizationKeyCommentLanguage;
         var l10nConstOutRule = paths.GetValueOrDefault("l10n_const_out_rule") ?? "";
         var l10nTextFiles = ResolveLocalizationTextFiles(scriptDir, l10nTextXlsx, l10nTextFilePattern);
-        var l10nTextRows = LoadLocalizationTextRows(l10nTextFiles);
+        var l10nTextRows = LoadLocalizationTextRows(l10nTextFiles, languages);
         var lubanL10nTextFile = WriteLubanLocalizationTextFile(scriptDir, l10nTextRows);
 
         int lubanExitCode;
@@ -1056,23 +1120,45 @@ internal static partial class Program
 
         AddUtf8BomToCsFiles(ResolvePath(scriptDir, codeOut));
 
+        var constSheetRows = LoadWorkbookRows(ResolvePath(scriptDir, l10nConstXlsx), ConstSheetNames, true, languages);
+        var constRows = MergeRows(constSheetRows, "LocalizationConst", true);
+        var exportedLanguages = new List<string>();
         for (var index = 0; index < languages.Count; index++)
         {
             var language = languages[index];
-            ExportLocalizationTextRows(l10nTextRows, language, ResolvePath(scriptDir, l10nTextOut));
-            ExportLocalizationConst(
-                ResolvePath(scriptDir, l10nConstXlsx),
-                language,
-                ResolvePath(scriptDir, l10nConstOut),
-                ResolvePath(scriptDir, l10nEditor),
-                index == 0);
+            var exportedText = ExportLocalizationTextRows(l10nTextRows, language, ResolvePath(scriptDir, l10nTextOut));
+            var exportedConst = ExportLocalizationConstRows(constRows, language, ResolvePath(scriptDir, l10nConstOut));
+            if (exportedText || exportedConst)
+            {
+                exportedLanguages.Add(language);
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(l10nEditor))
+        {
+            Console.Error.WriteLine("warning: l10n_editor_out is empty; localization const editor json export skipped");
+        }
+        else
+        {
+            var editorJsonPath = Path.Combine(ResolvePath(scriptDir, l10nEditor), EditorJsonName);
+            if (constRows.Count > 0 && exportedLanguages.Count > 0)
+            {
+                WriteEditorJson(editorJsonPath, constRows, exportedLanguages);
+                Console.WriteLine($"generated editor json: {editorJsonPath}");
+            }
+            else
+            {
+                RemoveFileIfExists(editorJsonPath);
+                Console.Error.WriteLine("warning: no localization const editor json exported because no configured language has const data");
+            }
         }
 
         ExportLocalizationKey(
             ResolvePath(scriptDir, l10nConstXlsx),
             ResolvePath(scriptDir, l10nKeyCodeOut),
             l10nKeyCommentLanguage,
-            l10nConstOutRule);
+            l10nConstOutRule,
+            languages);
 
         return 0;
     }
@@ -1148,16 +1234,6 @@ internal static partial class Program
     private static partial Regex FormatArgRegex();
 
     private sealed record RowData(int Id, string Key, Dictionary<string, string> Texts, string Sheet, int Row, int KeyCol);
-
-    private sealed class EditorJsonRow
-    {
-        public string sheet { get; init; } = "";
-        public int id { get; init; }
-        public string key { get; init; } = "";
-        public string ChineseSimplified { get; init; } = "";
-        public string English { get; init; } = "";
-        public string Japanese { get; init; } = "";
-    }
 
     private sealed class IniFile
     {
