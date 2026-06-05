@@ -142,6 +142,20 @@ internal static partial class Program
         buffer.AddRange(raw);
     }
 
+    private static void WriteWarning(string message)
+    {
+        var previousColor = Console.ForegroundColor;
+        try
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Error.WriteLine(message);
+        }
+        finally
+        {
+            Console.ForegroundColor = previousColor;
+        }
+    }
+
     private static void WarnDuplicates(string label, IReadOnlyList<RowData> rows, bool checkId)
     {
         var seenKeys = new HashSet<string>(StringComparer.Ordinal);
@@ -153,13 +167,13 @@ internal static partial class Program
             {
                 if (!seenIds.Add(row.Id))
                 {
-                    Console.Error.WriteLine($"warning: {label}: duplicate id `{row.Id}`");
+                    WriteWarning($"warning: {label}: duplicate id `{row.Id}`");
                 }
             }
 
             if (!seenKeys.Add(row.Key))
             {
-                Console.Error.WriteLine($"warning: {label}: duplicate key `{row.Key}`");
+                WriteWarning($"warning: {label}: duplicate key `{row.Key}`");
             }
         }
     }
@@ -256,7 +270,7 @@ internal static partial class Program
         {
             if (!lookup.TryGetValue(language.ToLowerInvariant(), out var col))
             {
-                Console.Error.WriteLine($"warning: {sheet.Name}: missing configured language column `{language}`; values will be treated as empty");
+                WriteWarning($"warning: {sheet.Name}: missing configured language column `{language}`; values will be treated as empty");
                 continue;
             }
 
@@ -297,7 +311,7 @@ internal static partial class Program
         {
             if (!headers.ContainsKey(language))
             {
-                Console.Error.WriteLine($"warning: {sheet.Name}: missing configured language column `{language}`; values will be treated as empty");
+                WriteWarning($"warning: {sheet.Name}: missing configured language column `{language}`; values will be treated as empty");
             }
         }
 
@@ -325,7 +339,7 @@ internal static partial class Program
             var sheetInfo = workbook.Sheets.FirstOrDefault(sheet => sheet.Name == sheetName);
             if (sheetInfo is null)
             {
-                Console.Error.WriteLine($"warning: missing sheet `{sheetName}` in {xlsxPath}");
+                WriteWarning($"warning: missing sheet `{sheetName}` in {xlsxPath}");
                 continue;
             }
 
@@ -399,7 +413,7 @@ internal static partial class Program
             }
             else
             {
-                Console.Error.WriteLine($"warning: duplicate configured language `{language}` ignored");
+                WriteWarning($"warning: duplicate configured language `{language}` ignored");
             }
         }
 
@@ -568,7 +582,7 @@ internal static partial class Program
 
     private static void WarnInvalidKey(RowData row, string reason)
     {
-        Console.Error.WriteLine($"warning: LocalizationConst {row.Sheet}!R{row.Row}C{row.KeyCol} key `{row.Key}` {reason}; row skipped");
+        WriteWarning($"warning: LocalizationConst {row.Sheet}!R{row.Row}C{row.KeyCol} key `{row.Key}` {reason}; row skipped");
     }
 
     private static string TryClassIdentifier(RowData row, string value)
@@ -770,7 +784,7 @@ internal static partial class Program
     {
         if (!languages.Contains(commentLanguage, StringComparer.Ordinal))
         {
-            Console.Error.WriteLine($"warning: localization key comment language `{commentLanguage}` is not in configured languages; comments may be empty");
+            WriteWarning($"warning: localization key comment language `{commentLanguage}` is not in configured languages; comments may be empty");
         }
 
         var sheetRows = LoadWorkbookRows(Path.GetFullPath(xlsxPath), ConstSheetNames, true, languages);
@@ -780,7 +794,7 @@ internal static partial class Program
         var (code, exportedCount) = GenerateLocalizationKeyCode(rows, commentLanguage);
         if (exportedCount <= 0)
         {
-            Console.Error.WriteLine("warning: no valid LocalizationKey rows exported; output file was not changed");
+            WriteWarning("warning: no valid LocalizationKey rows exported; output file was not changed");
             return;
         }
 
@@ -811,7 +825,7 @@ internal static partial class Program
         if (!HasLanguageData(rows, language))
         {
             RemoveFileIfExists(outputPath);
-            Console.Error.WriteLine($"[{language}] warning: no localization text data found; skipped {outputPath}");
+            WriteWarning($"[{language}] warning: no localization text data found; skipped {outputPath}");
             return false;
         }
 
@@ -869,7 +883,7 @@ internal static partial class Program
         else
         {
             RemoveFileIfExists(outputPath);
-            Console.Error.WriteLine($"[{language}] warning: no localization const data found; skipped {outputPath}");
+            WriteWarning($"[{language}] warning: no localization const data found; skipped {outputPath}");
             return false;
         }
 
@@ -1136,7 +1150,7 @@ internal static partial class Program
 
         if (string.IsNullOrWhiteSpace(l10nEditor))
         {
-            Console.Error.WriteLine("warning: l10n_editor_out is empty; localization const editor json export skipped");
+            WriteWarning("warning: l10n_editor_out is empty; localization const editor json export skipped");
         }
         else
         {
@@ -1149,7 +1163,7 @@ internal static partial class Program
             else
             {
                 RemoveFileIfExists(editorJsonPath);
-                Console.Error.WriteLine("warning: no localization const editor json exported because no configured language has const data");
+                WriteWarning("warning: no localization const editor json exported because no configured language has const data");
             }
         }
 
