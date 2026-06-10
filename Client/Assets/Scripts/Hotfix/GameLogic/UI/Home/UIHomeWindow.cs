@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace GameLogic.UI
 {
-    [Window(UILayer.UI, false, 3)]
+    [Window(UILayer.UI, UIOcclusionMode.None, 30)]
     public class UIHomeWindow : UITabWindow<ui_UIHomeWindow>
     {
         private string currentLanguage;
@@ -92,6 +92,21 @@ namespace GameLogic.UI
         private void OnBtnExitClick()
         {
             Log.Info("Quit Game");
+        }
+
+        protected override void OnOpen()
+        {
+            Debug.Log("Open");
+        }
+
+        protected override void OnClose()
+        {
+            Debug.Log("OnClose");
+        }
+
+        protected override void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
         }
     }
 }

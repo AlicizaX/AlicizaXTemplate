@@ -317,7 +317,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u5546\u5E97"
+  m_text: Shop
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -454,7 +454,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u88C5\u5907"
+  m_text: Equipment
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -1109,6 +1109,7 @@ GameObject:
   - component: {fileID: 4323908906012606768}
   - component: {fileID: 678326836087717844}
   - component: {fileID: 4407422507495060593}
+  - component: {fileID: 7309206332327847148}
   m_Layer: 5
   m_Name: ScrollView@GoodsList
   m_TagString: Untagged
@@ -1189,6 +1190,57 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b7de4cb3a1546e4a9ade6b8dbf8af92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7309206332327847148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1793448674643077280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbc3c19241e34ae88b843826638e5933, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 0}
+  recyclerView: {fileID: 678326836087717844}
+  navigationScope: {fileID: 0}
+  wrapNavigation: 0
+  smoothScroll: 1
+  smoothScrollDuration: 0.18
+  focusAlignment: 2
+  exitLeft: {fileID: 0}
+  exitRight: {fileID: 0}
+  exitUp: {fileID: 0}
+  exitDown: {fileID: 0}
 --- !u!1 &1806984565951386443
 GameObject:
   m_ObjectHideFlags: 0
@@ -1932,7 +1984,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u6750\u6599"
+  m_text: Materials
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -2013,8 +2065,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6254675268270692240}
-  - component: {fileID: 4512208444019934690}
-  - component: {fileID: 7795977926102512671}
   m_Layer: 5
   m_Name: UXImage
   m_TagString: Untagged
@@ -2045,44 +2095,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!225 &4512208444019934690
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3000285645216214571}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
---- !u!114 &7795977926102512671
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3000285645216214571}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b880940ee89d20e4fa6f2630d7a81a14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  openPreset: 3
-  closePreset: 3
-  openEase: 4
-  closeEase: 3
-  targetRect: {fileID: 6254675268270692240}
-  canvasGroup: {fileID: 4512208444019934690}
-  useUnscaledTime: 1
-  initializeAsClosed: 1
-  disableInteractionWhilePlaying: 1
-  openDuration: 0.22
-  closeDuration: 0.18
-  slideDistance: 120
-  toastDistance: 40
-  closedScale: 0.94
 --- !u!1 &3115881015891297544
 GameObject:
   m_ObjectHideFlags: 0
@@ -2724,8 +2736,8 @@ GameObject:
   - component: {fileID: 1537036592558011597}
   - component: {fileID: 6287224038690070913}
   - component: {fileID: 665100842215895111}
-  - component: {fileID: 7107451633250205542}
   - component: {fileID: 6632951170448113532}
+  - component: {fileID: -4639290678824064717}
   m_Layer: 5
   m_Name: UIShopWindow
   m_TagString: Untagged
@@ -2795,18 +2807,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!225 &7107451633250205542
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3448168187203640000}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!114 &6632951170448113532
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2819,7 +2819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 698cc60c321497c4eb6859bb35ffdfb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _transitionPlayerComponent: {fileID: 7795977926102512671}
+  _transitionPlayerComponent: {fileID: -4639290678824064717}
   mBtnClose: {fileID: 4931375287322301384}
   mImgBackGround: {fileID: 607875759826900998}
   mImgHeaderPanel: {fileID: 8390873508647541044}
@@ -2835,6 +2835,32 @@ MonoBehaviour:
   mTogPack: {fileID: 8284539248617032526}
   mTogRecommend: {fileID: 5768689325602518406}
   mTogSkin: {fileID: 7442681452951954130}
+--- !u!114 &-4639290678824064717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3448168187203640000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b880940ee89d20e4fa6f2630d7a81a14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openPreset: 3
+  closePreset: 3
+  openEase: 4
+  closeEase: 3
+  targetRect: {fileID: 1537036592558011597}
+  canvasGroup: {fileID: 0}
+  useUnscaledTime: 1
+  initializeAsClosed: 1
+  followAnimationInteractable: 0
+  openDuration: 0.22
+  closeDuration: 0.18
+  slideDistance: 120
+  toastDistance: 40
+  closedScale: 0.94
 --- !u!1 &3649430252968141863
 GameObject:
   m_ObjectHideFlags: 0
@@ -3275,7 +3301,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u9000\u51FA"
+  m_text: Exit
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -3546,7 +3572,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u4FE1\u7528\u70B9\uFF1A"
+  m_text: 'Credits: '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -4049,7 +4075,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u6D88\u8017\u54C1"
+  m_text: Consumables
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -4356,7 +4382,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u6D4B\u8BD5"
+  m_text: Test
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -4583,7 +4609,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u8865\u7ED9\u7EC8\u7AEF"
+  m_text: Supply Terminal
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}

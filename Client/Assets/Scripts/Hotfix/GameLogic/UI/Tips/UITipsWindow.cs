@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GameLogic.UI
 {
-    [Window(UILayer.Tips, false, 3)]
+    [Window(UILayer.Tips, UIOcclusionMode.None, 3)]
     public sealed class UITipsWindow : UITabWindow<ui_UITipsWindow>
     {
         private UITextTipsWidget _textTip;

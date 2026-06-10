@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u5546\u5E97"
+  m_text: Shop
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -764,7 +764,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u89D2\u8272"
+  m_text: Character
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -847,9 +847,9 @@ GameObject:
   - component: {fileID: 8828091370361466877}
   - component: {fileID: 556449227124937549}
   - component: {fileID: 5891907753620010720}
-  - component: {fileID: 6856588170432960206}
   - component: {fileID: 3268640359497331672}
-  - component: {fileID: 3259763076922183672}
+  - component: {fileID: 3396370805121973109}
+  - component: {fileID: 826950546506153899}
   m_Layer: 5
   m_Name: UIHomeWindow
   m_TagString: Untagged
@@ -921,18 +921,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!225 &6856588170432960206
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2925661357764734874}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!114 &3268640359497331672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -945,7 +933,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3334fa9160927c9448729aefda906b67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _transitionPlayerComponent: {fileID: 3259763076922183672}
+  _transitionPlayerComponent: {fileID: 3396370805121973109}
   mBtnBag: {fileID: 8599430375733818942}
   mBtnExit: {fileID: 5077209145104049990}
   mBtnRole: {fileID: 7966806373771437446}
@@ -954,7 +942,7 @@ MonoBehaviour:
   mDropdownLanguages: {fileID: 331801688049960707}
   mImgBackGround: {fileID: 4874740869012465805}
   mImgTopButtonPanel: {fileID: 2312138431760557483}
---- !u!114 &3259763076922183672
+--- !u!114 &3396370805121973109
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -971,7 +959,7 @@ MonoBehaviour:
   openEase: 4
   closeEase: 3
   targetRect: {fileID: 8828091370361466877}
-  canvasGroup: {fileID: 6856588170432960206}
+  canvasGroup: {fileID: 826950546506153899}
   useUnscaledTime: 1
   initializeAsClosed: 1
   disableInteractionWhilePlaying: 1
@@ -980,6 +968,18 @@ MonoBehaviour:
   slideDistance: 120
   toastDistance: 40
   closedScale: 0.94
+--- !u!225 &826950546506153899
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2925661357764734874}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &3353888472002653388
 GameObject:
   m_ObjectHideFlags: 0
@@ -2209,7 +2209,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u9000\u51FA"
+  m_text: Exit
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -2877,7 +2877,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u80CC\u5305"
+  m_text: Bag
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -3014,7 +3014,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u63D0\u793A"
+  m_text: Tips
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
