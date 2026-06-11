@@ -35,6 +35,7 @@ internal static partial class Program
 
     public static async Task<int> Main(string[] args)
     {
+        Console.InputEncoding = new UTF8Encoding(false);
         Console.OutputEncoding = new UTF8Encoding(false);
 
         try
@@ -54,7 +55,7 @@ internal static partial class Program
         {
             if (args.Length != 4)
             {
-                Console.Error.WriteLine("usage: ConfigGenerate.dll --export-localization-text <xlsx> <language> <output_dir>");
+                Console.Error.WriteLine("用法：ConfigGenerate.dll --export-localization-text <xlsx文件> <语言> <输出目录>");
                 return 1;
             }
 
@@ -76,7 +77,7 @@ internal static partial class Program
                 return 0;
             }
 
-            Console.Error.WriteLine("usage: ConfigGenerate.dll --export-localization-const <xlsx> <language> <output_dir> <editor_config_dir>");
+            Console.Error.WriteLine("用法：ConfigGenerate.dll --export-localization-const <xlsx文件> <语言> <输出目录> <编辑器配置目录>");
             return 1;
         }
 
@@ -84,7 +85,7 @@ internal static partial class Program
         {
             if (args.Length is not (4 or 5))
             {
-                Console.Error.WriteLine("usage: ConfigGenerate.dll --export-localization-key <xlsx> <output_file> <comment_language> [key_prefix_rules]");
+                Console.Error.WriteLine("用法：ConfigGenerate.dll --export-localization-key <xlsx文件> <输出文件> <注释语言> [Key前缀规则]");
                 return 1;
             }
 
@@ -94,7 +95,7 @@ internal static partial class Program
 
         if (args.Length != 2)
         {
-            Console.Error.WriteLine("usage: ConfigGenerate.dll <config.ini> <TemplateDir>");
+            Console.Error.WriteLine("用法：ConfigGenerate.dll <config.ini> <模板目录>");
             return 1;
         }
 
@@ -167,13 +168,13 @@ internal static partial class Program
             {
                 if (!seenIds.Add(row.Id))
                 {
-                    WriteWarning($"warning: {label}: duplicate id `{row.Id}`");
+                    WriteWarning($"警告：{label} 存在重复 ID `{row.Id}`。");
                 }
             }
 
             if (!seenKeys.Add(row.Key))
             {
-                WriteWarning($"warning: {label}: duplicate key `{row.Key}`");
+                WriteWarning($"警告：{label} 存在重复 Key `{row.Key}`。");
             }
         }
     }
@@ -249,7 +250,7 @@ internal static partial class Program
         {
             if (!lookup.TryGetValue("id", out var idCol))
             {
-                throw new InvalidOperationException($"{sheet.Name}: missing column `ID`");
+                throw new InvalidOperationException($"{sheet.Name} 缺少列 `ID`。");
             }
 
             headers["id"] = idCol;
@@ -261,7 +262,7 @@ internal static partial class Program
 
         if (!lookup.TryGetValue("key", out var keyCol))
         {
-            throw new InvalidOperationException($"{sheet.Name}: missing column `key`");
+            throw new InvalidOperationException($"{sheet.Name} 缺少列 `key`。");
         }
 
         headers["key"] = keyCol;
@@ -270,7 +271,7 @@ internal static partial class Program
         {
             if (!lookup.TryGetValue(language.ToLowerInvariant(), out var col))
             {
-                WriteWarning($"warning: {sheet.Name}: missing configured language column `{language}`; values will be treated as empty");
+                WriteWarning($"警告：{sheet.Name} 缺少已配置的语言列 `{language}`，该语言内容将按空值处理。");
                 continue;
             }
 
@@ -303,7 +304,7 @@ internal static partial class Program
         {
             if (!headers.ContainsKey(column))
             {
-                throw new InvalidOperationException($"{sheet.Name}: missing column `{column}`");
+                throw new InvalidOperationException($"{sheet.Name} 缺少列 `{column}`。");
             }
         }
 
@@ -311,7 +312,7 @@ internal static partial class Program
         {
             if (!headers.ContainsKey(language))
             {
-                WriteWarning($"warning: {sheet.Name}: missing configured language column `{language}`; values will be treated as empty");
+                WriteWarning($"警告：{sheet.Name} 缺少已配置的语言列 `{language}`，该语言内容将按空值处理。");
             }
         }
 
@@ -339,7 +340,7 @@ internal static partial class Program
             var sheetInfo = workbook.Sheets.FirstOrDefault(sheet => sheet.Name == sheetName);
             if (sheetInfo is null)
             {
-                WriteWarning($"warning: missing sheet `{sheetName}` in {xlsxPath}");
+                WriteWarning($"警告：文件 `{xlsxPath}` 中缺少工作表 `{sheetName}`。");
                 continue;
             }
 
@@ -361,12 +362,12 @@ internal static partial class Program
             {
                 if (checkId && !seenIds.Add(row.Id))
                 {
-                    throw new InvalidOperationException($"{label}: duplicate id in merged rows: {row.Id}");
+                    throw new InvalidOperationException($"{label} 合并后存在重复 ID：{row.Id}。");
                 }
 
                 if (!seenKeys.Add(row.Key))
                 {
-                    throw new InvalidOperationException($"{label}: duplicate key in merged rows: {row.Key}");
+                    throw new InvalidOperationException($"{label} 合并后存在重复 Key：{row.Key}。");
                 }
 
                 merged.Add(row);
@@ -413,16 +414,26 @@ internal static partial class Program
             }
             else
             {
-                WriteWarning($"warning: duplicate configured language `{language}` ignored");
+                WriteWarning($"警告：重复配置的语言 `{language}` 已忽略。");
             }
         }
 
         if (result.Count == 0)
         {
-            throw new InvalidOperationException("languages section must contain at least one language");
+            throw new InvalidOperationException("多语言配置至少需要包含一种语言。");
         }
 
         return result;
+    }
+
+    private static List<string> ReadConfiguredLanguages(IniFile cfg, Dictionary<string, string?> paths)
+    {
+        if (paths.TryGetValue("l10n_languages", out var configuredLanguages) && !string.IsNullOrWhiteSpace(configuredLanguages))
+        {
+            return NormalizeLanguages(ParsePrefixRules(configuredLanguages));
+        }
+
+        return NormalizeLanguages(cfg.GetSection("languages").Keys);
     }
 
     private static List<RowData> FilterRowsByKeyPrefix(List<RowData> rows, IReadOnlyList<string> keyPrefixRules)
@@ -478,6 +489,34 @@ internal static partial class Program
         if (Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any())
         {
             Directory.Delete(path);
+        }
+    }
+
+    private static void CopyDirectoryWithoutMeta(string sourceDir, string targetDir)
+    {
+        if (!Directory.Exists(sourceDir))
+        {
+            throw new DirectoryNotFoundException($"源目录不存在：{sourceDir}");
+        }
+
+        Directory.CreateDirectory(targetDir);
+
+        foreach (var sourceFile in Directory.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories))
+        {
+            if (Path.GetExtension(sourceFile).Equals(".meta", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var relativePath = Path.GetRelativePath(sourceDir, sourceFile);
+            var targetFile = Path.Combine(targetDir, relativePath);
+            var targetFileDir = Path.GetDirectoryName(targetFile);
+            if (!string.IsNullOrEmpty(targetFileDir))
+            {
+                Directory.CreateDirectory(targetFileDir);
+            }
+
+            File.Copy(sourceFile, targetFile, true);
         }
     }
 
@@ -582,7 +621,7 @@ internal static partial class Program
 
     private static void WarnInvalidKey(RowData row, string reason)
     {
-        WriteWarning($"warning: LocalizationConst {row.Sheet}!R{row.Row}C{row.KeyCol} key `{row.Key}` {reason}; row skipped");
+        WriteWarning($"警告：LocalizationConst {row.Sheet}!R{row.Row}C{row.KeyCol} 的 Key `{row.Key}` {reason}，已跳过该行。");
     }
 
     private static string TryClassIdentifier(RowData row, string value)
@@ -590,14 +629,14 @@ internal static partial class Program
         if (InvalidClassSourceRegex().IsMatch(value))
         {
             var bad = new string(InvalidClassSourceRegex().Matches(value).Select(match => match.Value[0]).Distinct().OrderBy(ch => ch).ToArray());
-            WarnInvalidKey(row, $"contains invalid C# class character(s) `{bad}` in the first key segment");
+            WarnInvalidKey(row, $"首段包含非法 C# 类名字符 `{bad}`");
             return "";
         }
 
         var identifier = ClassIdentifier(value);
         if (identifier.Length == 0)
         {
-            WarnInvalidKey(row, "cannot generate a valid C# class name from the first key segment");
+            WarnInvalidKey(row, "无法根据首段生成有效的 C# 类名");
         }
 
         return identifier;
@@ -609,14 +648,14 @@ internal static partial class Program
         if (InvalidMemberSourceRegex().IsMatch(source))
         {
             var bad = new string(InvalidMemberSourceRegex().Matches(source).Select(match => match.Value[0]).Distinct().OrderBy(ch => ch).ToArray());
-            WarnInvalidKey(row, $"contains invalid C# variable character(s) `{bad}`");
+            WarnInvalidKey(row, $"包含非法 C# 变量名字符 `{bad}`");
             return "";
         }
 
         var identifier = MemberIdentifier(segments);
         if (identifier.Length == 0)
         {
-            WarnInvalidKey(row, "cannot generate a valid C# variable name");
+            WarnInvalidKey(row, "无法生成有效的 C# 变量名");
         }
 
         return identifier;
@@ -724,7 +763,7 @@ internal static partial class Program
 
                 if (!usedMembers.Add(memberName))
                 {
-                    throw new InvalidOperationException($"Duplicate LocalizationKey member `{className}.{memberName}` from key `{row.Key}`");
+                    throw new InvalidOperationException($"LocalizationKey 成员 `{className}.{memberName}` 重复，来源 Key：`{row.Key}`。");
                 }
 
                 var comment = row.Texts.GetValueOrDefault(commentLanguage, "");
@@ -784,7 +823,7 @@ internal static partial class Program
     {
         if (!languages.Contains(commentLanguage, StringComparer.Ordinal))
         {
-            WriteWarning($"warning: localization key comment language `{commentLanguage}` is not in configured languages; comments may be empty");
+            WriteWarning($"警告：LocalizationKey 注释语言 `{commentLanguage}` 不在已配置语言列表中，生成的注释可能为空。");
         }
 
         var sheetRows = LoadWorkbookRows(Path.GetFullPath(xlsxPath), ConstSheetNames, true, languages);
@@ -794,7 +833,7 @@ internal static partial class Program
         var (code, exportedCount) = GenerateLocalizationKeyCode(rows, commentLanguage);
         if (exportedCount <= 0)
         {
-            WriteWarning("warning: no valid LocalizationKey rows exported; output file was not changed");
+            WriteWarning("警告：没有可导出的 LocalizationKey 有效行，输出文件未修改。");
             return;
         }
 
@@ -806,7 +845,7 @@ internal static partial class Program
         }
 
         File.WriteAllText(outputPath, code, new UTF8Encoding(true));
-        Console.WriteLine($"generated localization key code: {outputPath}");
+        Console.WriteLine($"成功：已生成 LocalizationKey 代码：{outputPath}");
     }
 
     private static void ExportLocalizationText(string xlsxPath, string language, string outputDir)
@@ -825,12 +864,12 @@ internal static partial class Program
         if (!HasLanguageData(rows, language))
         {
             RemoveFileIfExists(outputPath);
-            WriteWarning($"[{language}] warning: no localization text data found; skipped {outputPath}");
+            WriteWarning($"警告：[{language}] 未找到多语言文本数据，已跳过：{outputPath}");
             return false;
         }
 
         WriteBinary(outputPath, BuildLanguageBytes(rows, language));
-        Console.WriteLine($"[{language}] generated localization bytes: {outputPath}");
+        Console.WriteLine($"成功：[{language}] 已生成多语言文本 bytes：{outputPath}");
         return true;
     }
 
@@ -865,7 +904,7 @@ internal static partial class Program
         {
             var editorJsonPath = Path.Combine(Path.GetFullPath(editorConfigDir), EditorJsonName);
             WriteEditorJson(editorJsonPath, rows, [language]);
-            Console.WriteLine($"[{language}] generated editor json: {editorJsonPath}");
+            Console.WriteLine($"成功：[{language}] 已生成编辑器 JSON：{editorJsonPath}");
         }
 
         return true;
@@ -878,12 +917,12 @@ internal static partial class Program
         if (rows.Count > 0 && HasLanguageData(rows, language))
         {
             WriteBinary(outputPath, BuildLanguageBytes(rows, language));
-            Console.WriteLine($"[{language}] generated localization const bytes: {outputPath}");
+            Console.WriteLine($"成功：[{language}] 已生成多语言常量 bytes：{outputPath}");
         }
         else
         {
             RemoveFileIfExists(outputPath);
-            WriteWarning($"[{language}] warning: no localization const data found; skipped {outputPath}");
+            WriteWarning($"警告：[{language}] 未找到多语言常量数据，已跳过：{outputPath}");
             return false;
         }
 
@@ -921,7 +960,7 @@ internal static partial class Program
 
         if (!Directory.Exists(fullPath))
         {
-            throw new DirectoryNotFoundException($"localization text directory not found: {fullPath}");
+            throw new DirectoryNotFoundException($"多语言文本目录不存在：{fullPath}");
         }
 
         var regex = new Regex(filePattern, RegexOptions.CultureInvariant);
@@ -934,10 +973,10 @@ internal static partial class Program
 
         if (files.Count == 0)
         {
-            throw new InvalidOperationException($"no localization text xlsx matched `{filePattern}` in {fullPath}");
+            throw new InvalidOperationException($"目录 `{fullPath}` 中没有匹配规则 `{filePattern}` 的多语言文本 xlsx 文件。");
         }
 
-        Console.WriteLine($"localization text files: {string.Join(", ", files.Select(Path.GetFileName))}");
+        Console.WriteLine($"信息：多语言文本文件：{string.Join(", ", files.Select(Path.GetFileName))}");
         return files;
     }
 
@@ -1044,9 +1083,9 @@ internal static partial class Program
             .Replace("'", "&apos;", StringComparison.Ordinal);
     }
 
-    private static async Task<int> RunLuban(string scriptDir, string dataOut, string codeOut, string template, string l10nTextFile)
+    private static async Task<int> RunLuban(string scriptDir, string dataOut, string codeOut, string template, string? l10nTextFile)
     {
-        var args = new[]
+        var args = new List<string>
         {
             Path.Combine(scriptDir, "Tools", "Luban.dll"),
             "-t", "client",
@@ -1056,11 +1095,17 @@ internal static partial class Program
             "--customTemplateDir", ResolveTemplateDir(scriptDir, template),
             "-x", $"outputDataDir={dataOut}",
             "-x", $"outputCodeDir={codeOut}",
-            "-x", "l10n.provider=default",
-            "-x", $"l10n.textFile.path={ToLubanInputPath(scriptDir, l10nTextFile)}",
-            "-x", "l10n.textFile.keyFieldName=key",
-            "-x", "l10n.textListFile=texts.txt",
         };
+
+        if (!string.IsNullOrEmpty(l10nTextFile))
+        {
+            args.AddRange([
+                "-x", "l10n.provider=default",
+                "-x", $"l10n.textFile.path={ToLubanInputPath(scriptDir, l10nTextFile)}",
+                "-x", "l10n.textFile.keyFieldName=key",
+                "-x", "l10n.textListFile=texts.txt",
+            ]);
+        }
 
         var startInfo = new ProcessStartInfo
         {
@@ -1075,12 +1120,12 @@ internal static partial class Program
             startInfo.ArgumentList.Add(arg);
         }
 
-        using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("failed to start Luban");
-        var stdoutTask = StreamProcessOutput(process.StandardOutput, Console.Out, "tables");
-        var stderrTask = StreamProcessOutput(process.StandardError, Console.Error, "tables");
+        using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("启动 Luban 失败。");
+        var stdoutTask = StreamProcessOutput(process.StandardOutput, Console.Out, "配置表");
+        var stderrTask = StreamProcessOutput(process.StandardError, Console.Error, "配置表");
         await process.WaitForExitAsync();
         await Task.WhenAll(stdoutTask, stderrTask);
-        Console.WriteLine($"[tables] exit code: {process.ExitCode}");
+        Console.WriteLine($"信息：配置表生成进程退出码：{process.ExitCode}");
         return process.ExitCode;
     }
 
@@ -1097,24 +1142,24 @@ internal static partial class Program
         var cfg = IniFile.Load(iniPath);
         var scriptDir = Path.GetDirectoryName(iniPath) ?? Directory.GetCurrentDirectory();
         var paths = cfg.GetSection("paths");
-        var languages = NormalizeLanguages(cfg.GetSection("languages").Keys);
 
         var tableDataOut = paths.GetValueOrDefault("table_data_out") ?? paths.GetValueOrDefault("data_out") ?? "../Client/Assets/Bundles/Configs/bytes/";
-        var l10nTextOut = paths.GetValueOrDefault("l10n_text_out") ?? paths.GetValueOrDefault("data_out") ?? tableDataOut;
-        var l10nConstOut = paths.GetValueOrDefault("l10n_const_out") ?? paths.GetValueOrDefault("data_out") ?? tableDataOut;
-        var codeOut = paths["code_out"] ?? throw new InvalidOperationException("paths.code_out is required");
-        var l10nTextXlsx = paths.GetValueOrDefault("l10n_text_xlsx") ?? "./Excels/Localization";
-        var l10nTextFilePattern = paths.GetValueOrDefault("l10n_text_file_pattern") ?? "^Localization(?!Const$).*$";
-        var l10nConstXlsx = paths.GetValueOrDefault("l10n_const_xlsx") ?? paths.GetValueOrDefault("l10n_xlsx") ?? "./Excels/Localization/LocalizationConst.xlsx";
-        var l10nEditor = paths.TryGetValue("l10n_editor_out", out var configuredL10nEditor)
-            ? configuredL10nEditor
-            : "../Client/Assets/Editor/Config";
-        var l10nKeyCodeOut = paths.GetValueOrDefault("l10n_key_code_out") ?? DefaultLocalizationKeyCodeOut;
-        var l10nKeyCommentLanguage = paths.GetValueOrDefault("l10n_key_comment_language") ?? paths.GetValueOrDefault("l10n_comment_language") ?? DefaultLocalizationKeyCommentLanguage;
-        var l10nConstOutRule = paths.GetValueOrDefault("l10n_const_out_rule") ?? "";
-        var l10nTextFiles = ResolveLocalizationTextFiles(scriptDir, l10nTextXlsx, l10nTextFilePattern);
-        var l10nTextRows = LoadLocalizationTextRows(l10nTextFiles, languages);
-        var lubanL10nTextFile = WriteLubanLocalizationTextFile(scriptDir, l10nTextRows);
+        var codeOut = paths["code_out"] ?? throw new InvalidOperationException("缺少必需配置：paths.code_out。");
+        var l10nEnabled = ParseBoolOption(paths.GetValueOrDefault("l10n_enabled"), true);
+        var l10nTextRows = new List<RowData>();
+
+        if (l10nEnabled)
+        {
+            var l10nProviderLanguages = ReadConfiguredLanguages(cfg, paths);
+            var l10nTextXlsx = paths.GetValueOrDefault("l10n_text_xlsx") ?? "./Excels/Localization";
+            var l10nTextFilePattern = paths.GetValueOrDefault("l10n_text_file_pattern") ?? "^Localization(?!Const$).*$";
+            var l10nTextFiles = ResolveLocalizationTextFiles(scriptDir, l10nTextXlsx, l10nTextFilePattern);
+            l10nTextRows = LoadLocalizationTextRows(l10nTextFiles, l10nProviderLanguages);
+        }
+
+        var lubanL10nTextFile = l10nEnabled
+            ? WriteLubanLocalizationTextFile(scriptDir, l10nTextRows)
+            : null;
 
         int lubanExitCode;
         try
@@ -1123,8 +1168,11 @@ internal static partial class Program
         }
         finally
         {
-            RemoveFileIfExists(lubanL10nTextFile);
-            RemoveDirectoryIfEmpty(Path.GetDirectoryName(lubanL10nTextFile) ?? "");
+            if (!string.IsNullOrEmpty(lubanL10nTextFile))
+            {
+                RemoveFileIfExists(lubanL10nTextFile);
+                RemoveDirectoryIfEmpty(Path.GetDirectoryName(lubanL10nTextFile) ?? "");
+            }
         }
 
         if (lubanExitCode != 0)
@@ -1133,6 +1181,28 @@ internal static partial class Program
         }
 
         AddUtf8BomToCsFiles(ResolvePath(scriptDir, codeOut));
+
+        if (!l10nEnabled)
+        {
+            Console.WriteLine("信息：paths.l10n_enabled 已关闭，多语言导出已跳过。");
+            return 0;
+        }
+
+        var languages = ReadConfiguredLanguages(cfg, paths);
+        var l10nTextOut = paths.GetValueOrDefault("l10n_text_out") ?? paths.GetValueOrDefault("data_out") ?? tableDataOut;
+        var l10nConstOut = paths.GetValueOrDefault("l10n_const_out") ?? paths.GetValueOrDefault("data_out") ?? tableDataOut;
+        var l10nConstXlsx = paths.GetValueOrDefault("l10n_const_xlsx") ?? paths.GetValueOrDefault("l10n_xlsx") ?? "./Excels/Localization/LocalizationConst.xlsx";
+        var l10nEditor = paths.TryGetValue("l10n_editor_out", out var configuredL10nEditor)
+            ? configuredL10nEditor
+            : "../Client/Assets/Editor/Config";
+        var l10nKeyCodeOut = paths.GetValueOrDefault("l10n_key_code_out") ?? DefaultLocalizationKeyCodeOut;
+        var l10nKeyCommentLanguage = paths.GetValueOrDefault("l10n_key_comment_language") ?? paths.GetValueOrDefault("l10n_comment_language") ?? DefaultLocalizationKeyCommentLanguage;
+        var l10nConstOutRule = paths.GetValueOrDefault("l10n_const_out_rule") ?? "";
+
+        var localizationConstSource = Path.Combine(scriptDir, "CustomeTools", "LocalizationConst");
+        var localizationConstTarget = Path.Combine(Path.GetDirectoryName(ResolvePath(scriptDir, codeOut)) ?? scriptDir, "LocalizationConst");
+        CopyDirectoryWithoutMeta(localizationConstSource, localizationConstTarget);
+        Console.WriteLine($"成功：已复制多语言常量代码：{localizationConstTarget}");
 
         var constSheetRows = LoadWorkbookRows(ResolvePath(scriptDir, l10nConstXlsx), ConstSheetNames, true, languages);
         var constRows = MergeRows(constSheetRows, "LocalizationConst", true);
@@ -1150,7 +1220,7 @@ internal static partial class Program
 
         if (string.IsNullOrWhiteSpace(l10nEditor))
         {
-            WriteWarning("warning: l10n_editor_out is empty; localization const editor json export skipped");
+            WriteWarning("警告：l10n_editor_out 为空，已跳过多语言常量编辑器 JSON 导出。");
         }
         else
         {
@@ -1158,12 +1228,12 @@ internal static partial class Program
             if (constRows.Count > 0 && exportedLanguages.Count > 0)
             {
                 WriteEditorJson(editorJsonPath, constRows, exportedLanguages);
-                Console.WriteLine($"generated editor json: {editorJsonPath}");
+                Console.WriteLine($"成功：已生成编辑器 JSON：{editorJsonPath}");
             }
             else
             {
                 RemoveFileIfExists(editorJsonPath);
-                WriteWarning("warning: no localization const editor json exported because no configured language has const data");
+                WriteWarning("警告：所有已配置语言都没有多语言常量数据，未导出编辑器 JSON。");
             }
         }
 
@@ -1188,6 +1258,21 @@ internal static partial class Program
             ? template
             : Path.Combine(scriptDir, "CustomeTools", template);
         return Path.GetFullPath(path);
+    }
+
+    private static bool ParseBoolOption(string? value, bool defaultValue)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return defaultValue;
+        }
+
+        return value.Trim().ToLowerInvariant() switch
+        {
+            "1" or "true" or "yes" or "on" or "enable" or "enabled" => true,
+            "0" or "false" or "no" or "off" or "disable" or "disabled" => false,
+            _ => throw new InvalidOperationException($"布尔配置值无效：`{value}`。"),
+        };
     }
 
     private static string CellText(string? value)
@@ -1296,7 +1381,7 @@ internal static partial class Program
         {
             return _sections.TryGetValue(name, out var section)
                 ? section
-                : throw new InvalidOperationException($"missing ini section `{name}`");
+                : throw new InvalidOperationException($"缺少 ini 配置段 `{name}`。");
         }
     }
 
@@ -1361,7 +1446,7 @@ internal static partial class Program
 
         public SheetData ReadSheet(SheetInfo sheet)
         {
-            var entry = _archive.GetEntry(sheet.Path) ?? throw new InvalidOperationException($"missing xlsx entry: {sheet.Path}");
+            var entry = _archive.GetEntry(sheet.Path) ?? throw new InvalidOperationException($"xlsx 文件缺少条目：{sheet.Path}");
             using var stream = entry.Open();
             var doc = XDocument.Load(stream, LoadOptions.None);
             var cells = new Dictionary<(int Row, int Col), string>();
@@ -1425,8 +1510,8 @@ internal static partial class Program
 
         private static List<SheetInfo> ReadWorkbookSheets(ZipArchive archive)
         {
-            var workbookEntry = archive.GetEntry("xl/workbook.xml") ?? throw new InvalidOperationException("missing xlsx entry: xl/workbook.xml");
-            var relsEntry = archive.GetEntry("xl/_rels/workbook.xml.rels") ?? throw new InvalidOperationException("missing xlsx entry: xl/_rels/workbook.xml.rels");
+            var workbookEntry = archive.GetEntry("xl/workbook.xml") ?? throw new InvalidOperationException("xlsx 文件缺少条目：xl/workbook.xml");
+            var relsEntry = archive.GetEntry("xl/_rels/workbook.xml.rels") ?? throw new InvalidOperationException("xlsx 文件缺少条目：xl/_rels/workbook.xml.rels");
 
             using var relsStream = relsEntry.Open();
             var relsDoc = XDocument.Load(relsStream, LoadOptions.None);
