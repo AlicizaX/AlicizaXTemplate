@@ -1,35 +1,32 @@
 # UI 模块
 
-UI 模块提供窗口创建、显示、关闭、层级管理、缓存、窗口生命周期、子组件 Widget、Tab 界面和 UI 事件自动解绑能力。窗口逻辑继承 `UIWindow<T>`、`UITabWindow<T>` 或 `UIWidget<T>`，其中 `T` 是自动生成的继承 `UIHolderObjectBase`。
+UI 模块负责窗口创建、显示、关闭、层级、缓存、遮挡、生命周期、Widget、Tab 窗口和 UI 事件自动解绑。
 
-源码位置：
+主要代码位置：
 
-- `Client/Packages/com.alicizax.unity.framework/Runtime/UI`
-- 项目示例：`Client/Assets/Scripts/Hotfix/GameLogic/UI`
+- `Client/Packages/com.alicizax.unity.framework/Runtime/Modules/UI`
+- 示例业务代码：`Client/Assets/Scripts/Hotfix/GameLogic/UI`
+
+常用入口：
+
+```csharp
+using AlicizaX;
+using AlicizaX.UI.Runtime;
+
+IUIService ui = GameApp.UI;
+IUIRouter router = GameApp.UI.Router;
+```
 
 ## 使用前提
 
-场景中的框架根节点需要挂载：
+启动场景需要挂载并初始化这些组件：
 
 - `ObjectPoolComponent`
 - `TimerComponent`
 - `ResourceComponent`
 - `UIComponent`
 
-`UIComponent` Inspector 中需要配置 `uiRoot` 预制体。运行时会实例化 UI 根节点，注册 `IUIService`，并根据 `UILayer` 创建各层级根节点。
-
-```csharp
-using AlicizaX;
-using AlicizaX.UI.Runtime;
-
-IUIService ui = AppServices.Require<IUIService>();
-```
-
-快捷入口：
-
-```csharp
-IUIService ui = GameApp.UI;
-```
+`UIComponent` Inspector 中需要配置 `uiRoot` 预制体。运行时会实例化 UI 根节点，注册 `IUIService`，并按 `UILayer` 创建层级节点。
 
 ## UI 层级
 
@@ -42,23 +39,517 @@ public enum UILayer
     Popup = 3,
     Tips = 4,
     Top = 5,
-    All = 6
+    All = 6,
 }
 ```
 
-常用约定：
+约定：
 
 - `Background`：背景层。
-- `Scene`：2D 场景信息、血条、飘字等。
-- `UI`：普通全屏或主界面。
-- `Popup`：弹窗。
-- `Tips`：提示、Toast。
-- `Top`：最上层遮罩或系统提示。
+- `Scene`：场景 2D 信息，例如血条、飘字。
+- `UI`：普通主界面、全屏界面。
+- `Popup`：弹窗层。
+- `Tips`：提示、Toast、跑马灯。
+- `Top`：最高层，例如新手引导遮罩。
 
-## UI绑定工具自动生成的Holder有哪些
-生成类禁止手动修改
+## WindowAttribute
 
-Holder 会自动挂在 UI 预制体上，负责暴露序列化控件。生成工具会生成类似下面的代码：
+窗口逻辑类使用 `WindowAttribute` 描述显示层级、遮挡模式和缓存时间。
+
+```csharp
+[Window(UILayer.UI, UIOcclusionMode.None, 30)]
+public sealed class HomeWindow : UIWindow<ui_HomeWindow>, IUISyncInitialize
+{
+    void IUISyncInitialize.OnInitialize()
+    {
+    }
+}
+```
+
+当前构造函数是：
+
+```csharp
+public WindowAttribute(
+    UILayer windowLayer,
+    UIOcclusionMode occlusionMode = UIOcclusionMode.None,
+    int cacheTime = 0)
+```
+
+参数说明：
+
+- `windowLayer`：窗口所在层级。
+- `occlusionMode`：遮挡模式。
+- `cacheTime`：缓存时间，`-1` 永久缓存，`0` 不缓存，`>= 1` 按秒缓存。
+
+遮挡模式：
+
+```csharp
+public enum UIOcclusionMode : byte
+{
+    None,
+    Visible,
+    Lifecycle,
+}
+```
+
+- `None`：只做普通显示排序，不主动遮挡下层窗口生命周期。
+- `Visible`：通过可见性隐藏被遮挡窗口。
+- `Lifecycle`：被遮挡窗口会走关闭生命周期，重新露出时再打开。路由深回退时要用 Router 的批量关闭能力避免中间页先被恢复再关闭。
+
+需要每帧更新时添加：
+
+```csharp
+[UIUpdate]
+[Window(UILayer.UI)]
+public sealed class BattleHudWindow : UIWindow<ui_BattleHudWindow>
+{
+    protected override void OnUpdate()
+    {
+        RefreshHpBar();
+    }
+}
+```
+
+## 窗口初始化
+
+当前初始化不再通过 `protected override OnInitialize()`。窗口需要实现以下二选一接口：
+
+```csharp
+public interface IUISyncInitialize
+{
+    void OnInitialize();
+}
+
+public interface IUIAsyncInitialize
+{
+    UniTask OnInitializeAsync();
+}
+```
+
+同步初始化示例：
+
+```csharp
+[Window(UILayer.UI, UIOcclusionMode.None, 30)]
+public sealed class TestWindow : UIWindow<ui_TestWindow>, IUISyncInitialize
+{
+    void IUISyncInitialize.OnInitialize()
+    {
+        baseui.BtnClose.onClick.AddListener(CloseSelf);
+    }
+}
+```
+
+异步初始化示例：
+
+```csharp
+[Window(UILayer.UI, UIOcclusionMode.None, 30)]
+public sealed class HomeWindow : UITabWindow<ui_HomeWindow>, IUIAsyncInitialize
+{
+    private HomeWidget _homeWidget;
+
+    async UniTask IUIAsyncInitialize.OnInitializeAsync()
+    {
+        _homeWidget = await CreateWidgetAsync<HomeWidget>(baseui.RectTransform, false);
+        baseui.BtnShop.onClick.AddListener(OnShopClick);
+    }
+
+    private void OnShopClick()
+    {
+        GameApp.UI.Router.NavigateTo<ShopWindow>().Forget();
+    }
+}
+```
+
+注意：
+
+- 一个 UI 类型不能同时实现 `IUISyncInitialize` 和 `IUIAsyncInitialize`。
+- `ShowUISync<T>()` 不能打开异步初始化 UI，遇到异步初始化 UI 会返回 `null`。
+- `OnOpen`、`OnClose`、`OnDestroy`、`OnUpdate` 仍然是 `UIBase` 的虚方法。
+
+## UIService API
+
+`IUIService` 负责实际 UI 实例、栈、层级、遮挡、缓存和生命周期。
+
+### 打开 UI
+
+无参异步打开：
+
+```csharp
+HomeWindow home = await GameApp.UI.ShowUI<HomeWindow>();
+```
+
+带参数异步打开：
+
+```csharp
+ItemTipsWindow tips = await GameApp.UI.ShowUI<ItemTipsWindow>(10001, "from_bag");
+```
+
+需要精确状态时使用 `ShowUIResult`：
+
+```csharp
+UIShowResult<HomeWindow> result = await GameApp.UI.ShowUIResult<HomeWindow>();
+if (result.IsAccepted)
+{
+    HomeWindow view = result.View;
+}
+```
+
+可用重载：
+
+```csharp
+UniTask<T> ShowUI<T>() where T : UIBase;
+UniTask<T> ShowUI<T>(params object[] userDatas) where T : UIBase;
+UniTask<UIShowResult<T>> ShowUIResult<T>() where T : UIBase;
+UniTask<UIShowResult<T>> ShowUIResult<T>(params object[] userDatas) where T : UIBase;
+UniTask<UIBase> ShowUI(string type, params object[] userDatas);
+UniTask<UIShowResult> ShowUIResult(string type, params object[] userDatas);
+UniTask<UIBase> ShowUI(RuntimeTypeHandle handle, params object[] userDatas);
+UniTask<UIShowResult> ShowUIResult(RuntimeTypeHandle handle, params object[] userDatas);
+```
+
+同步打开：
+
+```csharp
+LoginWindow login = GameApp.UI.ShowUISync<LoginWindow>();
+LoginWindow loginWithArgs = GameApp.UI.ShowUISync<LoginWindow>("startup");
+```
+
+同步打开只适合资源可同步加载且 UI 使用 `IUISyncInitialize` 的场景。
+
+### 关闭 UI
+
+```csharp
+GameApp.UI.CloseUI<LoginWindow>();
+GameApp.UI.CloseUI<LoginWindow>(force: true);
+bool ok = await GameApp.UI.CloseUIAsync<LoginWindow>();
+```
+
+`force: true` 会强制跳过缓存策略。
+
+窗口内部关闭自身：
+
+```csharp
+CloseSelf();
+ForceCloseSelf();
+```
+
+`CloseUI` / `CloseSelf` 进入 UIService 后会先检查目标是否为 Router 当前页。
+如果是当前 routed page，会转交给 `Router.CloseCurrent(expectedHandle)`，由 Router 维护 history；
+如果不是当前 routed page，则继续按普通 UIService 关闭流程处理。
+
+routed page 内部仍建议直接表达路由语义：
+
+```csharp
+GameApp.UI.Router.CloseCurrent().Forget();
+```
+
+### 查询 UI
+
+```csharp
+bool opened = GameApp.UI.IsOpen<LoginWindow>();
+LoginWindow login = GameApp.UI.GetUI<LoginWindow>();
+RectTransform uiLayer = GameApp.UI.GetLayer(UILayer.UI);
+```
+
+`IsOpen` 只表示该 UI 类型当前处于稳定 `Opened` 状态，不表示它一定是 Router 当前页。
+
+### 关闭最上层匹配 UI
+
+```csharp
+bool closed = await GameApp.UI.TryCloseTopAsync(
+    handle => handle.Equals(typeof(SettingsWindow).TypeHandle));
+```
+
+`TryCloseTopAsync` 从最高层、最高栈位开始查找，关闭第一个满足谓词的 UI。
+
+### CloseManyAsync
+
+`CloseManyAsync` 是 UIService 内部栈事务能力，主要给 Router 深回退使用。普通业务通常不直接调用。
+
+```csharp
+RuntimeTypeHandle[] handles =
+{
+    typeof(ShopWindow).TypeHandle,
+    typeof(TestWindow).TypeHandle,
+};
+
+UICloseManyMode[] modes =
+{
+    UICloseManyMode.Transition,
+    UICloseManyMode.SilentFinalize,
+};
+
+UICloseManyResult result = await GameApp.UI.CloseManyAsync(handles, modes, 2);
+```
+
+语义：
+
+- `Transition`：走正常关闭动画。
+- `SilentFinalize`：不播放关闭动画，但仍完成 UIBase 关闭状态机。
+- 一次事务内不会在每个窗口关闭后重复刷新遮挡。
+- 最终每个变更层只刷新一次可见性和深度。
+- preflight 不会反射注册 UI，也不会创建 metadata；未知 handle 返回 `UnknownHandle`。
+- 重复 handle 会被折叠，已缓存或不在栈中的 handle 会被跳过。
+
+## UIRouter
+
+`IUIRouter` 管理 Page 级导航历史。Router 只负责 history 和导航事务，不负责 UI 实例、层级、遮挡、缓存。
+
+入口：
+
+```csharp
+IUIRouter router = GameApp.UI.Router;
+```
+
+### 初始化 root
+
+启动主界面建议用 Router 建立 root history：
+
+```csharp
+GameApp.UI.Router.ResetHistory();
+await GameApp.UI.Router.NavigateTo<UIHomeWindow>();
+```
+
+不要用 `ShowUI<UIHomeWindow>()` 打开主 Page 后再期待 Router 能自动知道 history。若确实已有 UI 是手动打开的，可以用 `SyncFromCurrentUI` 重建 Router history。
+
+### 前进导航
+
+```csharp
+await GameApp.UI.Router.NavigateTo<UITestAWindow>();
+await GameApp.UI.Router.NavigateTo<UIShopWindow>(shopId);
+```
+
+规则：
+
+- 每次成功导航会加入一条 Router history。
+- 参数会浅拷贝保存到 history，避免调用方后续修改数组影响回放。
+- 如果目标类型等于当前 history 顶部类型，会刷新当前页参数，不新增 history。
+- `A -> B -> C -> D -> NavigateTo<A>()` 是正常前进导航，history 会变成 `A, B, C, D, A`，此后 `Back()` 返回 `D`。
+
+### Replace
+
+```csharp
+await GameApp.UI.Router.Replace<SettingsWindow>();
+await GameApp.UI.Router.Replace<SettingsWindow>("from_home");
+```
+
+`Replace` 用目标页替换当前 history 顶部。目标打开失败时不修改 history；旧页关闭失败时会按事务规则回滚或进入 dirty。
+
+### Back
+
+```csharp
+await GameApp.UI.Router.Back();
+```
+
+返回上一条 history。Router Back 不处理弹窗优先关闭，弹窗应由业务、输入系统或弹窗管理逻辑处理。
+
+相邻回退时，如果目标页已经被遮挡系统恢复打开，Router 会跳过重复 `ShowByRouter`。
+
+### CloseCurrent
+
+```csharp
+await GameApp.UI.Router.CloseCurrent();
+await GameApp.UI.Router.CloseCurrent(force: true);
+```
+
+用于 routed page 内部关闭当前页面：
+
+- history 大于 1 时等价于 `Back()`。
+- 只有 root 时关闭 root 并移除 history。
+- `CloseSelf()` / `GameApp.UI.CloseUI<T>()` 如果命中 Router 当前页，也会转交给本流程。
+
+### BackToRoot
+
+```csharp
+await GameApp.UI.Router.BackToRoot();
+```
+
+返回当前导航流的 root。
+
+深回退示例：
+
+```text
+A -> B -> C -> D -> BackToRoot()
+```
+
+行为：
+
+- `D` 播放关闭动画。
+- `B`、`C` silent finalize，不播放关闭动画。
+- 中间页不会因为 Lifecycle 遮挡先被 reopen 再 close。
+- root `A` 只恢复或打开一次。
+
+这依赖 UIService 的 `CloseManyAsync`。Router 会先让 UIService 批量关闭目标以上的非 target UI，再根据目标是否已被遮挡恢复决定是否需要显式 `ShowByRouter(target)`。
+
+### BackTo
+
+```csharp
+await GameApp.UI.Router.BackTo<UIHomeWindow>();
+await GameApp.UI.Router.BackTo<UIHomeWindow>(openIfMissing: false);
+await GameApp.UI.Router.BackTo<UIHomeWindow>(openIfMissing: true, "arg");
+```
+
+规则：
+
+- 命中 history 时，返回最近的目标类型，并恢复该 history entry 保存的参数。
+- 未命中且 `openIfMissing == true` 时，执行 `ResetTo<T>(args)`。
+- 未命中且 `openIfMissing == false` 时返回 `false`。
+- 深回退不会关闭 target TypeHandle；重复 UI 类型只关闭一次。
+
+### ResetTo
+
+```csharp
+await GameApp.UI.Router.ResetTo<UIHomeWindow>();
+await GameApp.UI.Router.ResetTo<UIHomeWindow>("startup");
+```
+
+重建导航栈，只保留目标页作为 root entry。目标打开失败时不破坏旧页面和旧 history。
+
+### ResetHistory
+
+```csharp
+GameApp.UI.Router.ResetHistory();
+```
+
+只清空 Router history 并清除 dirty 状态，不关闭任何实际 UI。
+
+### SyncFromCurrentUI
+
+```csharp
+GameApp.UI.Router.SyncFromCurrentUI(typeof(UIHomeWindow));
+GameApp.UI.Router.SyncFromCurrentUI(typeof(UIHomeWindow).TypeHandle, "arg");
+```
+
+用于把当前实际显示的 UI 类型设为新的 Router root。它只修复 Router history，不打开或关闭实际 UI。
+
+### Router 状态
+
+```csharp
+bool canBack = GameApp.UI.Router.CanBack;
+Type currentType = GameApp.UI.Router.Current;
+UIRouteEntry currentEntry = GameApp.UI.Router.CurrentEntry;
+```
+
+`CurrentEntry` 返回快照，不要修改后期待影响 Router 内部 history。
+
+### Router 使用建议
+
+- Page 级 UI 使用 Router：`NavigateTo`、`Back`、`BackToRoot`、`CloseCurrent`。
+- 非 routed 弹窗、Tips、临时 UI 可以继续使用 `ShowUI` / `CloseSelf`。
+- 不要让 UIService 参与 Router history；UIService 只管理实际 UI 生命周期。
+- routed page 的直接关闭入口会在 UIService 源头转交 Router；关键业务流程仍建议显式调用 Router API。
+- Router API 是异步事务，按钮里可以 `.Forget()`，但关键流程建议 `await` 并检查返回值。
+
+## 接收打开参数
+
+`ShowUI`、`ShowUISync`、Router `NavigateTo`、`Replace`、`ResetTo` 的 `params object[]` 会传到窗口内部。
+
+```csharp
+public sealed class ItemTipsWindow : UIWindow<ui_ItemTipsWindow>
+{
+    protected override void OnOpen()
+    {
+        int itemId = UserData is int value ? value : 0;
+        object[] args = UserDatas;
+    }
+}
+```
+
+Router 会复制参数数组保存到 history。`Back` / `BackTo` 恢复旧页面时会使用对应 history entry 保存的参数。
+
+## UI 事件自动解绑
+
+窗口可重写 `OnRegisterEvent`，通过 `EventListenerProxy` 注册 UI 事件。窗口销毁时会自动移除。
+
+```csharp
+public sealed class SettingsWindow : UIWindow<ui_SettingsWindow>
+{
+    protected override void OnRegisterEvent(EventListenerProxy proxy)
+    {
+        proxy.AddUIEvent<LocalizationChangeEvent>(OnLanguageChanged);
+    }
+
+    private void OnLanguageChanged(in LocalizationChangeEvent evt)
+    {
+        RefreshText();
+    }
+}
+```
+
+## Widget
+
+`UIWidget<T>` 适合窗口内部子界面、分页内容、列表详情。
+
+```csharp
+public sealed class BagWindow : UIWindow<ui_BagWindow>, IUIAsyncInitialize
+{
+    private BagDetailWidget _detail;
+
+    async UniTask IUIAsyncInitialize.OnInitializeAsync()
+    {
+        _detail = await CreateWidgetAsync<BagDetailWidget>(baseui.DetailRoot, false);
+    }
+
+    protected override void OnOpen()
+    {
+        _detail.Open(10001);
+    }
+
+    protected override void OnClose()
+    {
+        _detail.Close();
+    }
+}
+
+public sealed class BagDetailWidget : UIWidget<ui_BagDetailWidget>
+{
+    protected override void OnOpen()
+    {
+        int itemId = UserData is int value ? value : 0;
+    }
+}
+```
+
+常用 API：
+
+```csharp
+T widget = await CreateWidgetAsync<T>(Transform parent, bool visible = true);
+T widget = await CreateWidgetAsync<T>(UIHolderObjectBase holder, bool destroyHolderOnDispose = false);
+T widget = CreateWidgetSync<T>(Transform parent, bool visible = true);
+await RemoveWidget(widget);
+
+widget.Open(args);
+await widget.OpenAsync(args);
+widget.Close();
+await widget.CloseAsync();
+widget.Destroy();
+```
+
+## Tab 窗口
+
+`UITabWindow<T>` 内置虚拟 Tab 注册和切换。
+
+```csharp
+public sealed class RoleWindow : UITabWindow<ui_RoleWindow>, IUISyncInitialize
+{
+    void IUISyncInitialize.OnInitialize()
+    {
+        InitTabVirtuallyView<RoleInfoTab>(baseui.TabRoot);
+        InitTabVirtuallyView<RoleEquipTab>(baseui.TabRoot);
+
+        baseui.BtnInfo.onClick.AddListener(() => SwitchTab(0));
+        baseui.BtnEquip.onClick.AddListener(() => SwitchTab(1));
+    }
+}
+```
+
+第一次切换到某个 Tab 时会异步创建，后续切换复用已加载实例。
+
+## Holder 生成
+
+Holder 是 UI 绑定工具生成的类，继承 `UIHolderObjectBase`，挂在 UI 预制体上，负责暴露序列化控件引用。
+
+生成示例：
 
 ```csharp
 using AlicizaX.UI.Runtime;
@@ -74,504 +565,89 @@ namespace Game.UI
 
         [SerializeField] private Button mBtnLogin;
         public Button BtnLogin => mBtnLogin;
-
-        [SerializeField] private Text mTxtTitle;
-        public Text TxtTitle => mTxtTitle;
     }
 }
 ```
 
-`UIResAttribute` 用于描述 UI 预制体加载地址：
+`UIResAttribute` 写在 Holder 类上，不写在窗口逻辑类上。
 
-- `EUIResLoadType.AssetBundle`：通过 `IResourceService` 加载。
-- `EUIResLoadType.Resources`：通过 Unity `Resources.Load` 加载。
-
-## 编辑器生成 Holder
-
-框架提供 UI 绑定脚本生成工具，用于从 UI 预制体层级自动生成 Holder 类，并把控件引用序列化回预制体。入口在 Unity 菜单：
+生成入口：
 
 ```text
 AlicizaX/UISetting Window
 ```
 
-打开后会看到 `General`、`Script Generation`、`Element Mapping` 三个页签。
-
-![UI Setting General](src/ui-setting-general.png)
-
-### General 配置
-
-`General` 页签控制命名规则和生成辅助类：
-
-| 配置 | 说明 |
-| --- | --- |
-| `组件分割符` | 控件类型前缀和字段名之间的分隔符，默认 `#` |
-| `组件结尾符` | 生成规则的结尾标记，默认 `@` |
-| `数组分割` | 数组控件分组标记，默认 `*` |
-| `生成脚本前缀` | Holder 类名前缀，默认 `ui`，例如 `UILoadUpdateWindow` 生成 `ui_UILoadUpdateWindow` |
-| `Identifier Formatter` | 控制字段名、属性名、类名格式化 |
-| `Resource Path Resolver` | 控制 `UIResAttribute` 中的资源路径 |
-| `Script Code Emitter` | 控制 Holder 代码内容生成 |
-| `Script File Writer` | 控制生成文件写入方式和自动挂载流程 |
-| `Exclude Keywords` | 命中关键字的节点不参与绑定，默认排除 `ViewHolder` |
-
-截图中的 `Script Preview` 和 `Component Preview` 会根据当前规则预览生成结果。例如：
+右键 UI Prefab：
 
 ```text
-ui_UITestWindow
-*Text#Img@Test*0
+UI生成绑定
+UI生成绑定 仅复制属性
 ```
 
-### Script Generation 配置
-
-`Script Generation` 页签用于配置不同 UI 项目的生成路径、命名空间、Prefab 根目录和加载方式。工具会按选中 Prefab 的资源路径匹配 `Prefab Root Path`，命中哪条配置就使用哪条配置生成。
-
-![UI Setting Script Generation](src/ui-setting-script-generation.png)
-
-项目里常见两套配置：
-
-| Project Name | Namespace | Holder Code Path | Prefab Root Path | Load Type |
-| --- | --- | --- | --- | --- |
-| `MainProject` | `Game.UI` | `Assets/Scripts/Startup/UI/Generate` | `Assets/Resources/` | `Resources` |
-| `Hotfix` | `Game.UI` | `Assets/Scripts/Hotfix/GameLogic/UI/Generate` | `Assets/Bundles/UI` | `Asset Bundle` |
-
-配置含义：
-
-- `Project Name`：只用于区分配置项。
-- `Namespace`：生成 Holder 类所在命名空间。
-- `Holder Code Path`：生成 `.cs` 文件的位置。
-- `Prefab Root Path`：允许生成绑定的 UI 预制体根目录。
-- `Load Type`：决定 `UIResAttribute` 使用 `Resources` 还是 `AssetBundle`。
-
-例如 Hotfix 配置下，`Assets/Bundles/UI/UILoadUpdateWindow.prefab` 会生成：
-
-```csharp
-namespace Game.UI
-{
-    [UIRes(ui_UILoadUpdateWindow.ResTag, EUIResLoadType.AssetBundle)]
-    public class ui_UILoadUpdateWindow : UIHolderObjectBase
-    {
-        public const string ResTag = "UILoadUpdateWindow";
-    }
-}
-```
-
-如果 YooAsset 开启 Addressable，AssetBundle 模式下的 `ResTag` 会优先使用预制体名；否则会使用去掉扩展名后的 `Assets/...` 路径。
-
-### Element Mapping 配置
-
-`Element Mapping` 页签用于配置“节点名前缀 -> 组件类型”的映射。
-
-![UI Setting Element Mapping](src/ui-setting-element-mapping.png)
-
-常用映射示例：
-
-| 前缀 | 组件类型 |
-| --- | --- |
-| `Rect` | `UnityEngine.RectTransform` |
-| `Obj` | `GameObject` |
-| `Tf` | `UnityEngine.Transform` |
-| `Btn` | `UnityEngine.UI.UXButton` |
-| `Slider` | `UnityEngine.UI.Slider` |
-| `Img` | `UnityEngine.UI.Image` |
-| `RImg` | `UnityEngine.UI.RawImage` |
-| `Text` | `TMPro.TextMeshProUGUI` |
-| `Input` | `TMPro.TMP_InputField` |
-| `ScrollView` | `AlicizaX.UI.RecyclerView` |
-| `Drag` | `UnityEngine.UI.UXDraggable` |
-
-节点名以映射前缀开头时，生成器会查找该节点上可赋值给目标类型的组件。前缀只用于生成规则，真正字段类型以节点上实际组件类型为准。
-
-### 命名规则
-
-普通控件命名格式：
-
-```text
-前缀@字段名
-```
-
-示例：
+常用命名：
 
 ```text
 Btn@Login
 Img@BackGround
 Text@Title
 ScrollView@ItemList
-```
-
-会生成类似：
-
-```csharp
-[SerializeField]
-private UXButton mBtnLogin;
-public UXButton BtnLogin => mBtnLogin;
-
-[SerializeField]
-private Image mImgBackGround;
-public Image ImgBackGround => mImgBackGround;
-```
-
-一个节点需要绑定多个组件时，可以写多个前缀：
-
-```text
 Btn#Img@Close
-```
-
-数组控件命名格式：
-
-```text
-*前缀#@字段名*序号
-```
-
-示例：
-
-```text
 *Img@Star*0
 *Img@Star*1
-*Img@Star*2
 ```
 
-会按序号排序并生成数组字段：
+Widget 节点不需要写绑定符号。只要子节点上挂了 `UIHolderObjectBase`，生成器会把它作为 Widget 引用收集。
+
+## 手动创建 Holder
+
+少数场景可手动创建 Holder，例如临时 Tips 多实例。生命周期需要业务自行维护。
 
 ```csharp
-[SerializeField]
-private Image[] mImgStarList = new Image[3];
-public Image[] ImgStarList => mImgStarList;
+await UIHolderFactory.CreateUIHolderAsync<ui_UILogicTestAlert>(parent);
+ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAlert>(parent);
 ```
-
-Widget 节点不需要写绑定符号。只要子节点上挂了 `UIHolderObjectBase`，生成器会把它作为 Widget 引用收集；如果节点名同时包含 `#` 和 `@`，会被认为是错误命名。
-
-### 生成绑定
-
-完成配置和节点命名后，对 UI 预制体执行生成：
-
-1. 保存 UI 为 Prefab，或者在 Prefab Mode 中编辑该 Prefab。
-2. 确认 Prefab 路径位于某条 `Prefab Root Path` 下。
-3. 在 Hierarchy 或 Prefab 根节点上右键。
-4. 点击 `UI生成绑定`。
-5. 等待脚本生成、Unity 编译完成后，工具会自动把 Holder 脚本挂到 Prefab，并回填序列化字段。
-
-![UI Generate Context Menu](src/ui-generate-context-menu.png)
-
-右键菜单说明：
-
-| 菜单 | 说明 |
-| --- | --- |
-| `UI生成绑定` | 生成 Holder 脚本、刷新 AssetDatabase、编译后自动挂载脚本并绑定字段 |
-| `UI生成绑定 仅复制属性` | 只把字段和属性代码复制到剪贴板，不写入文件 |
-
-生成器要求目标是 Prefab Asset 或正在编辑的 Prefab。直接对普通场景物体执行 `UI生成绑定` 会提示先保存为 UI Prefab。
-
-### 生成结果示例
-
-以项目里的 `UILoadUpdateWindow` 为例，预制体在 `Assets/Bundles/UI` 下，命中 Hotfix 配置后会生成到：
-
-```text
-Assets/Scripts/Hotfix/GameLogic/UI/Generate/ui_UILoadUpdateWindow.cs
-```
-
-生成结果节选：
-
-```csharp
-using AlicizaX.UI;
-using UnityEngine;
-using UnityEngine.UI;
-using AlicizaX.UI.Runtime;
-
-namespace Game.UI
-{
-    [UIRes(ui_UILoadUpdateWindow.ResTag, EUIResLoadType.AssetBundle)]
-    public class ui_UILoadUpdateWindow : UIHolderObjectBase
-    {
-        public const string ResTag = "UILoadUpdateWindow";
-
-        [SerializeField]
-        private UXButton mBtnTest;
-        public UXButton BtnTest => mBtnTest;
-
-        [SerializeField]
-        private Image mImgBackGround;
-        public Image ImgBackGround => mImgBackGround;
-
-        [SerializeField]
-        private RecyclerView mScrollViewTestList;
-        public RecyclerView ScrollViewTestList => mScrollViewTestList;
-    }
-}
-```
-
-窗口逻辑中直接通过 `baseui` 使用这些引用：
-
-```csharp
-[Window(UILayer.UI, false, 3)]
-public class UILoadUpdate : UITabWindow<ui_UILoadUpdateWindow>
-{
-    protected override void OnInitialize()
-    {
-        baseui.ImgBackGround.color = Color.gray;
-        baseui.BtnTest.onClick.AddListener(OnTestClick);
-    }
-}
-```
-
-### 常见问题
-
-1. 右键生成后提示没有配置：先打开 `AlicizaX/UISetting Window`，在 `Script Generation` 中添加至少一条配置。
-2. 提示没有找到符合规则路径的生成配置：检查 Prefab 是否在 `Prefab Root Path` 下。
-3. 生成后字段为空：检查节点名是否包含正确的 `#` 和 `@`，以及节点上是否真的挂了对应组件。
-4. 字段重复：同一个 Prefab 内不要生成相同的字段名，例如两个 `Btn#Close@` 会冲突。
-5. 子 Widget 被重复扫描：Widget 节点名不要写绑定符号，只需要挂 `UIHolderObjectBase`。
-6. `ViewHolder` 节点没有生成字段：默认被 `Exclude Keywords` 排除，如需生成请修改排除关键字。
-
-## 定义窗口逻辑
-
-```csharp
-using AlicizaX;
-using AlicizaX.UI.Runtime;
-using Game.UI;
-
-[Window(UILayer.UI, fullScreen: true, cacheTime: 30)]
-public sealed class LoginWindow : UIWindow<ui_LoginWindow>
-{
-    protected override void OnInitialize()
-    {
-        baseui.BtnLogin.onClick.AddListener(OnLoginClick);
-        baseui.TxtTitle.text = "Login";
-    }
-
-    protected override void OnOpen()
-    {
-        Log.Info("Login window opened");
-    }
-
-    protected override void OnClose()
-    {
-        Log.Info("Login window closed");
-    }
-
-    private void OnLoginClick()
-    {
-        CloseSelf();
-    }
-}
-```
-
-`WindowAttribute` 参数：
-
-- `windowLayer`：窗口显示层级。
-- `fullScreen`：是否全屏窗口。
-- `cacheTime`：缓存时间，`-1` 永久缓存，`0` 不缓存，`>=1` 按秒缓存。
-
-需要每帧更新时添加 `UIUpdateAttribute`：
-
-```csharp
-[UIUpdate]
-[Window(UILayer.UI)]
-public sealed class BattleHudWindow : UIWindow<ui_BattleHudWindow>
-{
-    protected override void OnUpdate()
-    {
-        RefreshHpBar();
-    }
-}
-```
-
-## 打开和关闭窗口
-
-推荐异步打开：
-
-```csharp
-using AlicizaX;
-using Cysharp.Threading.Tasks;
-
-public sealed class LoginEntry
-{
-    public async UniTask OpenLogin()
-    {
-        LoginWindow window = await GameApp.UI.ShowUI<LoginWindow>("from_startup");
-    }
-}
-```
-
-同步打开适合资源已可同步加载或已预热的窗口：
-
-```csharp
-LoginWindow window = GameApp.UI.ShowUISync<LoginWindow>();
-```
-
-关闭窗口：
-
-```csharp
-GameApp.UI.CloseUI<LoginWindow>();
-
-// force 为 true 时会强制移除缓存。
-GameApp.UI.CloseUI<LoginWindow>(force: true);
-```
-
-窗口内部关闭自己：
-
-```csharp
-CloseSelf();
-```
-
-获取已打开窗口：
-
-```csharp
-LoginWindow login = GameApp.UI.GetUI<LoginWindow>();
-```
-
-## 接收打开参数
-
-`ShowUI` 和 `ShowUISync` 的 `params object[] userDatas` 会传到窗口内部。
-
-```csharp
-public sealed class ItemTipsWindow : UIWindow<ui_ItemTipsWindow>
-{
-    protected override void OnOpen()
-    {
-        int itemId = UserData is int value ? value : 0;
-        baseui.TxtItemId.text = itemId.ToString();
-    }
-}
-
-GameApp.UI.ShowUISync<ItemTipsWindow>(10001);
-```
-
-多个参数可通过 `UserDatas` 读取。
-
-## UI 事件自动解绑
-
-窗口可以重写 `OnRegisterEvent`，通过 `EventListenerProxy` 注册事件。窗口销毁时会自动取消订阅。
-
-```csharp
-using AlicizaX;
-using AlicizaX.Localization;
-using AlicizaX.UI.Runtime;
-using Game.UI;
-
-public sealed class SettingsWindow : UIWindow<ui_SettingsWindow>
-{
-    protected override void OnRegisterEvent(EventListenerProxy proxy)
-    {
-        proxy.AddUIEvent<LocalizationChangeEvent>(OnLanguageChanged);
-    }
-
-    private void OnLanguageChanged(in LocalizationChangeEvent evt)
-    {
-        RefreshText();
-    }
-}
-```
-
-## 创建 Widget
-
-`UIWidget<T>` 适合窗口内部的子界面、分页内容、列表项详情等。
-
-```csharp
-using AlicizaX.UI.Runtime;
-using Cysharp.Threading.Tasks;
-using Game.UI;
-
-[Window(UILayer.UI)]
-public sealed class BagWindow : UIWindow<ui_BagWindow>
-{
-    private BagDetailWidget _detail;
-
-    protected override async UniTask OnOpenAsync()
-    {
-        _detail = await CreateWidgetAsync<BagDetailWidget>(baseui.DetailRoot);
-        _detail.Open(10001);
-    }
-
-    protected override void OnClose()
-    {
-        if (_detail != null)
-        {
-            RemoveWidget(_detail).Forget();
-            _detail = null;
-        }
-    }
-}
-
-public sealed class BagDetailWidget : UIWidget<ui_BagDetailWidget>
-{
-    protected override void OnOpen()
-    {
-        int itemId = UserData is int value ? value : 0;
-        baseui.TxtItemId.text = itemId.ToString();
-    }
-}
-```
-
-也可以同步创建：
-
-```csharp
-BagDetailWidget detail = CreateWidgetSync<BagDetailWidget>(baseui.DetailRoot);
-```
-
-## Tab 窗口
-
-`UITabWindow<T>` 内置虚拟 Tab 注册和切换。
-
-```csharp
-using AlicizaX.UI.Runtime;
-using Game.UI;
-
-[Window(UILayer.UI)]
-public sealed class RoleWindow : UITabWindow<ui_RoleWindow>
-{
-    protected override void OnInitialize()
-    {
-        InitTabVirtuallyView<RoleInfoTab>(baseui.TabRoot);
-        InitTabVirtuallyView<RoleEquipTab>(baseui.TabRoot);
-
-        baseui.BtnInfo.onClick.AddListener(() => SwitchTab(0));
-        baseui.BtnEquip.onClick.AddListener(() => SwitchTab(1));
-    }
-}
-```
-
-第一次切换到某个 Tab 时会异步创建，后续切换复用已加载实例。
-
-## 手动创建Holder
-```csharp
-using AlicizaX.UI.Runtime;
-using Game.UI;
-
-[Window(UILayer.UI)]
-public sealed class RoleWindow : UITabWindow<ui_RoleWindow>
-{
-    protected override void OnInitialize()
-    {
-        //可能会有手动创建多个一样的Holder进行操作 该API提供创建 
-        //但是具体维护销毁交给自己来处理
-        //常见场景 比如Tips 小提示 可能自己去创建多个Holder然后不走Widget
-        //只是多一种选择给你 可用可不用
-        UIHolderFactory.CreateUIHolderAsync<ui_UILogicTestAlert>("父物体");
-    }
-}
-```
-
 
 ## API 速查
 
 | API | 说明 |
 | --- | --- |
-| `IUIService.ShowUI<T>(params object[])` | 异步打开窗口 |
-| `IUIService.ShowUI(string, params object[])` | 按类型名异步打开窗口 |
-| `IUIService.ShowUISync<T>(params object[])` | 同步打开窗口 |
-| `IUIService.CloseUI<T>(bool force)` | 关闭窗口 |
-| `IUIService.GetUI<T>()` | 获取已打开窗口 |
+| `GameApp.UI.Router` | Page 级导航 Router |
+| `IUIRouter.NavigateTo<T>()` | 前进导航到 Page |
+| `IUIRouter.Replace<T>()` | 替换当前 Page |
+| `IUIRouter.Back()` | 返回上一条 history |
+| `IUIRouter.CloseCurrent()` | routed page 关闭当前页 |
+| `IUIRouter.BackToRoot()` | 深回退到 root |
+| `IUIRouter.BackTo<T>()` | 回退到最近的指定 Page |
+| `IUIRouter.ResetTo<T>()` | 重建 Router history，只保留目标 root |
+| `IUIRouter.ResetHistory()` | 只清空 Router history，不关闭 UI |
+| `IUIRouter.SyncFromCurrentUI(...)` | 用当前实际 UI 重建 Router root |
+| `IUIService.ShowUI<T>()` | 异步打开 UI |
+| `IUIService.ShowUIResult<T>()` | 异步打开并返回精确状态 |
+| `IUIService.ShowUISync<T>()` | 同步打开 UI |
+| `IUIService.CloseUI<T>(bool force)` | 关闭 UI |
+| `IUIService.CloseUIAsync<T>(bool force)` | 异步关闭 UI |
+| `IUIService.CloseManyAsync(...)` | 批量关闭 UIService 栈项，主要供 Router 使用 |
+| `IUIService.TryCloseTopAsync(...)` | 关闭最上层匹配 UI |
+| `IUIService.IsOpen<T>()` | 查询 UI 是否稳定打开 |
+| `IUIService.GetUI<T>()` | 获取已打开 UI |
 | `IUIService.GetLayer(UILayer)` | 获取层级根节点 |
-| `UIWindow<T>.CloseSelf()` | 窗口内部关闭自己 |
-| `UIBase.CreateWidgetAsync<T>()` | 创建子 Widget |
-| `UIBase.RemoveWidget(UIBase)` | 移除子 Widget |
+| `UIWindow<T>.CloseSelf()` | 关闭自身；若自身是 Router 当前页，会转交 Router |
+| `UIWindow<T>.ForceCloseSelf()` | 强制关闭自身；若自身是 Router 当前页，会转交 Router |
+| `UITabWindow<T>.CloseSelf(bool)` | TabWindow 关闭自身 |
+| `UIBase.CreateWidgetAsync<T>()` | 创建 Widget |
+| `UIBase.CreateWidgetSync<T>()` | 同步创建 Widget |
+| `UIBase.RemoveWidget(UIBase)` | 移除 Widget |
+| `UIWidget.Open/Close/Destroy` | Widget 自身打开、关闭、销毁 |
 | `UIMetaRegistry.Register(...)` | 手动注册窗口元数据 |
 | `UIResRegistry.Register(...)` | 手动注册 Holder 资源 |
 
 ## 注意事项
 
-1. `UIResAttribute` 应写在 Holder 类上，不是窗口逻辑类上。
-2. `WindowAttribute` 写在窗口逻辑类上，用于描述层级、全屏和缓存。
-3. 异步生命周期重写 `OnInitializeAsync`、`OnOpenAsync`、`OnCloseAsync` 时，同步版本不会自动再调用，除非你在重写方法里主动调用。
-4. `ShowUISync` 只适合同步资源可用的场景，常规业务优先使用 `ShowUI<T>()`。
-5. UI 依赖 `ObjectPool`、`Timer` 和 `Resource`，组件注册顺序需要在启动场景中保证。
+1. `WindowAttribute` 写在窗口逻辑类上；`UIResAttribute` 写在 Holder 类上。
+2. 窗口初始化使用 `IUISyncInitialize` 或 `IUIAsyncInitialize`，不要写旧式 `protected override OnInitialize()`。
+3. `ShowUISync` 只适合同步初始化 UI；异步初始化 UI 应使用 `ShowUI`。
+4. routed page 使用 Router 打开；关闭建议用 Router API。`CloseSelf` / `CloseUI` 命中 Router 当前页时会自动转交 Router。
+5. `IsOpen` 只表示 UIBase 状态，不代表 Router 当前页。
+6. `Lifecycle` 遮挡会触发被遮挡窗口关闭和恢复打开。深回退必须走 Router，避免中间页被恢复后再关闭。
+7. Router 发生事务失败时可能进入 dirty 状态。dirty 时导航 API 会返回 `false`，需要业务决定是 `ResetHistory`、`SyncFromCurrentUI` 还是重建 UI 流程。
+8. UI 依赖 ObjectPool、Timer、Resource，启动场景需要保证组件注册顺序。

@@ -438,7 +438,7 @@ ulong timer = GameApp.Timer.AddTimer(() =>
 发布和订阅事件：
 
 ```csharp
-public readonly struct LoginSuccessEvent : IEventArgs
+public readonly struct LoginSuccessEvent : IPayloadEventArgs
 {
     public readonly long UserId;
 

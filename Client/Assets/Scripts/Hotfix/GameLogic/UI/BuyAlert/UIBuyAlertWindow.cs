@@ -8,14 +8,14 @@ using UnityEngine;
 namespace GameLogic.UI
 {
     [Window(UILayer.Popup, UIOcclusionMode.None, 3)]
-    public class UIBuyAlertWindow : UITabWindow<ui_UIBuyAlertWindow>
+    public class UIBuyAlertWindow : UITabWindow<ui_UIBuyAlertWindow>, IUISyncInitialize
     {
         private ShopGoodsData _goodsData;
         private IFakePlayerDataService _playerDataService;
         private int _unitPrice;
         private int _quantity = 1;
 
-        protected override void OnInitialize()
+        void IUISyncInitialize.OnInitialize()
         {
             baseui.BtnClose.onClick.AddListener(OnBtnCloseClick);
             baseui.BtnConfirm.onClick.AddListener(OnBtnConfirmClick);

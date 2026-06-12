@@ -101,7 +101,7 @@ namespace GameLogic.Player
     }
 
     [Prewarm(8)]
-    public readonly struct PlayerDataChangedEvent : IEventArgs
+    public readonly struct PlayerDataChangedEvent : IPayloadEventArgs
     {
         public readonly int Credit;
         public readonly int ChangedItemId;

@@ -1,7 +1,7 @@
 ﻿using AlicizaX;
 
 [Prewarm(4)]
-public readonly struct AssetDownloadProgressUpdateEventArgs : IEventArgs
+public readonly struct AssetDownloadProgressUpdateEventArgs : IPayloadEventArgs
 {
     /// <summary>
     /// 包名称

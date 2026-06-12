@@ -7,21 +7,20 @@ using UnityEngine;
 namespace GameLogic.UI
 {
     [Window(UILayer.Tips, UIOcclusionMode.None, 3)]
-    public sealed class UITipsWindow : UITabWindow<ui_UITipsWindow>
+    public sealed class UITipsWindow : UITabWindow<ui_UITipsWindow>, IUIAsyncInitialize
     {
         private UITextTipsWidget _textTip;
         private UIIconTipsWidget _iconTip;
 
-        protected override void OnInitialize()
+        async UniTask IUIAsyncInitialize.OnInitializeAsync()
         {
-            _textTip = CreateWidgetSync<UITextTipsWidget>(baseui.RectTextTipsRoot, false);
-            _iconTip = CreateWidgetSync<UIIconTipsWidget>(baseui.RectIconTipsRoot, false);
+            _textTip = await CreateWidgetAsync<UITextTipsWidget>(baseui.RectTextTipsRoot, false);
+            _iconTip = await CreateWidgetAsync<UIIconTipsWidget>(baseui.RectIconTipsRoot, false);
         }
 
         public static void ShowText(string content, float duration = 1.6f)
         {
-            UITipsWindow window = GameApp.UI.ShowUISync<UITipsWindow>();
-            window.ShowTextTip(content, duration);
+            ShowTextAsync(content, duration).Forget();
         }
 
         public static void ShowLocalizedText(string key, float duration = 1.6f)
@@ -31,8 +30,7 @@ namespace GameLogic.UI
 
         public static void ShowIcon(string content, Sprite icon, float duration = 1.6f)
         {
-            UITipsWindow window = GameApp.UI.ShowUISync<UITipsWindow>();
-            window.ShowIconTip(content, icon, duration);
+            ShowIconAsync(content, icon, duration).Forget();
         }
 
         public static void ShowLocalizedIcon(string key, Sprite icon, float duration = 1.6f)
@@ -50,6 +48,18 @@ namespace GameLogic.UI
         {
             _textTip.Close();
             _iconTip.Show(content, icon, duration).Forget();
+        }
+
+        private static async UniTaskVoid ShowTextAsync(string content, float duration)
+        {
+            UITipsWindow window = await GameApp.UI.ShowUI<UITipsWindow>();
+            window?.ShowTextTip(content, duration);
+        }
+
+        private static async UniTaskVoid ShowIconAsync(string content, Sprite icon, float duration)
+        {
+            UITipsWindow window = await GameApp.UI.ShowUI<UITipsWindow>();
+            window?.ShowIconTip(content, icon, duration);
         }
     }
 }

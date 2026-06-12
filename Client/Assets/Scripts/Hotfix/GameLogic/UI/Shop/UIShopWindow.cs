@@ -14,8 +14,8 @@ using UnityEngine.UI;
 
 namespace GameLogic.UI
 {
-    [Window(UILayer.UI, UIOcclusionMode.Lifecycle, 3)]
-    public class UIShopWindow : UITabWindow<ui_UIShopWindow>
+    [Window(UILayer.UI, UIOcclusionMode.None, 3)]
+    public class UIShopWindow : UITabWindow<ui_UIShopWindow>, IUISyncInitialize
     {
         private readonly Dictionary<EShopCategory, List<ShopGoodsData>> _goodsByCategory = new();
         private UGList<ShopGoodsData> _goodsList;
@@ -24,7 +24,7 @@ namespace GameLogic.UI
         private IFakePlayerDataService _playerDataService;
         private IConfigService _configService;
 
-        protected override void OnInitialize()
+        void IUISyncInitialize.OnInitialize()
         {
             _goodsList = UGListCreateHelper.Create<ShopGoodsData>(baseui.ScrollViewGoodsList);
             _goodsLinerList = UGListCreateHelper.Create<ShopGoodsData>(baseui.ScrollViewGoodsLinerList);
@@ -43,9 +43,8 @@ namespace GameLogic.UI
             SwitchCategory(EShopCategory.TEST);
         }
 
-        protected override async UniTask OnOpenAsync()
+        protected override void OnOpen()
         {
-            await UniTask.Delay(3000);
             RefreshCurrencyText();
         }
 
@@ -99,7 +98,7 @@ namespace GameLogic.UI
 
         private void OnBtnCloseClick()
         {
-            CloseSelf();
+           CloseSelf();
         }
 
         private void SwitchCategory(EShopCategory category)

@@ -1,4 +1,5 @@
 using AlicizaX.UI;
+using Cysharp.Threading.Tasks;
 using Game.Config.Tables;
 using TMPro;
 using UnityEngine;
@@ -82,7 +83,7 @@ namespace GameLogic.UI
             if (CurrentData != null)
             {
                 SetSelect();
-                GameApp.UI.ShowUISync<UIBuyAlertWindow>(CurrentData);
+                GameApp.UI.ShowUI<UIBuyAlertWindow>(CurrentData).Forget();
             }
         }
 

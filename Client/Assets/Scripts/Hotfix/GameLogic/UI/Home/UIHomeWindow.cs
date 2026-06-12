@@ -12,10 +12,9 @@ using UnityEngine;
 namespace GameLogic.UI
 {
     [Window(UILayer.UI, UIOcclusionMode.None, 30)]
-    public class UIHomeWindow : UITabWindow<ui_UIHomeWindow>
+    public class UIHomeWindow : UIWindow<ui_UIHomeWindow>, IUIAsyncInitialize
     {
         private string currentLanguage;
-
         static readonly IReadOnlyList<string> Languages = new List<string>
         {
             "ChineseSimplified",
@@ -23,7 +22,7 @@ namespace GameLogic.UI
             "Japanese",
         };
 
-        protected override void OnInitialize()
+        async UniTask IUIAsyncInitialize.OnInitializeAsync()
         {
             baseui.BtnShop.onClick.AddListener(OnBtnShopClick);
             baseui.BtnBag.onClick.AddListener(OnBtnBagClick);
@@ -71,12 +70,13 @@ namespace GameLogic.UI
 
         private void OnBtnShopClick()
         {
-            GameApp.UI.ShowUISync<UIShopWindow>();
+            GameApp.UI.ShowUI<UIShopWindow>();
         }
 
         private void OnBtnBagClick()
         {
             Log.Info("点击背包按钮");
+
         }
 
         private void OnBtnRoleClick()
@@ -96,17 +96,19 @@ namespace GameLogic.UI
 
         protected override void OnOpen()
         {
-            Debug.Log("Open");
+            Debug.Log("HomeOpen");
         }
+
+
 
         protected override void OnClose()
         {
-            Debug.Log("OnClose");
+            Debug.Log("HomeOnClose");
         }
 
         protected override void OnDestroy()
         {
-            Debug.Log("OnDestroy");
+            Debug.Log("HomeOnDestroy");
         }
     }
 }
