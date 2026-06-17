@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using AlicizaX;
 using Cysharp.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -23,13 +22,21 @@ public static class StartupSetting
     public static string CDNUrl = string.Empty;
     public static string AppDownloadUrl = string.Empty;
 
+    [System.Serializable]
+    private class RemoteVersionInfo
+    {
+        public string version;
+        public string cdnUrl;
+        public string appDownloadUrl;
+    }
+
     public static async UniTask GetRemoteVersion()
     {
         var updateDataStr = await Utility.Http.Get(VersionApi);
-        JObject json = JObject.Parse(updateDataStr);
-        Version = json["version"].ToString();
-        CDNUrl = json["cdnUrl"].ToString();
-        AppDownloadUrl = json["appDownloadUrl"].ToString();
+        var versionInfo = JsonUtility.FromJson<RemoteVersionInfo>(updateDataStr);
+        Version = versionInfo.version;
+        CDNUrl = versionInfo.cdnUrl;
+        AppDownloadUrl = versionInfo.appDownloadUrl;
         Debug.Log(updateDataStr);
     }
 }

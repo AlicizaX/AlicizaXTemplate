@@ -36,7 +36,7 @@ namespace GameLogic
                 AppServices.App.Register<IFakePlayerDataService>(new FakePlayerDataService());
             }
 
-            GameApp.UI.ShowUISync<UIHomeWindow>();
+            GameApp.UI.ShowUI<UIHomeWindow>();
         }
 
         private sealed class ConfigBytesLoader : IConfigBytesLoader
