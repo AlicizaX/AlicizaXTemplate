@@ -12,7 +12,7 @@ using UnityEngine;
 namespace GameLogic.UI
 {
     [Window(UILayer.UI, UIOcclusionMode.None, 30)]
-    public class UIHomeWindow : UIWindow<ui_UIHomeWindow>, IUIAsyncInitialize
+    public class UIHomeWindow : UIWindow<ui_UIHomeWindow>
     {
         private string currentLanguage;
         static readonly IReadOnlyList<string> Languages = new List<string>
@@ -22,7 +22,7 @@ namespace GameLogic.UI
             "Japanese",
         };
 
-        async UniTask IUIAsyncInitialize.OnInitializeAsync()
+        protected override void OnInitialize()
         {
             baseui.BtnShop.onClick.AddListener(OnBtnShopClick);
             baseui.BtnBag.onClick.AddListener(OnBtnBagClick);
@@ -99,7 +99,10 @@ namespace GameLogic.UI
             Debug.Log("HomeOpen");
         }
 
-
+        protected override void OnRefresh()
+        {
+            Debug.Log("OnRefresh");
+        }
 
         protected override void OnClose()
         {

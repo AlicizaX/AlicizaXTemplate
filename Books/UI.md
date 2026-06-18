@@ -58,9 +58,9 @@ public enum UILayer
 
 ```csharp
 [Window(UILayer.UI, UIOcclusionMode.None, 30)]
-public sealed class HomeWindow : UIWindow<ui_HomeWindow>, IUISyncInitialize
+public sealed class HomeWindow : UIWindow<ui_HomeWindow>
 {
-    void IUISyncInitialize.OnInitialize()
+    protected override void OnInitialize()
     {
     }
 }
@@ -112,17 +112,17 @@ public sealed class BattleHudWindow : UIWindow<ui_BattleHudWindow>
 
 ## 窗口初始化
 
-当前初始化不再通过 `protected override OnInitialize()`。窗口需要实现以下二选一接口：
+初始化生命周期内联在 `UIBase` 中，通过虚方法重写：
 
 ```csharp
-public interface IUISyncInitialize
+protected virtual void OnInitialize()
 {
-    void OnInitialize();
 }
 
-public interface IUIAsyncInitialize
+protected virtual UniTask OnInitializeAsync()
 {
-    UniTask OnInitializeAsync();
+    OnInitialize();
+    return UniTask.CompletedTask;
 }
 ```
 
@@ -130,9 +130,9 @@ public interface IUIAsyncInitialize
 
 ```csharp
 [Window(UILayer.UI, UIOcclusionMode.None, 30)]
-public sealed class TestWindow : UIWindow<ui_TestWindow>, IUISyncInitialize
+public sealed class TestWindow : UIWindow<ui_TestWindow>
 {
-    void IUISyncInitialize.OnInitialize()
+    protected override void OnInitialize()
     {
         baseui.BtnClose.onClick.AddListener(CloseSelf);
     }
@@ -143,11 +143,11 @@ public sealed class TestWindow : UIWindow<ui_TestWindow>, IUISyncInitialize
 
 ```csharp
 [Window(UILayer.UI, UIOcclusionMode.None, 30)]
-public sealed class HomeWindow : UITabWindow<ui_HomeWindow>, IUIAsyncInitialize
+public sealed class HomeWindow : UITabWindow<ui_HomeWindow>
 {
     private HomeWidget _homeWidget;
 
-    async UniTask IUIAsyncInitialize.OnInitializeAsync()
+    protected override async UniTask OnInitializeAsync()
     {
         _homeWidget = await CreateWidgetAsync<HomeWidget>(baseui.RectTransform, false);
         baseui.BtnShop.onClick.AddListener(OnShopClick);
@@ -162,9 +162,11 @@ public sealed class HomeWindow : UITabWindow<ui_HomeWindow>, IUIAsyncInitialize
 
 注意：
 
-- 一个 UI 类型不能同时实现 `IUISyncInitialize` 和 `IUIAsyncInitialize`。
-- `ShowUISync<T>()` 不能打开异步初始化 UI，遇到异步初始化 UI 会返回 `null`。
-- `OnOpen`、`OnClose`、`OnDestroy`、`OnUpdate` 仍然是 `UIBase` 的虚方法。
+- 只重写 `OnInitialize`：同步 API 和异步 API 都会执行这段初始化。
+- 重写 `OnInitializeAsync`：异步 API 会等待它完成；同步 API 只调用 `OnInitialize`，不会执行异步初始化逻辑。
+- 只写异步初始化的 UI 不建议用 `ShowUISync` 打开，除非明确不依赖该异步初始化结果。
+- `OnOpen`、`OnRefresh`、`OnClose`、`OnDestroy`、`OnUpdate` 也是 `UIBase` 的虚方法。
+- `OnRefresh` 用于重复打开或重复传参后的刷新，调用前参数已经写入 `UserData` / `UserDatas`。
 
 ## UIService API
 
@@ -214,7 +216,22 @@ LoginWindow login = GameApp.UI.ShowUISync<LoginWindow>();
 LoginWindow loginWithArgs = GameApp.UI.ShowUISync<LoginWindow>("startup");
 ```
 
-同步打开只适合资源可同步加载且 UI 使用 `IUISyncInitialize` 的场景。
+同步打开的语义是“同步拿到可操作 View，并启动打开流程”：
+
+- 同步完成 UI 实例创建、资源绑定、参数写入和 `OnInitialize`。
+- 打开动画仍会正常播放，但同步 API 不等待动画完成；返回时状态可能是 `Opening`。
+- 动画完成后才进入稳定 `Opened`，并触发 `OnWindowAfterShowEvent`。
+- 需要等待动画完成和稳定打开时，使用 `await ShowUI<T>()` 或 `ShowUIResult<T>()`。
+- 同步打开只适合资源可同步加载的场景；如果初始化依赖 `OnInitializeAsync`，应使用异步 API。
+
+重复 `ShowUI` 打开同一个正在打开或已打开的窗口时，不会重新初始化。框架会刷新参数，并在初始化完成后的状态调用 `OnRefresh`；`Opening` 阶段也会触发刷新。
+
+```csharp
+protected override void OnRefresh()
+{
+    RefreshView(UserDatas);
+}
+```
 
 ### 关闭 UI
 
@@ -252,6 +269,7 @@ RectTransform uiLayer = GameApp.UI.GetLayer(UILayer.UI);
 ```
 
 `IsOpen` 只表示该 UI 类型当前处于稳定 `Opened` 状态，不表示它一定是 Router 当前页。
+同步打开返回后如果动画仍在播放，`IsOpen<T>()` 可能暂时为 `false`。
 
 ### 关闭最上层匹配 UI
 
@@ -325,6 +343,8 @@ await GameApp.UI.Router.NavigateTo<UIShopWindow>(shopId);
 - 参数会浅拷贝保存到 history，避免调用方后续修改数组影响回放。
 - 如果目标类型等于当前 history 顶部类型，会刷新当前页参数，不新增 history。
 - `A -> B -> C -> D -> NavigateTo<A>()` 是正常前进导航，history 会变成 `A, B, C, D, A`，此后 `Back()` 返回 `D`。
+- 当旧页和目标页在同一层，且目标页是 `Lifecycle` 遮挡窗口时，Router 会在目标开始显示后先加入 pending history，让遮挡系统负责旧页关闭；目标打开失败时会移除 pending history 并恢复本次 trim 掉的旧记录。
+- 跨层 `Lifecycle` 目标不会走这个 shortcut，仍会按普通流程打开目标并主动关闭旧页。
 
 ### Replace
 
@@ -412,6 +432,7 @@ GameApp.UI.Router.ResetHistory();
 ```
 
 只清空 Router history 并清除 dirty 状态，不关闭任何实际 UI。
+如果当前正在导航，或存在尚未完成的 pending route show，调用会被忽略，避免同步修改 history 破坏异步导航事务。
 
 ### SyncFromCurrentUI
 
@@ -421,6 +442,7 @@ GameApp.UI.Router.SyncFromCurrentUI(typeof(UIHomeWindow).TypeHandle, "arg");
 ```
 
 用于把当前实际显示的 UI 类型设为新的 Router root。它只修复 Router history，不打开或关闭实际 UI。
+如果当前正在导航，或存在尚未完成的 pending route show，调用会被忽略。
 
 ### Router 状态
 
@@ -439,6 +461,7 @@ UIRouteEntry currentEntry = GameApp.UI.Router.CurrentEntry;
 - 不要让 UIService 参与 Router history；UIService 只管理实际 UI 生命周期。
 - routed page 的直接关闭入口会在 UIService 源头转交 Router；关键业务流程仍建议显式调用 Router API。
 - Router API 是异步事务，按钮里可以 `.Forget()`，但关键流程建议 `await` 并检查返回值。
+- `BackTo` / `BackToRoot` 遇到同层事务正在播放动画时可能返回 `false`；如果没有实际关闭任何 UI，不会把 Router 标记为 dirty，调用方可稍后重试。
 
 ## 接收打开参数
 
@@ -481,11 +504,11 @@ public sealed class SettingsWindow : UIWindow<ui_SettingsWindow>
 `UIWidget<T>` 适合窗口内部子界面、分页内容、列表详情。
 
 ```csharp
-public sealed class BagWindow : UIWindow<ui_BagWindow>, IUIAsyncInitialize
+public sealed class BagWindow : UIWindow<ui_BagWindow>
 {
     private BagDetailWidget _detail;
 
-    async UniTask IUIAsyncInitialize.OnInitializeAsync()
+    protected override async UniTask OnInitializeAsync()
     {
         _detail = await CreateWidgetAsync<BagDetailWidget>(baseui.DetailRoot, false);
     }
@@ -516,6 +539,7 @@ public sealed class BagDetailWidget : UIWidget<ui_BagDetailWidget>
 T widget = await CreateWidgetAsync<T>(Transform parent, bool visible = true);
 T widget = await CreateWidgetAsync<T>(UIHolderObjectBase holder, bool destroyHolderOnDispose = false);
 T widget = CreateWidgetSync<T>(Transform parent, bool visible = true);
+T widget = CreateWidgetSync<T>(UIHolderObjectBase holder, bool destroyHolderOnDispose = false);
 await RemoveWidget(widget);
 
 widget.Open(args);
@@ -525,14 +549,16 @@ await widget.CloseAsync();
 widget.Destroy();
 ```
 
+`CreateWidgetAsync` 会等待可见 Widget 的打开动画完成后返回。`CreateWidgetSync` 会同步完成资源绑定和 `OnInitialize`，然后以后台任务播放打开动画；返回时可见 Widget 可能仍处于 `Opening`。
+
 ## Tab 窗口
 
 `UITabWindow<T>` 内置虚拟 Tab 注册和切换。
 
 ```csharp
-public sealed class RoleWindow : UITabWindow<ui_RoleWindow>, IUISyncInitialize
+public sealed class RoleWindow : UITabWindow<ui_RoleWindow>
 {
-    void IUISyncInitialize.OnInitialize()
+    protected override void OnInitialize()
     {
         InitTabVirtuallyView<RoleInfoTab>(baseui.TabRoot);
         InitTabVirtuallyView<RoleEquipTab>(baseui.TabRoot);
@@ -623,7 +649,7 @@ ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAl
 | `IUIRouter.SyncFromCurrentUI(...)` | 用当前实际 UI 重建 Router root |
 | `IUIService.ShowUI<T>()` | 异步打开 UI |
 | `IUIService.ShowUIResult<T>()` | 异步打开并返回精确状态 |
-| `IUIService.ShowUISync<T>()` | 同步打开 UI |
+| `IUIService.ShowUISync<T>()` | 同步准备 UI 并启动打开动画，立即返回 View |
 | `IUIService.CloseUI<T>(bool force)` | 关闭 UI |
 | `IUIService.CloseUIAsync<T>(bool force)` | 异步关闭 UI |
 | `IUIService.CloseManyAsync(...)` | 批量关闭 UIService 栈项，主要供 Router 使用 |
@@ -635,7 +661,7 @@ ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAl
 | `UIWindow<T>.ForceCloseSelf()` | 强制关闭自身；若自身是 Router 当前页，会转交 Router |
 | `UITabWindow<T>.CloseSelf(bool)` | TabWindow 关闭自身 |
 | `UIBase.CreateWidgetAsync<T>()` | 创建 Widget |
-| `UIBase.CreateWidgetSync<T>()` | 同步创建 Widget |
+| `UIBase.CreateWidgetSync<T>()` | 同步准备 Widget 并启动打开动画 |
 | `UIBase.RemoveWidget(UIBase)` | 移除 Widget |
 | `UIWidget.Open/Close/Destroy` | Widget 自身打开、关闭、销毁 |
 | `UIMetaRegistry.Register(...)` | 手动注册窗口元数据 |
@@ -644,10 +670,11 @@ ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAl
 ## 注意事项
 
 1. `WindowAttribute` 写在窗口逻辑类上；`UIResAttribute` 写在 Holder 类上。
-2. 窗口初始化使用 `IUISyncInitialize` 或 `IUIAsyncInitialize`，不要写旧式 `protected override OnInitialize()`。
-3. `ShowUISync` 只适合同步初始化 UI；异步初始化 UI 应使用 `ShowUI`。
+2. 窗口初始化重写 `OnInitialize` / `OnInitializeAsync`；`OnInitializeAsync` 默认会调用 `OnInitialize`。
+3. `ShowUISync` 会同步完成资源绑定和 `OnInitialize`，但不等待打开动画完成，也不会执行 `OnInitializeAsync` 中真正异步的逻辑；需要完整异步初始化和动画完成时使用 `ShowUI`。
 4. routed page 使用 Router 打开；关闭建议用 Router API。`CloseSelf` / `CloseUI` 命中 Router 当前页时会自动转交 Router。
 5. `IsOpen` 只表示 UIBase 状态，不代表 Router 当前页。
 6. `Lifecycle` 遮挡会触发被遮挡窗口关闭和恢复打开。深回退必须走 Router，避免中间页被恢复后再关闭。
-7. Router 发生事务失败时可能进入 dirty 状态。dirty 时导航 API 会返回 `false`，需要业务决定是 `ResetHistory`、`SyncFromCurrentUI` 还是重建 UI 流程。
-8. UI 依赖 ObjectPool、Timer、Resource，启动场景需要保证组件注册顺序。
+7. 重复 `ShowUI` 打开已初始化后的窗口会刷新参数并触发 `OnRefresh`，包括 `Opening` 阶段。
+8. Router 发生事务失败时可能进入 dirty 状态。dirty 时导航 API 会返回 `false`，需要业务决定是 `ResetHistory`、`SyncFromCurrentUI` 还是重建 UI 流程。导航中或 pending route show 未完成时，`ResetHistory` / `SyncFromCurrentUI` 会被忽略。
+9. UI 依赖 ObjectPool、Timer、Resource，启动场景需要保证组件注册顺序。

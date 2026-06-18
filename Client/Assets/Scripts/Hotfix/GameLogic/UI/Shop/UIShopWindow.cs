@@ -14,8 +14,8 @@ using UnityEngine.UI;
 
 namespace GameLogic.UI
 {
-    [Window(UILayer.UI, UIOcclusionMode.None, 3)]
-    public class UIShopWindow : UITabWindow<ui_UIShopWindow>, IUISyncInitialize
+    [Window(UILayer.UI, UIOcclusionMode.Visible, 3)]
+    public class UIShopWindow : UITabWindow<ui_UIShopWindow>
     {
         private readonly Dictionary<EShopCategory, List<ShopGoodsData>> _goodsByCategory = new();
         private UGList<ShopGoodsData> _goodsList;
@@ -24,7 +24,7 @@ namespace GameLogic.UI
         private IFakePlayerDataService _playerDataService;
         private IConfigService _configService;
 
-        void IUISyncInitialize.OnInitialize()
+        protected override void OnInitialize()
         {
             _goodsList = UGListCreateHelper.Create<ShopGoodsData>(baseui.ScrollViewGoodsList);
             _goodsLinerList = UGListCreateHelper.Create<ShopGoodsData>(baseui.ScrollViewGoodsLinerList);
