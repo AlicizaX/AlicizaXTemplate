@@ -11,7 +11,11 @@
 
 ## 简介
 
-**AlicizaX** 是一套为商业化项目打造的 **Unity 工程模板**。
+<div align="center">
+
+**AlicizaX** 是一套为商业化项目打造的 **Unity 游戏框架**。
+
+</div>
 
 ## 核心能力
 
