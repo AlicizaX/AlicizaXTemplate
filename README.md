@@ -60,7 +60,18 @@ com.alicizax.unity.framework
 
 安装成功后，模板入口将自动解锁。
 
-### 4. 选择项目模板
+### 4. 安装可选扩展包
+
+根据项目需要，可继续安装以下扩展包：
+
+| 包名 | 说明 |
+| :--- | :--- |
+| `com.alicizax.unity.ui.extension` | UI 扩展组件 |
+| `com.alicizax.unity.editor.extension` | 编辑器扩展工具 |
+| `com.alicizax.unity.input` | 输入系统扩展 |
+| `com.alicizax.unity.debugger` | 运行时调试面板 |
+
+### 5. 选择项目模板
 
 根据你的项目需求，选择并导入对应模板：
 
