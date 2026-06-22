@@ -4,8 +4,8 @@ GameObjectPool 模块用于池化 Unity `GameObject` 实例，适合特效、怪
 
 源码位置：
 
-- `Client/Packages/com.alicizax.unity.framework/Runtime/ABase/GameObjectPool`
-- 编辑器辅助：`Client/Packages/com.alicizax.unity.framework/Editor/GameObjectPool`
+- `Client/Packages/com.alicizax.unity.framework/Runtime/Modules/GameObjectPool`
+- 编辑器辅助：`Client/Packages/com.alicizax.unity.framework/Editor/Modules/GameObjectPool`
 
 ## 使用前提
 
@@ -42,12 +42,58 @@ void ForceCleanup();
 
 源码内部存在 `GameObjectPoolService.LoadCatalog(string poolConfigPath)` 用于加载 `PoolConfigScriptableObject`，但 `GameObjectPoolService` 是 `internal`，该方法未暴露到 `IGameObjectPoolService`。业务代码应以前置启动流程已加载 PoolConfig 为前提使用。
 
+`LoadCatalog` 内部通过 `IResourceService.LoadAsset<PoolConfigScriptableObject>(poolConfigPath)` 加载配置。因此 `poolConfigPath` 是资源系统的定位地址，当前项目中通常是 YooAsset location，不是 Windows 文件路径，也不是 `Resources.Load` 的相对路径。
+
+## PoolConfig 资源路径
+
+对象池配置有两层路径，需要分开配置：
+
+- `poolConfigPath`：`LoadCatalog` 加载 `PoolConfigScriptableObject` 时使用的资源地址。
+- `PoolEntry.assetPath`：配置表里每条池规则匹配 prefab 时使用的逻辑路径、前缀或 glob 规则。
+
+当前项目的 YooAsset 默认包配置位于：
+
+```text
+Client/Assets/YooAsset/AssetBundleCollectorSetting.asset
+```
+
+默认包启用了 `EnableAddressable` 和 `SupportExtensionless`，并且 Collector 使用 `AddressByFileName`。这表示被 YooAsset 收集的资源可以用“不带扩展名的文件名”加载。例如配置资源文件名为 `GameObjectPoolConfig.asset` 时，启动流程调用 `LoadCatalog` 传入的 `poolConfigPath` 应为：
+
+```text
+GameObjectPoolConfig
+```
+
+推荐把对象池配置资源放到当前已收集的 ScriptableObject 配置目录：
+
+```text
+Client/Assets/Bundles/Configs/sciptableObject/GameObjectPoolConfig.asset
+```
+
+如果配置资源仍放在项目根目录：
+
+```text
+Client/Assets/GameObjectPoolConfig.asset
+```
+
+当前 YooAsset Collector 不会收集它，`LoadCatalog("GameObjectPoolConfig")` 会因为资源地址无效而加载失败。解决方式二选一：
+
+1. 将 `GameObjectPoolConfig.asset` 移到 `Assets/Bundles/Configs/sciptableObject/` 下。
+2. 在 YooAsset Collector 中新增覆盖该资源所在目录或该资源本身的收集规则，并保持地址规则与启动代码传入的 `poolConfigPath` 一致。
+
+不要把下面这些值当作 `poolConfigPath` 使用，除非 YooAsset Collector 的地址规则明确支持它们：
+
+```text
+G:\UnityProject\AlicizaXTemplate\Client\Assets\GameObjectPoolConfig.asset
+Assets/GameObjectPoolConfig.asset
+Assets/Bundles/Configs/sciptableObject/GameObjectPoolConfig.asset
+```
+
 ## 创建 PoolConfig
 
 在 Project 面板创建：
 
 ```text
-Create > GameplaySystem > PoolConfig
+Create > AlicizaX > PoolConfig
 ```
 
 每条 `PoolEntry` 代表一条池化匹配规则：
@@ -78,6 +124,22 @@ Assets/Bundles/Effects/Explosion.prefab -> Effects/Explosion
 Assets/Resources/UI/DamageText.prefab -> UI/DamageText
 ```
 
+`assetPath` 配置示例：
+
+```text
+loaderType = AssetBundle
+assetPath = Assets/Bundles/Effects/Explosion.prefab   -> 规则保存为 Effects/Explosion
+assetPath = Effects/Explosion                         -> 精确匹配 Effects/Explosion
+assetPath = Effects/*                                 -> 匹配 Effects 下一层 prefab
+assetPath = Effects/**                                -> 递归匹配 Effects 下所有 prefab
+
+loaderType = Resources
+assetPath = Assets/Resources/UI/DamageText.prefab     -> 规则保存为 UI/DamageText
+assetPath = UI/DamageText                             -> 匹配 Resources.Load("UI/DamageText")
+```
+
+AssetBundle 规则命中后，实际加载仍走 `IResourceService`。如果请求传入的是 YooAsset 地址，例如当前 `AddressByFileName` 下的 `"Explosion"`，对象池会先通过 `IResourceService.GetAssetInfo("Explosion")` 取得真实资源路径，再转换为 `Effects/Explosion` 去匹配规则。
+
 ## 规则匹配
 
 `assetPath` 支持两类规则：
@@ -103,11 +165,25 @@ UI/DamageText_?    // ? 匹配单个字符
 GameObject go = GameApp.GameObjectPool.GetGameObject("Effects/Explosion", transform);
 ```
 
+在当前项目的 YooAsset `AddressByFileName` 规则下，AssetBundle 资源更常见的请求写法是文件名地址：
+
+```csharp
+GameObject go = GameApp.GameObjectPool.GetGameObject("Explosion", transform);
+```
+
+假设该资源真实路径是 `Assets/Bundles/Effects/Explosion.prefab`，对象池会把 YooAsset 返回的真实路径规范化为 `Effects/Explosion`，再与 `PoolConfig` 中的 `Effects/Explosion`、`Effects/*` 或 `Effects/**` 规则匹配。
+
 可以用前缀强制指定加载器：
 
 ```csharp
 GameObject abEffect = GameApp.GameObjectPool.GetGameObject("ab:Effects/Explosion");
 GameObject resText = GameApp.GameObjectPool.GetGameObject("res:UI/DamageText");
+```
+
+如果传入 `ab:` 前缀，对象池只按 AssetBundle 规则解析；如果传入 `res:` 前缀，只按 Resources 规则解析。当前 YooAsset 文件名地址也可以这样写：
+
+```csharp
+GameObject abEffect = GameApp.GameObjectPool.GetGameObject("ab:Explosion");
 ```
 
 如果请求路径没有命中 PoolConfig 规则，模块会退化为直接加载。直接加载出来的对象不会进入池，调用 `Release` 时会被销毁。Editor 和 Development Build 下会对同一路径只警告一次。

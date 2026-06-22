@@ -1,45 +1,32 @@
-# InputGlyph 输入图标与按键重绑定
+# InputGlyph 输入图标
 
-`InputGlyph` 模块基于 Unity Input System，用于把当前输入设备 profile 和 `InputAction` 绑定解析成 UI 图标、TMP Sprite Tag 或可读文本。模块同时提供输入动作注册、动作查询、设备上下文监听、运行时按键重绑定和输入轮询工具。
+`InputGlyph` 用于把 Unity Input System 的 `InputAction` 绑定或控制路径解析成 UI 图标、TMP Sprite 标签或可读文本。它只负责图标查询和 UI 展示，不负责设备监听、读取输入、重绑定或震动，这些通用输入能力见 `UXInput.md`。
 
 源码位置：
 
-- 本地包：`file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`
-- 源码目录：`Client/Packages/com.alicizax.unity.input/Runtime/InputGlyph`
-- 编辑器入口：`AlicizaX/Extension/Input/Input Glyph Database`
-- 创建入口：`AlicizaX/Extension/Input/Create Input Glyph Database`
-- 示例目录：`Client/Packages/com.alicizax.unity.input/Samples~/InputGlyph`
-
-安装说明：先安装 `com.alicizax.unity.ui.extension`。如果项目需要输入图标、按键重绑定、快捷键或导航，再安装 `com.alicizax.unity.input`。Unity Package Manager 中本地包会显示为 `com.alicizax.unity.input@file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`。
-
-编译条件：不需要手动添加宏。`com.alicizax.unity.input` 的 asmdef 会在检测到 `com.unity.inputsystem` 后自动生成 `INPUTSYSTEM_SUPPORT`，InputGlyph 文件受 `#if INPUTSYSTEM_SUPPORT` 保护。
+| 内容 | 路径 |
+| --- | --- |
+| 运行时代码 | `Client/Packages/com.alicizax.unity.input/Runtime/InputGlyph` |
+| 图标查询入口 | `Client/Packages/com.alicizax.unity.input/Runtime/Input/UXInput.Glyph.cs` |
+| 数据库编辑器 | `Client/Packages/com.alicizax.unity.input/Editor/InputGlyph/InputGlyphDatabaseEditor.cs` |
+| 数据库窗口 | `AlicizaX/Extension/Input/Input Glyph Database` |
+| 创建数据库 | `AlicizaX/Extension/Input/Create Input Glyph Database` |
 
 ## 组成
 
 | 类型 | 作用 |
 | --- | --- |
-| `InputActionProvider` | 在运行时注册 `IInputActionProvider` 服务，持有并启用 `InputActionAsset` |
-| `InputBindingManager` | 基于 `IInputActionProvider` 管理绑定缓存、重绑定、保存和恢复 |
-| `InputGlyphDatabase` | `ScriptableObject`，保存不同设备 profile 下控制路径到 Sprite 的映射 |
-| `InputGlyphService` | 静态查询工具，把 Action 或控制路径解析为 Sprite、TMP Tag 或显示名 |
-| `InputGlyphComponent` | UI 组件，自动根据设备切换和绑定变更刷新 Image 或 TMP 文本 |
-| `InputDeviceWatcher` | 监听键鼠、Xbox、PlayStation、Switch 和其他手柄的当前输入设备 |
-| `InputActionReader` | 业务层轮询输入动作的工具类 |
+| `InputActionProvider` | 场景入口组件。持有 `InputActionAsset` 和 `InputGlyphDatabase`，负责初始化 `UXInput.Watch`、`UXInput.Rebind`、`UXInput.Glyph` 和导航系统。 |
+| `InputGlyphDatabase` | `ScriptableObject` 数据库，保存不同输入 Profile 下的控制路径到 Sprite/TMP 名称映射。 |
+| `UXInput.Glyph` | 静态查询入口，根据当前 `UXInput.Watch.CurrentInputProfile` 查询图标、TMP 标签和显示文本。 |
+| `InputGlyphImage` | UI Image 输出组件，把当前动作绑定显示为 `Sprite`。 |
+| `InputGlyphText` | TMP Text 输出组件，把当前动作绑定显示为 `<sprite name="...">` 或文本回退。 |
+| `InputGlyphBehaviourBase` | 图标 UI 组件基类，处理 Action 来源、Composite Part、Profile 事件和刷新时机。 |
+| `InputGlyphPathUtility` | 控制路径规范化工具，把 Input System 路径转换成数据库 glyph key。 |
 
-## 使用前提
+## 启动方式
 
-项目需要安装 `com.alicizax.unity.input` 并启用 Unity Input System，然后准备：
-
-1. 一个 `InputActionAsset`。
-2. 一个场景常驻节点挂载 `InputActionProvider`，并在 Inspector 中配置 `Actions`。
-3. 一个场景常驻节点挂载 `InputBindingManager`。它不再直接配置 `InputActionAsset`，会从 `IInputActionProvider` 获取动作资产。
-4. 一个 `InputGlyphDatabase` 资源，并在运行时调用 `InputGlyphService.SetDatabase(...)` 注入；也可以调用 `InputDeviceWatcher.SetProfileDatabase(...)` 注入并立即刷新当前设备 profile。
-
-推荐启动顺序是：先让 `InputActionProvider` 注册服务，再初始化 `InputBindingManager`。如果二者在同一场景，确保 Provider 所在对象先创建，或放在更早加载的常驻根节点。
-
-## 注册 InputActionAsset
-
-在启动场景或常驻输入节点上添加：
+在常驻输入节点上挂载：
 
 ```text
 Add Component > Input > Input Action Provider
@@ -49,56 +36,21 @@ Inspector 配置：
 
 | 字段 | 说明 |
 | --- | --- |
-| `Actions` | 项目的 `InputActionAsset` |
+| `Actions` | 项目的 `InputActionAsset`。 |
+| `Glyph Database` | 项目的 `InputGlyphDatabase`。 |
 
-运行时 `InputActionProvider` 会：
+运行时 `InputActionProvider` 会执行：
 
-- 注册 `IInputActionProvider` 到 `AppServices.App`。
-- 建立 `ActionName` 与 `MapName/ActionName` 查询表。
-- 自动启用 `InputActionAsset`。
-- 当多个 ActionMap 中有同名 Action 时，短名称会被标记为歧义，必须使用 `MapName/ActionName`。
+1. 初始化 `UXInput.Watch`。
+2. 注入 `UXInput.Glyph.SetDatabase(glyphDatabase)`。
+3. 建立 action 查询表。
+4. 初始化 `UXInput.Rebind`。
+5. 启用 `InputActionAsset`。
+6. 初始化 `UXNavigationSystem`。
 
-动作查询示例：
+不要在业务代码里单独传入 `InputGlyphDatabase`。当前设计只有一个全局数据库入口：`UXInput.Glyph.SetDatabase(...)`，通常由 `InputActionProvider` 自动设置。
 
-```csharp
-using UnityEngine.InputSystem;
-
-InputAction submit = InputActionResolver.Action("UI/Submit");
-
-if (InputActionResolver.TryGetAction("Submit", out InputAction action))
-{
-    // 仅当 Submit 没有重名歧义时能成功。
-}
-```
-
-## 挂载 InputBindingManager
-
-`InputBindingManager` 继承框架服务组件，建议放在启动场景的框架根节点或常驻输入节点上。
-
-Inspector 配置：
-
-| 字段 | 说明 |
-| --- | --- |
-| `debugMode` | 输出加载、保存、重绑定等调试日志 |
-
-运行时获取：
-
-```csharp
-using AlicizaX;
-
-InputBindingManager input = AppServices.Require<InputBindingManager>();
-```
-
-也可以按名称查找 Action：
-
-```csharp
-InputAction move = InputBindingManager.Action("Player/Move");
-InputAction submit = InputBindingManager.Action("UI/Submit");
-```
-
-如果不同 ActionMap 下存在同名 Action，请使用 `MapName/ActionName`，不要只写短名称。
-
-## 创建 InputGlyphDatabase
+## InputGlyphDatabase
 
 打开编辑器窗口：
 
@@ -106,165 +58,190 @@ InputAction submit = InputBindingManager.Action("UI/Submit");
 AlicizaX/Extension/Input/Input Glyph Database
 ```
 
-如果项目里还没有 `InputGlyphDatabase`，可以使用：
+如果项目还没有数据库资源：
 
 ```text
 AlicizaX/Extension/Input/Create Input Glyph Database
 ```
 
-也可以双击已有 `InputGlyphDatabase` 资源打开专用编辑器。
-
-设备表是固定 profile：
-
-| 表 | 说明 |
-| --- | --- |
-| `KeyboardMouse` | Keyboard 与 Mouse 布局 |
-| `GenericGamepad` | 通用 Gamepad 兜底 |
-| `Xbox` | Xbox、XInput 布局 |
-| `PlayStation` | DualShock、DualSense、PlayStation 布局 |
-| `Switch` | Switch、Nintendo、Joy-Con 布局 |
-| `SteamDeck` | Steam Deck 布局，默认回退到 Xbox / GenericGamepad |
-
-数据库全局设置：
+数据库全局字段：
 
 | 字段 | 说明 |
 | --- | --- |
-| `placeholderSprite` | 找到绑定但没有匹配图标时返回的占位 Sprite |
+| `Placeholder` | 找不到图标或条目无有效图标时使用的占位 Sprite。可以为空。 |
 
-每个 profile 会维护：
-
-| 字段 | 说明 |
-| --- | --- |
-| `profileId` | 固定 profile 名称，例如 `KeyboardMouse`、`Xbox` |
-| `fallbackProfileIds` | 当前 profile 缺图标时按顺序查找的兜底 profile |
-| `bindingGroupHints` | 用于从 Action 绑定组中优先选择当前 profile 对应的 binding |
-| `matchers` | 根据 VendorId、ProductId、布局、设备名等信息识别设备 profile |
-| `glyphs` | `InputGlyphMapping[]`，维护控制路径到 Sprite/TMP 名称的映射 |
-
-每条 `InputGlyphMapping` 需要配置：
+每个 Profile 包含：
 
 | 字段 | 说明 |
 | --- | --- |
-| `controlPaths` | 一个或多个 Input System 控制路径，例如 `<Keyboard>/space`、`<Gamepad>/buttonSouth` |
-| `sprite` | UI Image 模式显示的图标 |
-| `tmpSpriteName` | TMP Sprite Asset 中的 sprite 名称；为空时会尝试使用 `sprite.name` |
+| `id` | Profile 名称，例如 `Xbox`、`PlayStation`。 |
+| `fallbackProfileIds` | 当前 Profile 找不到图标时按顺序查找的兜底 Profile。 |
+| `bindingGroupHints` | 用于从 Action 的 binding groups 中优先选择当前 Profile 对应绑定。 |
+| `entries` | 控制路径到 Sprite/TMP 名称的映射。 |
 
-数据库会把 `controlPaths` 归一化为 glyph key 建缓存。例如 `<XInputController>/buttonSouth`、`<Gamepad>/buttonSouth`、`<DualShockGamepad>/buttonSouth` 会按设备 profile 和 fallback 规则匹配到对应图标。
+每个 Entry 包含：
 
-运行时注入数据库：
+| 字段 | 说明 |
+| --- | --- |
+| `controlPaths` | 一个或多个 Input System 控制路径，例如 `<Gamepad>/buttonSouth`。 |
+| `sprite` | UI Image 模式使用的图标。 |
+| `tmpSpriteName` | TMP Sprite Asset 中的 sprite 名称。为空时尝试使用 `sprite.name`。 |
 
-```csharp
-using UnityEngine;
+## 默认 Profile
 
-public sealed class InputGlyphBootstrap : MonoBehaviour
-{
-    [SerializeField] private InputGlyphDatabase glyphDatabase;
+`Sync Profiles` 会生成固定 Profile。当前默认不包含 `Touch`，因为触摸输入不应该作为通用按键图标数据库默认配置。
 
-    private void Awake()
-    {
-        InputDeviceWatcher.SetProfileDatabase(glyphDatabase);
-    }
-}
-```
+| Profile | 默认 Fallback |
+| --- | --- |
+| `KeyboardMouse` | 无 |
+| `GenericGamepad` | 无 |
+| `GenericJoystick` | `GenericGamepad` |
+| `Xbox` | `GenericGamepad` |
+| `PlayStation` | `GenericGamepad` |
+| `Switch` | `GenericGamepad`，`Xbox` |
+| `SteamDeck` | `Xbox`，`GenericGamepad` |
+| `SteamController` | `SteamDeck`，`Xbox`，`GenericGamepad` |
 
-## 显示按键图标
-
-在 UI 节点上添加：
+Fallback 使用广度优先队列，并会去重。以 `SteamController` 为例，查找顺序是：
 
 ```text
-Add Component > UI > Input Glyph
+SteamController -> SteamDeck -> Xbox -> GenericGamepad
 ```
 
-`InputGlyphComponent` 会在启用时自动监听：
+以 `Xbox` 找 `<Gamepad>/buttonSouth` 为例：
 
-- `InputDeviceWatcher.OnDeviceContextChanged`
-- `InputBindingManager.BindingsChanged`
+```text
+Xbox -> GenericGamepad -> Placeholder
+```
 
-设备切换或绑定保存后，组件会自动刷新。
+不会自动去找 `PlayStation`、`Switch` 或 `KeyboardMouse`，除非你把它们写进 `fallbackProfileIds`。
 
-### Source
+## 控制路径和按钮含义
 
-| 模式 | 说明 |
+Gamepad 的控制路径表达的是物理位置，不是按钮文字。不同 Profile 可以使用相同 `controlPaths`，但配置不同图标。
+
+| 控制路径 | Xbox | PlayStation | Switch | Steam Deck |
+| --- | --- | --- | --- | --- |
+| `<Gamepad>/buttonSouth` | A | Cross | B | A |
+| `<Gamepad>/buttonEast` | B | Circle | A | B |
+| `<Gamepad>/buttonWest` | X | Square | Y | X |
+| `<Gamepad>/buttonNorth` | Y | Triangle | X | Y |
+| `<Gamepad>/leftShoulder` | LB | L1 | L | LB |
+| `<Gamepad>/rightShoulder` | RB | R1 | R | RB |
+| `<Gamepad>/leftTrigger` | LT | L2 | ZL | LT |
+| `<Gamepad>/rightTrigger` | RT | R2 | ZR | RT |
+
+因此推荐做法是每个 Profile 都配置同一批常用 `controlPaths`，只换 `sprite` 和 `tmpSpriteName`。
+
+## Glyph Key 规范化
+
+数据库不是直接用原始控制路径查找，而是先转换成 glyph key。
+
+常见例子：
+
+```text
+<Gamepad>/buttonSouth           -> gamepad/buttonsouth
+<XInputController>/buttonSouth  -> gamepad/buttonsouth
+<DualShockGamepad>/buttonSouth  -> gamepad/buttonsouth
+<Keyboard>/space                -> keyboard/space
+<Mouse>/leftButton              -> mouse/leftbutton
+```
+
+`Gamepad`、`XInput`、`DualShock`、`DualSense`、`Switch`、`Nintendo`、`Controller` 等布局会归一为 `gamepad`。这让不同手柄布局可以共享同一批路径，再由 Profile 决定实际图标。
+
+## UI 组件
+
+### InputGlyphImage
+
+用于把 Action 绑定显示为 `Image.sprite`。
+
+```text
+Add Component > UI > Input Glyph Image
+```
+
+字段：
+
+| 字段 | 说明 |
 | --- | --- |
-| `ActionReference` | 直接指定 `InputActionReference` |
-| `HotkeyTrigger` | 从同节点或指定组件上的 `IHotkeyTrigger` 读取 `HotkeyAction` |
-| `ActionName` | 通过 `InputActionResolver.Action(actionName)` 查询 |
+| `Action Source Mode` | 图标来源。 |
+| `Action Reference` | 直接指定 `InputActionReference`。 |
+| `Hotkey Trigger` | 从同节点或指定 `HotkeyComponentBase` 读取 Hotkey Action。 |
+| `Action Name` | 通过 `InputActionProvider.ResolveAction(actionName)` 查询。 |
+| `Composite Part Name` | 组合绑定部分，例如 `Up`、`Down`、`Left`、`Right`。 |
+| `Target Image` | 要写入 Sprite 的 Image。为空时自动取同节点 `Image`。 |
+| `Profile Events` | 当前 Profile 匹配或不匹配时触发 UnityEvent。 |
 
-`Composite Part` 只在 Action 包含 Composite Binding 时显示，常见值是 `Up`、`Down`、`Left`、`Right`。它用于显示或重绑定 2DVector 里的某一个方向。
+刷新时机：
 
-### Output
-
-| 模式 | 说明 |
+| 事件 | 行为 |
 | --- | --- |
-| `Image` | 将解析到的 Sprite 设置到 `targetImage` |
-| `Text` | 将 TMP Sprite Tag 或显示名填入 `targetText` |
+| `OnEnable` | 自动解析目标并立即刷新。 |
+| `UXInput.Watch.OnContextChanged` | 设备 Profile 切换后刷新。 |
+| `UXInput.Rebind.OnBindingsChanged` | 绑定改变后刷新。 |
 
-`Image` 模式如果没有手动指定 `targetImage`，组件会尝试 `GetComponent<Image>()`。
+### InputGlyphText
 
-`Text` 模式如果没有手动指定 `targetText`，组件会尝试 `GetComponent<TMP_Text>()`。当前 TMP 文本会被当作模板，并用 `Utility.Text.Format(template, token)` 替换 `{0}`：
+用于把 Action 绑定显示为 TMP Sprite 标签或文本回退。
+
+```text
+Add Component > UI > Input Glyph Text
+```
+
+字段和 `InputGlyphImage` 基本一致，输出目标为 `Target Text`。为空时自动取同节点 `TMP_Text`。
+
+启用时会缓存当前 TMP 文本作为模板，刷新时用 `{0}` 填入图标或回退文本：
 
 ```text
 Press {0} to confirm
 ```
 
-当找到 Sprite 时，文本里会插入：
+如果找到 TMP Sprite 名称：
 
 ```text
-<sprite name="SpriteName">
+Press <sprite name="xbox_a"> to confirm
 ```
 
-找不到 Sprite 时，会回退为 Input System 的可读显示名。
+如果找不到图标：
 
-### 平台事件
+```text
+Press A to confirm
+```
 
-`Platform Events` 可以为指定 profile 配置两个 UnityEvent：
+## Action 来源
 
-| 事件 | 触发时机 |
+| 模式 | 说明 |
 | --- | --- |
-| `On Matched` | 当前 `InputGlyphContext.ProfileId` 等于该条配置的 `profileId` |
-| `On Not Matched` | 当前 `InputGlyphContext.ProfileId` 不等于该条配置的 `profileId` |
+| `ActionReference` | 直接使用 Inspector 中的 `InputActionReference`。 |
+| `HotkeyTrigger` | 从 `HotkeyComponentBase.HotkeyAction` 读取动作，适合按钮热键提示。 |
+| `ActionName` | 使用 `InputActionProvider.ResolveAction` 按名称查找。 |
 
-适合用于切换不同平台提示、布局节点或手柄专属 UI。常用 `profileId` 包括 `KeyboardMouse`、`GenericGamepad`、`Xbox`、`PlayStation`、`Switch`、`SteamDeck`。
+`ActionName` 推荐使用完整路径：
 
-## 手动查询图标
+```text
+UI/Submit
+Gameplay/Jump
+```
+
+`InputActionProvider` 只注册 `MapName/ActionName` 形式的完整路径，短名称不会被解析。
+
+## 运行时查询
+
+`UXInput.Glyph` 是当前唯一公开的图标查询入口。
 
 ```csharp
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public sealed class ActionGlyphView : MonoBehaviour
+public sealed class GlyphExample : MonoBehaviour
 {
     [SerializeField] private InputActionReference action;
     [SerializeField] private Image icon;
-    [SerializeField] private TextMeshProUGUI label;
-    [SerializeField] private string compositePartName;
-
-    private void OnEnable()
-    {
-        InputDeviceWatcher.OnDeviceContextChanged += OnDeviceContextChanged;
-        InputBindingManager.BindingsChanged += Refresh;
-        Refresh();
-    }
-
-    private void OnDisable()
-    {
-        InputDeviceWatcher.OnDeviceContextChanged -= OnDeviceContextChanged;
-        InputBindingManager.BindingsChanged -= Refresh;
-    }
-
-    private void OnDeviceContextChanged(InputGlyphContext context)
-    {
-        Refresh();
-    }
 
     private void Refresh()
     {
-        InputGlyphContext context = InputDeviceWatcher.CurrentContext;
         InputAction inputAction = action != null ? action.action : null;
-
-        if (InputGlyphService.TryGetUISpriteForActionPath(inputAction, compositePartName, context, out Sprite sprite))
+        if (UXInput.Glyph.TryGetUISpriteForActionPath(inputAction, null, out Sprite sprite))
         {
             icon.sprite = sprite;
         }
@@ -272,381 +249,103 @@ public sealed class ActionGlyphView : MonoBehaviour
         {
             icon.sprite = null;
         }
-
-        label.text = InputGlyphService.GetDisplayNameFromInputAction(inputAction, compositePartName, context);
     }
 }
 ```
 
-查询 TMP Sprite Tag：
+查询 TMP 标签：
 
 ```csharp
-InputAction action = InputBindingManager.Action("UI/Submit");
-InputGlyphContext context = InputDeviceWatcher.CurrentContext;
-
-if (InputGlyphService.TryGetTMPTagForActionPath(
-        action,
+if (UXInput.Glyph.TryGetTMPTagForActionPath(
+        action.action,
         null,
-        context,
         out string tag,
         out string fallback))
 {
-    text.text = $"Press {tag}";
+    label.text = $"Press {tag}";
 }
 else
 {
-    text.text = $"Press {fallback}";
+    label.text = $"Press {fallback}";
 }
 ```
 
-查询 Composite 方向图标：
+查询 Composite Part：
 
 ```csharp
-InputAction move = InputBindingManager.Action("Player/Move");
-InputGlyphService.TryGetUISpriteForActionPath(
-    move,
-    "Up",
-    InputDeviceWatcher.CurrentContext,
-    out Sprite upSprite);
+InputAction move = InputActionProvider.ResolveAction("Gameplay/Move");
+UXInput.Glyph.TryGetUISpriteForActionPath(move, "Up", out Sprite upSprite);
 ```
 
-## 按键重绑定
-
-重绑定由 `InputBindingManager` 负责。它会选择目标 Action 上最适合键盘的 Binding，排除鼠标移动和滚轮，并通过 `Escape` 取消。
-
-开始重绑定：
+直接查询控制路径：
 
 ```csharp
-using AlicizaX;
-
-InputBindingManager input = AppServices.Require<InputBindingManager>();
-input.StartRebind("UI/Submit");
+UXInput.Glyph.TryGetUISpriteForControlPath("<Gamepad>/buttonSouth", out Sprite sprite);
+UXInput.Glyph.TryGetTMPTagForControlPath("<Keyboard>/space", out string tag, out string fallback);
 ```
 
-重绑定 Composite 中的某个方向：
+显示文本：
 
 ```csharp
-input.StartRebind("Player/Move", "Up");
+string displayName = UXInput.Glyph.GetDisplayNameFromInputAction(action.action);
+string pathDisplay = UXInput.Glyph.GetDisplayNameFromControlPath("<Keyboard>/space");
 ```
-
-取消正在进行的交互式重绑定：
-
-```csharp
-input.CancelRebind();
-```
-
-重绑定完成后，新绑定会先进入暂存区。调用 `ConfirmApply` 后才会写入 `InputActionAsset` override、保存到磁盘，并触发 `InputBindingManager.BindingsChanged`：
-
-```csharp
-bool saved = await input.ConfirmApply();
-```
-
-如果不想应用暂存修改：
-
-```csharp
-input.DiscardPrepared();
-```
-
-恢复默认绑定：
-
-```csharp
-await input.ResetToDefaultAsync();
-```
-
-保存位置：
-
-| 环境 | 文件 |
-| --- | --- |
-| Unity Editor | `Assets/input_bindings.json` |
-| Player | `Application.persistentDataPath/input_bindings.json` |
-
-### 重绑定 UI 示例
-
-```csharp
-using AlicizaX;
-using TMPro;
-using UnityEngine;
-using UnityEngine.InputSystem;
-
-public sealed class RebindButtonView : MonoBehaviour
-{
-    [SerializeField] private string actionName = "UI/Submit";
-    [SerializeField] private string compositePartName;
-    [SerializeField] private TextMeshProUGUI bindingLabel;
-    [SerializeField] private TextMeshProUGUI stateLabel;
-
-    private InputBindingManager input;
-
-    private void OnEnable()
-    {
-        input = AppServices.Require<InputBindingManager>();
-        input.OnRebindStart += OnRebindStart;
-        input.OnRebindEnd += OnRebindEnd;
-        input.OnRebindPrepare += OnRebindPrepare;
-        input.OnRebindConflict += OnRebindConflict;
-        input.OnApply += OnApply;
-        InputBindingManager.BindingsChanged += Refresh;
-        Refresh();
-    }
-
-    private void OnDisable()
-    {
-        if (input != null)
-        {
-            input.OnRebindStart -= OnRebindStart;
-            input.OnRebindEnd -= OnRebindEnd;
-            input.OnRebindPrepare -= OnRebindPrepare;
-            input.OnRebindConflict -= OnRebindConflict;
-            input.OnApply -= OnApply;
-        }
-
-        InputBindingManager.BindingsChanged -= Refresh;
-    }
-
-    public void StartRebind()
-    {
-        input.StartRebind(actionName, string.IsNullOrEmpty(compositePartName) ? null : compositePartName);
-    }
-
-    public async void Confirm()
-    {
-        bool saved = await input.ConfirmApply();
-        stateLabel.text = saved ? "Saved" : "No changes";
-    }
-
-    public void Discard()
-    {
-        input.DiscardPrepared();
-        Refresh();
-    }
-
-    private void Refresh()
-    {
-        InputAction action = InputBindingManager.Action(actionName);
-        bindingLabel.text = InputGlyphService.GetDisplayNameFromInputAction(
-            action,
-            string.IsNullOrEmpty(compositePartName) ? null : compositePartName,
-            InputDeviceWatcher.CurrentContext);
-    }
-
-    private void OnRebindStart()
-    {
-        stateLabel.text = "Press a key...";
-    }
-
-    private void OnRebindEnd(bool success, InputBindingManager.RebindContext context)
-    {
-        stateLabel.text = success ? "Ready to save" : "Canceled";
-    }
-
-    private void OnRebindPrepare(InputBindingManager.RebindContext context)
-    {
-        if (IsTarget(context))
-        {
-            stateLabel.text = $"Prepared: {context.OverridePath}";
-        }
-    }
-
-    private void OnRebindConflict(
-        InputBindingManager.RebindContext prepared,
-        InputBindingManager.RebindContext conflict)
-    {
-        if (IsTarget(prepared) || IsTarget(conflict))
-        {
-            stateLabel.text = "Conflict detected";
-        }
-    }
-
-    private void OnApply(bool success, InputBindingManager.RebindContext[] contexts)
-    {
-        Refresh();
-    }
-
-    private bool IsTarget(InputBindingManager.RebindContext context)
-    {
-        if (context == null || context.Action == null)
-        {
-            return false;
-        }
-
-        InputAction action = InputBindingManager.Action(actionName);
-        if (context.Action != action)
-        {
-            return false;
-        }
-
-        if (string.IsNullOrEmpty(compositePartName))
-        {
-            return true;
-        }
-
-        if (context.BindingIndex < 0 || context.BindingIndex >= action.bindings.Count)
-        {
-            return false;
-        }
-
-        return string.Equals(
-            action.bindings[context.BindingIndex].name,
-            compositePartName,
-            System.StringComparison.OrdinalIgnoreCase);
-    }
-}
-```
-
-## 输入读取工具
-
-`InputActionReader` 适合在业务逻辑中按名称或 `InputAction` 轮询输入。
-
-```csharp
-using UnityEngine;
-
-public sealed class PlayerInputLoop : MonoBehaviour
-{
-    private void Update()
-    {
-        Vector2 move = InputActionReader.ReadValue<Vector2>("Player/Move");
-
-        if (InputActionReader.ReadPressedOnce(this, "Player/Interact"))
-        {
-            Interact();
-        }
-
-        bool inventoryOpen = InputActionReader.ReadPressedToggle(this, "UI/OpenInventory");
-        SetInventoryVisible(inventoryOpen);
-
-        if (InputActionReader.ReadCompositePartButtonOnce(this, "Player/Move", "Up"))
-        {
-            StepUp();
-        }
-    }
-
-    private void Interact() { }
-    private void SetInventoryVisible(bool visible) { }
-    private void StepUp() { }
-}
-```
-
-常用 API：
-
-| API | 说明 |
-| --- | --- |
-| `ReadValue<T>(InputAction/string)` | 直接读取 Action 当前值 |
-| `TryReadValue<T>(InputAction/string, out T)` | 仅在 Action 处于按下状态时读取值 |
-| `TryReadValueOnce<T>(owner, InputAction/string, out T)` | 仅在本次按下第一帧读取值 |
-| `ReadButton(InputAction/string)` | 读取 Button 类型 Action，非 Button 会抛异常 |
-| `ReadPressed(InputAction/string)` | 对任意类型 Action 读取 `IsPressed()` |
-| `ReadPressedOnce(owner/int/string, InputAction/string)` | 对任意类型 Action 做单次按下触发 |
-| `ReadPressedToggle(owner/int/string, InputAction/string)` | 对任意类型 Action 做按下切换 |
-| `ReadButtonOnce(owner/int/string, InputAction/string)` | Button 类型单次触发 |
-| `ReadButtonToggle(owner/int/string, InputAction/string)` | Button 类型按下切换 |
-| `ReadCompositePartButton(InputAction/string, part)` | 读取 Composite 指定 part 是否按下 |
-| `ReadCompositePartButtonOnce(owner/int/string, InputAction/string, part)` | Composite 指定 part 单次触发 |
-| `ReadCompositePartButtonToggle(owner/int/string, InputAction/string, part)` | Composite 指定 part 按下切换 |
-| `ResetToggledButton(...)` | 重置指定切换状态 |
-| `ResetToggledCompositePartButton(...)` | 重置指定 Composite part 的切换状态 |
-| `ResetToggledButtons()` | 清空全部切换状态 |
-
-## 设备切换
-
-`InputDeviceWatcher` 会在 `BeforeSceneLoad` 自动初始化。默认 profile 是 `KeyboardMouse`，设备名为 `Keyboard&Mouse`。模块会监听键盘、鼠标、Gamepad 和 Joystick，并根据控制方案、布局、设备描述、VendorId/ProductId 判断 profile。
-
-监听当前设备：
-
-```csharp
-private void OnEnable()
-{
-    InputDeviceWatcher.OnDeviceContextChanged += OnDeviceContextChanged;
-}
-
-private void OnDisable()
-{
-    InputDeviceWatcher.OnDeviceContextChanged -= OnDeviceContextChanged;
-}
-
-private void OnDeviceContextChanged(InputGlyphContext context)
-{
-    AlicizaX.Log.Info(
-        $"Device: {context.ProfileId}, {context.DeviceName}, vid={context.VendorId}, pid={context.ProductId}");
-}
-```
-
-设备 profile：
-
-```csharp
-public static class InputGlyphProfileIds
-{
-    public const string KeyboardMouse = "KeyboardMouse";
-    public const string GenericGamepad = "GenericGamepad";
-    public const string Xbox = "Xbox";
-    public const string PlayStation = "PlayStation";
-    public const string Switch = "Switch";
-    public const string SteamDeck = "SteamDeck";
-}
-```
-
-常用状态：
-
-| 属性 | 说明 |
-| --- | --- |
-| `CurrentProfileId` | 当前设备 profile |
-| `CurrentDeviceName` | 当前设备显示名 |
-| `CurrentDeviceId` | 当前 Input System 设备 ID |
-| `CurrentVendorId` | 当前设备 VendorId |
-| `CurrentProductId` | 当前设备 ProductId |
-| `CurrentContext` | 完整设备上下文 |
-
-## Hotkey 集成
-
-当 UI 节点已经使用 `HotkeyComponent` 时，可以把 `InputGlyphComponent.Source` 设为 `HotkeyTrigger`。组件会从 `IHotkeyTrigger.HotkeyAction` 中读取要显示的 Action。
-
-典型结构：
-
-```text
-Button GameObject
-  - UXButton 或其他 ISubmitHandler
-  - HotkeyComponent
-  - Image / TMP_Text
-  - InputGlyphComponent
-```
-
-配置：
-
-1. 在 `HotkeyComponent.HotkeyAction` 中指定快捷键 Action。
-2. 在 `InputGlyphComponent` 中选择 `Reference Mode = HotkeyTrigger`。
-3. 如果 `Hotkey Trigger` 留空，组件会尝试从同节点自动查找实现 `IHotkeyTrigger` 的组件。
 
 ## API 速查
 
 | API | 说明 |
 | --- | --- |
-| `InputGlyphService.SetDatabase(InputGlyphDatabase)` | 注入 Glyph 数据库 |
-| `InputGlyphService.GetBindingControlPath(...)` | 获取当前设备下最匹配绑定的控制路径 |
-| `InputGlyphService.TryGetUISpriteForActionPath(...)` | 获取 Action 或控制路径对应 Sprite |
-| `InputGlyphService.TryGetTMPTagForActionPath(...)` | 获取 TMP Sprite Tag，并输出显示名兜底 |
-| `InputGlyphService.GetDisplayNameFromInputAction(...)` | 获取 Action 当前绑定的可读显示名 |
-| `InputGlyphService.GetDisplayNameFromControlPath(...)` | 将控制路径转换为可读文本 |
-| `InputActionResolver.Action(string)` | 按名称查找 Action，失败会记录错误 |
-| `InputActionResolver.TryGetAction(string, out InputAction)` | 尝试按名称查找 Action |
-| `InputBindingManager.Action(string)` | `InputActionResolver.Action` 的便捷入口 |
-| `InputBindingManager.StartRebind(string, string)` | 开始交互式键盘重绑定 |
-| `InputBindingManager.CancelRebind()` | 取消当前交互式重绑定 |
-| `InputBindingManager.ConfirmApply(bool)` | 应用并保存暂存重绑定 |
-| `InputBindingManager.DiscardPrepared()` | 丢弃暂存重绑定 |
-| `InputBindingManager.ResetToDefaultAsync()` | 恢复默认绑定并保存 |
-| `InputBindingManager.GetBindingPath(...)` | 获取指定 Action/Binding 的路径对象 |
-| `InputDeviceWatcher.CurrentProfileId` | 当前设备 profile |
-| `InputDeviceWatcher.CurrentContext` | 当前完整设备上下文 |
-| `InputDeviceWatcher.SetProfileDatabase(InputGlyphDatabase)` | 注入 Glyph 数据库并刷新当前设备 profile |
-| `InputActionReader.ReadPressedOnce(...)` | 任意 Action 类型的单次按下读取 |
+| `UXInput.Glyph.CurrentProfileId` | 当前输入 Profile 名称。 |
+| `UXInput.Glyph.SetDatabase(InputGlyphDatabase)` | 设置全局图标数据库。通常由 `InputActionProvider` 调用。 |
+| `UXInput.Glyph.GetBindingControlPath(...)` | 获取当前 Profile 下最匹配绑定的有效控制路径。 |
+| `UXInput.Glyph.TryGetUISpriteForActionPath(...)` | 根据 Action 绑定获取 UI Sprite。 |
+| `UXInput.Glyph.TryGetTMPTagForActionPath(...)` | 根据 Action 绑定获取 TMP Sprite 标签和文本回退。 |
+| `UXInput.Glyph.TryGetUISpriteForControlPath(...)` | 根据控制路径获取 UI Sprite。 |
+| `UXInput.Glyph.TryGetTMPTagForControlPath(...)` | 根据控制路径获取 TMP Sprite 标签和文本回退。 |
+| `UXInput.Glyph.GetDisplayNameFromInputAction(...)` | 获取 Action 当前绑定的可读文本。 |
+| `UXInput.Glyph.GetDisplayNameFromControlPath(...)` | 获取控制路径的可读文本。 |
+| `UXInput.Glyph.TryGetBindingControl(...)` | 获取当前 Profile 下最匹配的 `InputBinding`。 |
+| `UXInput.Glyph.GetGlyphKeyFromControlPath(...)` | 把控制路径转换成数据库 glyph key。 |
+
+图标查询 API 不再允许额外传入 `InputGlyphDatabase`。这样可以避免 UI 局部传入不同数据库导致 Profile、Fallback 和缓存行为不一致。
+
+## AI 辅助配置建议
+
+可以让 AI 生成结构化配置草稿，但不建议让 AI 直接改 Unity `.asset` 中的 Sprite 引用。
+
+推荐流程：
+
+1. 统一图标资源命名，例如 `xbox_a`、`ps_cross`、`generic_button_south`。
+2. 让 AI 生成 JSON/YAML 配置，内容包含 Profile、controlPaths、sprite 名称和 tmpSpriteName。
+3. 写一个 Editor Importer，根据 sprite 名称在项目里查找 Sprite，再写入 `InputGlyphDatabase.asset`。
+
+示例中间格式：
+
+```yaml
+profiles:
+  Xbox:
+    fallback:
+      - GenericGamepad
+    entries:
+      - controlPaths:
+          - "<Gamepad>/buttonSouth"
+        sprite: "xbox_a"
+        tmpSpriteName: "xbox_a"
+  PlayStation:
+    fallback:
+      - GenericGamepad
+    entries:
+      - controlPaths:
+          - "<Gamepad>/buttonSouth"
+        sprite: "ps_cross"
+        tmpSpriteName: "ps_cross"
+```
 
 ## 注意事项
 
-1. 当前 API 名称是 `InputGlyphService`，不是旧文档里的 `GlyphService`。
-2. `InputBindingManager` 不再直接配置 `InputActionAsset`，必须先通过 `InputActionProvider` 注册 `IInputActionProvider`。
-3. `InputBindingManager.Instance` 不是当前模块的公开用法，请通过 `AppServices.Require<InputBindingManager>()` 获取服务实例。
-4. `InputGlyphService.SetDatabase(...)` 或 `InputDeviceWatcher.SetProfileDatabase(...)` 需要项目启动逻辑主动调用，否则图标查询只能回退为显示名或返回空。
-5. `InputGlyphComponent.Text` 模式会把启用时的 TMP 文本作为模板，建议模板中保留 `{0}`。
-6. 同名 Action 存在多个 ActionMap 时，必须使用 `MapName/ActionName`。
-7. `StartRebind` 当前按键重绑定限定键盘路径 `<Keyboard>`，并排除鼠标移动和滚轮，更适合键位设置界面。
-8. 重绑定结果先进入暂存区，只有 `ConfirmApply` 后才会写入磁盘并触发 `BindingsChanged`。
-9. `ReadButton(...)` 只支持 `InputActionType.Button`，Value/PassThrough/Composite 请使用 `ReadPressed(...)` 系列。
+1. `Touch` 不在默认 `InputGlyphDatabase` Profile 中。触摸输入仍然可以被 `UXInput.Watch` 识别，但默认不生成触摸图标表。
+2. 同一物理位置的 Gamepad 控制路径在不同平台显示不同按钮文字，差异应放在不同 Profile 的 Sprite 上。
+3. `InputGlyphText` 会把启用时的文本作为模板，模板中建议保留 `{0}`。
+4. `InputGlyphImage` 找不到图标时会清空 `Image.sprite`。
+5. `InputGlyphText` 找不到图标时会优先回退到 Input System 的可读绑定文本。
+6. 绑定变化由 `UXInput.Rebind.OnBindingsChanged` 通知，设备变化由 `UXInput.Watch.OnContextChanged` 通知。

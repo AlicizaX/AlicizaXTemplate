@@ -23,7 +23,8 @@
 | [HotkeyComponent](HotkeyComponent.md) | 可选 input 包：Input System 快捷键绑定、优先级规则 |
 | [RecyclerView](RecyclerView.md) | 虚拟列表、`ViewHolder`、`ItemRender`、普通列表、循环列表、混合模板列表和分组列表 |
 | [RecyclerView.Navigation](RecyclerView.Navigation.md) | 可选 input 包：RecyclerView 手柄/键盘导航、虚拟焦点、ViewHolder 导航接口和 UXNavigation 接入 |
-| [InputGlyph](InputGlyph.md) | 可选 input 包：Input System 按键图标、设备 profile 识别、按键重绑定、输入读取工具 |
+| [InputGlyph](InputGlyph.md) | 可选 input 包：Input System 按键图标、TMP Sprite 标签和图标数据库 |
+| [UXInput](UXInput.md) | 可选 input 包：设备监听、输入读取、运行时重绑定、震动和输入诊断 |
 | [Navigation](Navigation.md) | 可选 input 包：多输入设备 UI 焦点管理、`UXNavigationScope`、顶层 Scope 选择、导航压制和模式切换处理器 |
 
 ## 使用前提
@@ -52,8 +53,8 @@ file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/
 | --- | --- |
 | `UXButton`、`UXToggle`、`UXImage`、`UXTextMeshPro`、`UXController` | `UnityEngine.UI` |
 | `RecyclerView`、`ViewHolder`、`UGList`、`ItemRender` | `AlicizaX.UI` |
-| `InputGlyphComponent`、`InputGlyphService`、`InputBindingManager`、`InputDeviceWatcher` | 全局命名空间，位于 `com.alicizax.unity.input` |
-| `HotkeyComponent`、`IHotkeyTrigger` | `UnityEngine.UI`，位于 `com.alicizax.unity.input` |
+| `UXInput`、`InputActionProvider`、`InputGlyphImage`、`InputGlyphText`、`InputVisualizer` | 全局命名空间，位于 `com.alicizax.unity.input` |
+| `HotkeyComponent`、`HotkeyComponentBase` | `UnityEngine.UI`，位于 `com.alicizax.unity.input` |
 | `UXNavigationScope`、`UXNavigationManager`、`UXNavigationModeListener` | `AlicizaX.UI.UXNavigation`，位于 `com.alicizax.unity.input` |
 
 示例：
@@ -126,5 +127,5 @@ public sealed class BagWindow : UIWindow<ui_BagWindow>
 
 1. `UXButton`、`UXToggle` 等类型在 `UnityEngine.UI` 命名空间下，和 Unity UGUI 控件同一套使用方式。
 2. `RecyclerView` 的 `SetAdapter`、`Refresh`、`RequestLayout` 是内部方法，业务层优先通过 `UGList`、`UGMixedList` 等包装类操作。
-3. `InputGlyph` 运行时不会自动 `Resources.Load` 图标库，必须在项目启动时调用 `InputGlyphService.SetDatabase(...)` 或 `InputDeviceWatcher.SetProfileDatabase(...)` 注入 `InputGlyphDatabase`。
-4. `InputBindingManager` 继承框架服务组件，需要挂在启动场景或常驻节点上；它会从 `InputActionProvider` 注册的 `IInputActionProvider` 获取 `InputActionAsset`。
+3. `InputGlyph` 运行时不会自动 `Resources.Load` 图标库，必须在启动场景挂载 `InputActionProvider`，由它注入 `InputGlyphDatabase` 并初始化 `UXInput`。
+4. 输入读取、运行时重绑定、设备监听和震动统一走 `UXInput`；图标 UI 只监听 `UXInput.Watch` 和 `UXInput.Rebind` 的变化后刷新显示。
