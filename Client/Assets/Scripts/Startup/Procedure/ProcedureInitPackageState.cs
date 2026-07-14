@@ -32,7 +32,7 @@ namespace Unity.Startup.Procedure
             var buildInOperation = GameApp.Resource.RequestPackageVersionAsync();
             await buildInOperation.ToUniTask();
 
-            if (buildInOperation.Status == EOperationStatus.Succeed)
+            if (buildInOperation.Status == EOperationStatus.Succeeded)
             {
                 //更新成功
                 string packageVersion = buildInOperation.PackageVersion;
@@ -60,17 +60,17 @@ namespace Unity.Startup.Procedure
 
         private async UniTask UpdateManifest()
         {
-            UpdatePackageManifestOperation buildInOperation;
+            LoadPackageManifestOperation buildInOperation;
             string packageVersion = "Simulate";
             if (GameApp.Resource.PlayMode != EPlayMode.EditorSimulateMode)
             {
                 packageVersion = GameApp.Resource.PackageVersion;
             }
 
-            buildInOperation = GameApp.Resource.UpdatePackageManifestAsync(packageVersion);
+            buildInOperation = GameApp.Resource.LoadPackageManifestAsync(packageVersion);
             await buildInOperation.ToUniTask();
 
-            if (buildInOperation.Status == EOperationStatus.Succeed)
+            if (buildInOperation.Status == EOperationStatus.Succeeded)
             {
                 if (GameApp.Resource.PlayMode == EPlayMode.OfflinePlayMode)
                 {

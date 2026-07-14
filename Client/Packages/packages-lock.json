@@ -25,7 +25,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.tuyoogame.yooasset": "2.3.18",
+        "com.tuyoogame.yooasset": "3.0.4",
         "com.cysharp.zstring": "2.6.0",
         "com.alicizax.unity.cysharp.unitask": "2.5.10"
       }
@@ -80,14 +80,14 @@
       "url": "https://registry.npmjs.org"
     },
     "com.tuyoogame.yooasset": {
-      "version": "2.3.18",
+      "version": "3.0.4",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.scriptablebuildpipeline": "1.21.25",
         "com.unity.modules.assetbundle": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0",
-        "com.unity.modules.unitywebrequestassetbundle": "1.0.0"
+        "com.unity.modules.unitywebrequestassetbundle": "1.0.0",
+        "com.unity.scriptablebuildpipeline": "1.21.25"
       },
       "url": "https://package.openupm.com"
     },

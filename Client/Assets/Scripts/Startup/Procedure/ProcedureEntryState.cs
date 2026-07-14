@@ -15,6 +15,7 @@ namespace Unity.Startup.Procedure
         protected override void OnEnter()
         {
             UpdateProgressUtils.Start();
+            Log.Info(GameApp.Resource.PlayMode);
             if (GameApp.Resource.PlayMode == EPlayMode.OfflinePlayMode || GameApp.Resource.PlayMode == EPlayMode.EditorSimulateMode)
             {
                 SwitchProcedure<ProcedureInitPackageState>();

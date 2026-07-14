@@ -11,7 +11,7 @@ namespace Unity.Startup.Procedure
     {
         private async UniTaskVoid Start()
         {
-            await UniTask.WaitUntil(() => YooAsset.YooAssets.Initialized);
+            await UniTask.WaitUntil(() => YooAsset.YooAssets.IsInitialized);
             ProcedureBuilder.InitializeProcedure(
                 new List<ProcedureBase>
                 {

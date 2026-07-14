@@ -48,19 +48,19 @@ namespace Unity.Startup.Procedure
         private async UniTask DownloadFiles()
         {
             // 注册下载回调
-            void DownloaderOnDownloadErrorCallback(DownloadErrorData data)
+            void DownloaderOnDownloadErrorCallback(DownloadErrorEventArgs data)
             {
                 Log.Error($"PackagegName:{data.PackageName} FileName:{data.FileName} Error:{data.ErrorInfo}");
                 CreateDownloader();
             }
 
-            downloader.DownloadErrorCallback = DownloaderOnDownloadErrorCallback;
-            downloader.DownloadUpdateCallback = OnDownloadProgressCallback;
-            downloader.BeginDownload();
+            downloader.DownloadError += DownloaderOnDownloadErrorCallback;
+            downloader.DownloadProgressChanged += OnDownloadProgressCallback;
+            downloader.StartDownload();
             await downloader;
 
             // 检测下载结果
-            if (downloader.Status != EOperationStatus.Succeed)
+            if (downloader.Status != EOperationStatus.Succeeded)
             {
                 Log.Error("资源更新失败!");
                 return;
@@ -69,7 +69,7 @@ namespace Unity.Startup.Procedure
             SwitchProcedure<ProcedurePatchDoneState>();
         }
 
-        private void OnDownloadProgressCallback(DownloadUpdateData data)
+        private void OnDownloadProgressCallback(DownloadProgressChangedEventArgs data)
         {
             EventBus.Publish(AssetDownloadProgressUpdateEventArgs.Create(data.PackageName, data.TotalDownloadCount, data.CurrentDownloadCount, data.TotalDownloadBytes, data.CurrentDownloadBytes));
         }

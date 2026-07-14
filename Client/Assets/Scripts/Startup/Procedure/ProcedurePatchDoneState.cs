@@ -9,7 +9,8 @@ namespace Unity.Startup.Procedure
     {
         protected override void OnEnter()
         {
-            ClearCacheFilesOperation operation = GameApp.Resource.ClearCacheFilesAsync(EFileClearMode.ClearUnusedBundleFiles);
+            var options = new ClearCacheOptions(ClearCacheMethods.ClearUnusedBundleFiles);
+            ClearCacheOperation operation = GameApp.Resource.ClearCacheAsync(options);
             operation.Completed += ClearCacheCompleted;
         }
 
