@@ -28,15 +28,15 @@ public static class ResourceBuildHelper
         try
         {
             string copyParams = string.Empty;
-            EBuildinFileCopyOption copyOption = EBuildinFileCopyOption.None;
+            EBundledCopyOption copyOption = EBundledCopyOption.None;
             if (buildParameter.BuildMode == ResourceBuildMode.Online)
             {
-                copyOption = EBuildinFileCopyOption.ClearAndCopyByTags;
+                copyOption = EBundledCopyOption.ClearAndCopyByTags;
                 copyParams = "Launch";
             }
             else
             {
-                copyOption = EBuildinFileCopyOption.ClearAndCopyAll;
+                copyOption = EBundledCopyOption.ClearAndCopyAll;
             }
 
             var parameters = new ScriptableBuildParameters
@@ -44,19 +44,19 @@ public static class ResourceBuildHelper
                 BuildOutputRoot = buildParameter.OutputPath,
                 BuildTarget = buildParameter.ResourceBuildTarget,
                 PackageName = BuildPackageName,
-                BuildBundleType = (int)EBuildBundleType.AssetBundle,
+                BuildBundleType = (int)EBundleType.AssetBundle,
                 BuildPipeline = EBuildPipeline.ScriptableBuildPipeline.ToString(),
-                BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot(),
+                BundledFileRoot = BundleBuilderHelper.GetStreamingAssetsRoot(),
                 PackageVersion = buildParameter.UseDefaultPackageVersion ? GeneratePackageVersion() : buildParameter.PackageVersion,
                 CompressOption = buildParameter.CompressOption,
                 BuiltinShadersBundleName = GetBuiltinShaderBundleName(),
                 VerifyBuildingResult = true,
                 ClearBuildCacheFiles = false,
-                BuildinFileCopyOption = copyOption,
-                BuildinFileCopyParams = copyParams,
+                BundledCopyOption = copyOption,
+                BundledCopyParams = copyParams,
                 EnableSharePackRule = EnableSharePack,
                 FileNameStyle = buildParameter.FileNameStyle,
-                EncryptionServices = CreateEncryptionInstance(buildParameter.EncryptionServiceType),
+                BundleEncryptor = CreateEncryptionInstance(buildParameter.EncryptionServiceType),
                 ReplaceAssetPathWithAddress = buildParameter.ReplaceAssetPathWithAddress,
                 StripUnityVersion = buildParameter.StripUnityVersion,
                 DisableWriteTypeTree = buildParameter.DisableWriteTypeTree,
@@ -93,8 +93,8 @@ public static class ResourceBuildHelper
     /// </summary>
     private static string GetBuiltinShaderBundleName()
     {
-        var uniqueBundleName = AssetBundleCollectorSettingData.Setting.UniqueBundleName;
-        var packRuleResult = DefaultPackRule.CreateShadersPackRuleResult();
+        var uniqueBundleName = BundleCollectorSettingData.Setting.UniqueBundleName;
+        var packRuleResult = DefaultBundlePackRule.CreateShadersPackRuleResult();
         return packRuleResult.GetBundleName(BuildPackageName, uniqueBundleName);
     }
 
@@ -120,14 +120,14 @@ public static class ResourceBuildHelper
         }
     }
 
-    private static IEncryptionServices CreateEncryptionInstance(string encryptionService)
+    private static IBundleEncryptor CreateEncryptionInstance(string encryptionService)
     {
         if (string.IsNullOrEmpty(encryptionService)) return null;
 
         var type = Type.GetType(encryptionService);
         if (type != null)
         {
-            return (IEncryptionServices)Activator.CreateInstance(type);
+            return (IBundleEncryptor)Activator.CreateInstance(type);
         }
 
         return null;
