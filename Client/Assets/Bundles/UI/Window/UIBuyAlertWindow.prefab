@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u8F93\u5165\u6570\u91CF\u6216\u4F7F\u7528 +/- \u8C03\u6574\u8D2D\u4E70\u6570\u91CF"
+  m_text: Enter a quantity or use +/- to adjust it
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
@@ -366,7 +366,7 @@ RectTransform:
   m_GameObject: {fileID: 2060376945812149439}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4957435043033457440}
@@ -374,7 +374,7 @@ RectTransform:
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
@@ -475,7 +475,7 @@ MonoBehaviour:
   canvasGroup: {fileID: 2914238141745871181}
   useUnscaledTime: 1
   initializeAsClosed: 1
-  disableInteractionWhilePlaying: 1
+  followAnimationInteractable: 0
   openDuration: 0.22
   closeDuration: 0.18
   slideDistance: 120
@@ -2479,7 +2479,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u786E\u8BA4\u8D2D\u4E70"
+  m_text: Confirm
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}
   m_sharedMaterial: {fileID: -1232377485662373643, guid: 7cdd102360e32234383f8e3f40da47a9, type: 2}

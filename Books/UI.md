@@ -675,6 +675,84 @@ ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAl
 | `UIMetaRegistry.Register(...)` | 手动注册窗口元数据 |
 | `UIResRegistry.Register(...)` | 手动注册 Holder 资源 |
 
+## 同层命令队列
+
+同一 `UILayer` 上的异步 `ShowUI` / `CloseUI` 走**统一 FIFO 命令队列**，不要求业务对同层连续调用 `await`。
+
+规则：
+
+- 同层 `Show` / `Close` 按入队顺序串行执行，避免并发改栈。
+- 同 type 折叠：
+  - pending `Show` + 新 `Show`：覆盖参数并 join 同一 completion。
+  - pending `Show` + `Close`：取消 pending `Show`（`Cancelled`）；若实例已在栈中仍继续真正 Close。
+  - pending `Close` + `Close`：join 已有 Close completion；`force` 可升级。
+- 正在进行的 `Show` 收到 `Close` 时：发 `RequestCancelShowLoad` 取消加载，**不插队**，等当前命令结束后再 drain Close。
+- `ShowUISync` **不入队**：仅当该层完全 idle 时执行；层忙或已有异步 Show 时返回 `null`。
+- `CloseManyAsync` 在 preflight 阶段若目标层有 pending 命令会拒绝，避免绕过 FIFO。
+
+## Show 结果语义
+
+`UIShowResultState`：
+
+| State | 含义 | 典型场景 |
+| --- | --- | --- |
+| `Opened` | 成功打开（稳定或已接受） | 正常 `ShowUI` / `ShowUIResult` |
+| `Cancelled` | 被业务取消或被后续操作顶替，**不是故障** | 加载中 `CloseUI`、pending Show 被 Close 折叠、服务销毁清空队列 |
+| `Failed` | 真实失败 | 资源加载失败、初始化异常、层事务阻塞且无法开始、非法参数 |
+
+业务侧：
+
+```csharp
+UIShowResult result = await GameApp.UI.ShowUIResult<HomeWindow>();
+if (result.State == UIShowResultState.Opened) { /* 使用 result.View */ }
+else if (result.State == UIShowResultState.Cancelled) { /* 正常取消，无需当错误处理 */ }
+else { /* Failed：查日志/资源 */ }
+```
+
+`await ShowUI<T>()` 在 `Cancelled` / `Failed` 时返回 `null`，无法区分原因；需要精确语义时用 `ShowUIResult`。
+
+## 日志与警告语义
+
+原则：**取消静默，故障告警**。预期的打断/取消路径不打 Warning；真实错误才 `Error` / 有针对性的 `Warning`。
+
+### Editor Warning（`WarnUIOperation`，可开关）
+
+开关：`UIWarningSettings.OtherWarningsEnabled`（EditorPrefs，默认开）。仅 Editor 编译进包。
+
+| 文案 | 何时出现 | 原因 | 是否预期 |
+| --- | --- | --- | --- |
+| `Show invalid after resource creation` | 资源创建/绑定结束后，元数据仍无效，且**不是**取消 | 资源加载成功但 View 未绑定、状态仍为 `CreatedUI`、或非法状态 | **否**。加载中被 Close 取消 → `Cancelled`，**不打此 Warning** |
+| `Show init failed` | `InternalInitlized` 返回 false，且**不是**取消 | `OnInitialize`/`OnInitializeAsync` 失败，或初始化后状态非法 | **否**。版本失效/CTS 取消 → `Cancelled`，无 Warning；真实异常在 UIBase 已有 `Error` |
+| `Show open rejected` | `InternalOpen` 未接受，且结果为 `Failed`、operation 仍当前 | 打开状态机拒绝、View 丢失、不在栈中等真实失败 | **否**。被 Close/新操作打断 → `Cancelled`，无 Warning |
+| `ShowSync invalid after resource creation` | Sync 路径资源创建后无效 | 同步资源/绑定问题 | **否**（Sync 无取消令牌，一般不是“取消”） |
+| `ShowSync init failed` | Sync 初始化失败 | 同步 `OnInitialize` 失败 | **否** |
+| `Close interrupted` | `InternalClose` 后未进入 `Closed`，且 **operation 仍当前** | 关闭流程中途失败，当前关闭操作仍有效 | **否**。被新 Show/Close 顶替导致 version 变化 → **不告警** |
+
+### Error（真实故障，运行时也保留）
+
+| 文案/位置 | 原因 |
+| --- | --- |
+| `UI resource load failed` / `missing holder component` | 资源路径错误或预制体缺 Holder |
+| `Failed to create UI instance` / Metadata 注册失败 | 类型/注册表问题 |
+| `Async/Sync initialize failed` / `OnOpen` / `OnClose` / transition failed | 业务生命周期或动画抛异常 |
+| `ShowUISync rejected while show is in progress` | 同实例异步 Show 进行中又调 Sync；Sync 不 join 半开 View |
+| UI 根节点 / Canvas / Camera 缺失 | 启动配置问题 |
+
+### 明确**不会**再告警的路径
+
+这些属于正常并发/取消，控制台不应出现 Warning：
+
+1. `ShowUI` 加载资源过程中调用 `CloseUI` 同一类型 → 取消加载、销毁未绑定实例 → `Cancelled`。
+2. 同层 pending `Show` 被后续 `Close` 折叠 → completion 设为 `Cancelled`。
+3. Opening / Closing 动画过程中被新操作打断生命周期版本 → 回滚状态，静默失败返回。
+4. UI 服务销毁时清空未执行的队列命令 → pending Show 记为 `Cancelled`。
+
+### 调试提示
+
+- 若看到 `Show invalid after resource creation` 且业务刚调了 `CloseUI`：检查框架版本是否已按“取消→Cancelled”修复；正常不应再出现。
+- 若 `ShowUI` 返回 `null` 但无任何 Error：多半是 `Cancelled` 或层 busy 的 `Failed`；用 `ShowUIResult` 看 `State`。
+- Router 导航失败看 `UIRouteResult.Status`，不要只看控制台 Warning。
+
 ## 注意事项
 
 1. `WindowAttribute` 写在窗口逻辑类上；`UIResAttribute` 写在 Holder 类上。
@@ -687,3 +765,5 @@ ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAl
 8. Router 发生事务失败时可能进入 dirty 状态。dirty 时导航 API 返回 `RejectedDirty`，需要业务决定是 `ResetHistory`、`SyncFromCurrentUI` 还是重建 UI 流程。导航中时，`ResetHistory` / `SyncFromCurrentUI` 会被忽略。
 9. UI 依赖 ObjectPool、Timer、Resource，启动场景需要保证组件注册顺序。
 10. 框架不再提供 `UIOcclusionMode`。同层多窗默认叠层显示；页面导航请用 Router，弹窗继续 `ShowUI` / `CloseSelf`。
+11. 同层连续 `ShowUI`/`CloseUI` 可不必 `await` 排队；框架 FIFO 保证顺序。需要结果态时用 `ShowUIResult` / `CloseUIAsync`。
+12. 日志语义：取消/打断不告警；资源、初始化、生命周期异常才 `Error`/`Warning`。详见上文「日志与警告语义」。
