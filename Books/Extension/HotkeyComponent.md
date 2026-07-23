@@ -27,12 +27,12 @@
 
 - `HotkeyAction`：热键对应的 `InputActionReference`
 - `HotkeyPressType`：触发阶段，支持 `Started`、`Performed`、`Canceled`
-- `HotkeyActionOwnershipMode`：InputAction 启用策略
 - `HotkeyConsumesInput`：触发后是否消费当前热键
 - `HotkeyHolder`：所属 `UIHolderObjectBase`
 - `AutoAssignHolder()`：自动向父级查找 Holder
 - `OnEnable` 注册热键，`OnDisable` / `OnDestroy` 反注册热键
-- 应用失焦或暂停时清理热键按压锁定状态
+
+热键系统只观察 InputAction，不负责 Enable/Disable。Action 必须由输入层（如 `InputActionProvider`）启用。
 
 业务层自定义热键时继承它：
 
@@ -71,7 +71,6 @@ InputAction 触发
 | `Holder` | 所属 `UIHolderObjectBase`，由 `HotkeyComponentBase` 自动查找 |
 | `Input Action` | `InputActionReference`，例如 Submit、Cancel、Close |
 | `Press Type` | 热键触发阶段，默认 `Performed` |
-| `Action Ownership` | `ObserveOnly` 或 `EnableWhileRegistered` |
 | `Consumes Input` | 当前热键触发后是否阻止继续向父级 scope 传播 |
 
 ## 配置方式
@@ -116,7 +115,7 @@ public sealed class SwitchTabHotkey : HotkeyComponentBase
 1. `Awake` / `OnEnable` 自动查找父级 `UIHolderObjectBase`。
 2. `OnEnable` 注册热键。
 3. `OnDisable` / `OnDestroy` 解绑热键。
-4. `OnApplicationFocus(false)` 和 `OnApplicationPause(true)` 会清理 `_pressTargets`，避免移动端后台恢复或失焦时保留旧的按压目标。
+4. `UXHotkeySystem` 在应用失焦 / 暂停时清理按压锁定目标（`_pressTargets`）。
 5. `HotkeyComponent` 在 EventSystem 变化或恢复焦点时重建 `BaseEventData`。
 
 ## CacheEventData
@@ -170,17 +169,18 @@ _submitHandler.OnSubmit(_eventData);
 
 如果同一个窗口内有多个 widget 想使用同一个热键，应由业务层控制启用状态，确保同一时间只有一个 widget/component 处于启用并注册状态。
 
-## InputAction Ownership
+## InputAction 启用
 
-| 模式 | 说明 |
-| --- | --- |
-| `ObserveOnly` | 热键系统只监听 action，不负责启用 action。外部 input map 必须已经启用 |
-| `EnableWhileRegistered` | 注册期间如果 action 未启用，热键系统会临时启用；最后一个注册者解绑后恢复 |
+热键系统不启用 / 禁用 InputAction。请确保：
 
-建议：
+- 运行时由 `InputActionProvider`（或等价入口）启用对应 `InputActionAsset`
+- Development 下若 action 未启用，注册时会输出 warning
 
-- 热键专用 action 可以使用 `EnableWhileRegistered`。
-- 如果 action 还被其他系统或 input map 管理，优先使用 `ObserveOnly`，避免 enabled 状态争用。
+## 显示 Canvas 回退
+
+- Holder 自身有 Canvas：用自身 `layer` / `sortingOrder`
+- Widget 等无自身 Canvas：回退到最近祖先 Canvas（正常路径，不警告）
+- 整条父链都没有 Canvas：仅依赖生命周期 + `activeInHierarchy`，Development 下警告一次
 
 ## InputGlyph 集成
 

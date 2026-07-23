@@ -962,7 +962,7 @@ MonoBehaviour:
   canvasGroup: {fileID: 826950546506153899}
   useUnscaledTime: 1
   initializeAsClosed: 1
-  disableInteractionWhilePlaying: 1
+  followAnimationInteractable: 0
   openDuration: 0.22
   closeDuration: 0.18
   slideDistance: 120
@@ -1132,10 +1132,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad0e473486c04dc19b468f2b20675091, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _component: {fileID: 5077209145104049990}
   _holder: {fileID: 3268640359497331672}
   _hotkeyAction: {fileID: 2578644123212045086, guid: 5a8ec89654ebcd642af04da22f4406f8, type: 3}
   _hotkeyPressType: 1
+  _hotkeyActionOwnershipMode: 1
+  _hotkeyConsumesInput: 1
+  _component: {fileID: 5077209145104049990}
 --- !u!1 &3396890644259487134
 GameObject:
   m_ObjectHideFlags: 0

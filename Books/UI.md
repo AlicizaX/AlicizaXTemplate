@@ -1,6 +1,6 @@
 # UI 模块
 
-UI 模块负责窗口创建、显示、关闭、层级、缓存、遮挡、生命周期、Widget、Tab 窗口和 UI 事件自动解绑。
+UI 模块负责窗口创建、显示、关闭、层级、缓存、生命周期、Widget、Tab 窗口和 UI 事件自动解绑。
 
 主要代码位置：
 
@@ -54,10 +54,10 @@ public enum UILayer
 
 ## WindowAttribute
 
-窗口逻辑类使用 `WindowAttribute` 描述显示层级、遮挡模式和缓存时间。
+窗口逻辑类使用 `WindowAttribute` 描述显示层级和缓存时间。
 
 ```csharp
-[Window(UILayer.UI, UIOcclusionMode.None, 30)]
+[Window(UILayer.UI, 30)]
 public sealed class HomeWindow : UIWindow<ui_HomeWindow>
 {
     protected override void OnInitialize()
@@ -71,30 +71,15 @@ public sealed class HomeWindow : UIWindow<ui_HomeWindow>
 ```csharp
 public WindowAttribute(
     UILayer windowLayer,
-    UIOcclusionMode occlusionMode = UIOcclusionMode.None,
     int cacheTime = 0)
 ```
 
 参数说明：
 
 - `windowLayer`：窗口所在层级。
-- `occlusionMode`：遮挡模式。
 - `cacheTime`：缓存时间，`-1` 永久缓存，`0` 不缓存，`>= 1` 按秒缓存。
 
-遮挡模式：
-
-```csharp
-public enum UIOcclusionMode : byte
-{
-    None,
-    Visible,
-    Lifecycle,
-}
-```
-
-- `None`：只做普通显示排序，不主动遮挡下层窗口生命周期。
-- `Visible`：通过可见性隐藏被遮挡窗口。
-- `Lifecycle`：被遮挡窗口会走关闭生命周期，重新露出时再打开。路由深回退时要用 Router 的批量关闭能力避免中间页先被恢复再关闭。
+同层多个窗口可以同时打开，框架只做深度排序，不会自动隐藏或关闭被盖住的窗口。页面流若需要“打开下一页并处理上一页 / 返回上一页 / 回根”，请使用 `UIRouter`。
 
 需要每帧更新时添加：
 
@@ -129,7 +114,7 @@ protected virtual UniTask OnInitializeAsync()
 同步初始化示例：
 
 ```csharp
-[Window(UILayer.UI, UIOcclusionMode.None, 30)]
+[Window(UILayer.UI, 30)]
 public sealed class TestWindow : UIWindow<ui_TestWindow>
 {
     protected override void OnInitialize()
@@ -142,7 +127,7 @@ public sealed class TestWindow : UIWindow<ui_TestWindow>
 异步初始化示例：
 
 ```csharp
-[Window(UILayer.UI, UIOcclusionMode.None, 30)]
+[Window(UILayer.UI, 30)]
 public sealed class HomeWindow : UITabWindow<ui_HomeWindow>
 {
     private HomeWidget _homeWidget;
@@ -170,7 +155,7 @@ public sealed class HomeWindow : UITabWindow<ui_HomeWindow>
 
 ## UIService API
 
-`IUIService` 负责实际 UI 实例、栈、层级、遮挡、缓存和生命周期。
+`IUIService` 负责实际 UI 实例、栈、层级、深度排序、缓存和生命周期。
 
 ### 打开 UI
 
@@ -304,14 +289,13 @@ UICloseManyResult result = await GameApp.UI.CloseManyAsync(handles, modes, 2);
 
 - `Transition`：走正常关闭动画。
 - `SilentFinalize`：不播放关闭动画，但仍完成 UIBase 关闭状态机。
-- 一次事务内不会在每个窗口关闭后重复刷新遮挡。
-- 最终每个变更层只刷新一次可见性和深度。
+- 一次事务内批量关闭目标，最终每个变更层只刷新一次深度排序。
 - preflight 不会反射注册 UI，也不会创建 metadata；未知 handle 返回 `UnknownHandle`。
 - 重复 handle 会被折叠，已缓存或不在栈中的 handle 会被跳过。
 
 ## UIRouter
 
-`IUIRouter` 管理 Page 级导航历史。Router 只负责 history 和导航事务，不负责 UI 实例、层级、遮挡、缓存。
+`IUIRouter` 管理 Page 级导航历史。Router 只负责 history 和导航事务，不负责 UI 实例、层级、缓存；实际开关窗仍通过 UIService。
 
 入口：
 
@@ -333,7 +317,12 @@ await GameApp.UI.Router.NavigateTo<UIHomeWindow>();
 ### 前进导航
 
 ```csharp
-await GameApp.UI.Router.NavigateTo<UITestAWindow>();
+UIRouteResult result = await GameApp.UI.Router.NavigateTo<UITestAWindow>();
+if (!result.Success)
+{
+    // result.Status: RejectedBusy / RejectedDirty / OpenFailed / CloseFailed ...
+}
+
 await GameApp.UI.Router.NavigateTo<UIShopWindow>(shopId);
 ```
 
@@ -343,8 +332,10 @@ await GameApp.UI.Router.NavigateTo<UIShopWindow>(shopId);
 - 参数会浅拷贝保存到 history，避免调用方后续修改数组影响回放。
 - 如果目标类型等于当前 history 顶部类型，会刷新当前页参数，不新增 history。
 - `A -> B -> C -> D -> NavigateTo<A>()` 是正常前进导航，history 会变成 `A, B, C, D, A`，此后 `Back()` 返回 `D`。
-- 当旧页和目标页在同一层，且目标页是 `Lifecycle` 遮挡窗口时，Router 会在目标开始显示后先加入 pending history，让遮挡系统负责旧页关闭；目标打开失败时会移除 pending history 并恢复本次 trim 掉的旧记录。
-- 跨层 `Lifecycle` 目标不会走这个 shortcut，仍会按普通流程打开目标并主动关闭旧页。
+- 前进导航流程：先打开目标页，成功后再关闭旧 current（若类型不同），最后写入 history。
+- Router 关闭必须真实完成；layer busy 时返回 `RejectedBusy`，不会把“入队成功”当关闭完成，也不会提交 history。
+- history 上限 64；新增条目超限返回 `RejectedLimit`，不会静默截断。
+- 目标打开失败时不修改 history；旧页关闭失败时会按事务规则回滚，必要时进入 dirty。
 
 ### Replace
 
@@ -363,7 +354,7 @@ await GameApp.UI.Router.Back();
 
 返回上一条 history。Router Back 不处理弹窗优先关闭，弹窗应由业务、输入系统或弹窗管理逻辑处理。
 
-相邻回退时，如果目标页已经被遮挡系统恢复打开，Router 会跳过重复 `ShowByRouter`。
+相邻回退时，如果目标页仍处于打开状态，Router 会跳过重复 `ShowByRouter`。
 
 ### CloseCurrent
 
@@ -396,10 +387,9 @@ A -> B -> C -> D -> BackToRoot()
 
 - `D` 播放关闭动画。
 - `B`、`C` silent finalize，不播放关闭动画。
-- 中间页不会因为 Lifecycle 遮挡先被 reopen 再 close。
-- root `A` 只恢复或打开一次。
+- root `A` 若仍打开则直接保留，否则再 `ShowByRouter` 一次。
 
-这依赖 UIService 的 `CloseManyAsync`。Router 会先让 UIService 批量关闭目标以上的非 target UI，再根据目标是否已被遮挡恢复决定是否需要显式 `ShowByRouter(target)`。
+这依赖 UIService 的 `CloseManyAsync`。Router 会先批量关闭目标以上的非 target UI，再根据目标是否仍打开决定是否需要显式 `ShowByRouter(target)`。
 
 ### BackTo
 
@@ -413,7 +403,7 @@ await GameApp.UI.Router.BackTo<UIHomeWindow>(openIfMissing: true, "arg");
 
 - 命中 history 时，返回最近的目标类型，并恢复该 history entry 保存的参数。
 - 未命中且 `openIfMissing == true` 时，执行 `ResetTo<T>(args)`。
-- 未命中且 `openIfMissing == false` 时返回 `false`。
+- 未命中且 `openIfMissing == false` 时返回 `NotFound`。
 - 深回退不会关闭 target TypeHandle；重复 UI 类型只关闭一次。
 
 ### ResetTo
@@ -432,7 +422,7 @@ GameApp.UI.Router.ResetHistory();
 ```
 
 只清空 Router history 并清除 dirty 状态，不关闭任何实际 UI。
-如果当前正在导航，或存在尚未完成的 pending route show，调用会被忽略，避免同步修改 history 破坏异步导航事务。
+如果当前正在导航，调用会被忽略，避免同步修改 history 破坏异步导航事务。
 
 ### SyncFromCurrentUI
 
@@ -442,7 +432,8 @@ GameApp.UI.Router.SyncFromCurrentUI(typeof(UIHomeWindow).TypeHandle, "arg");
 ```
 
 用于把当前实际显示的 UI 类型设为新的 Router root。它只修复 Router history，不打开或关闭实际 UI。
-如果当前正在导航，或存在尚未完成的 pending route show，调用会被忽略。
+如果当前正在导航，调用会被忽略。
+目标类型必须当前处于 `Opened`；否则拒绝同步（Editor 会记 warning）。
 
 ### Router 状态
 
@@ -450,9 +441,25 @@ GameApp.UI.Router.SyncFromCurrentUI(typeof(UIHomeWindow).TypeHandle, "arg");
 bool canBack = GameApp.UI.Router.CanBack;
 Type currentType = GameApp.UI.Router.Current;
 UIRouteEntry currentEntry = GameApp.UI.Router.CurrentEntry;
+UIRouteResult result = await GameApp.UI.Router.Back();
+if (result.Status == UIRouteStatus.RejectedBusy)
+{
+    // 可稍后重试
+}
 ```
 
 `CurrentEntry` 返回快照，不要修改后期待影响 Router 内部 history。
+`UIRouteResult` 可隐式转 `bool`，但关键流程建议读 `Status`：
+
+| Status | 含义 | 建议 |
+|---|---|---|
+| `Success` | 成功 | - |
+| `RejectedBusy` | 同层事务忙 | 稍后重试 |
+| `RejectedDirty` | Router dirty | `ResetTo` / `SyncFromCurrentUI` / `ResetHistory` |
+| `RejectedLimit` | history 已满 | 收敛导航深度或 `BackTo/ResetTo` |
+| `NotFound` | 无目标/无 history | 检查调用时机 |
+| `OpenFailed` / `CloseFailed` | 开关窗失败 | 查 UIService/资源；必要时 dirty 恢复 |
+| `InvalidTarget` | 目标类型非法 | 检查类型 |
 
 ### Router 使用建议
 
@@ -461,7 +468,7 @@ UIRouteEntry currentEntry = GameApp.UI.Router.CurrentEntry;
 - 不要让 UIService 参与 Router history；UIService 只管理实际 UI 生命周期。
 - routed page 的直接关闭入口会在 UIService 源头转交 Router；关键业务流程仍建议显式调用 Router API。
 - Router API 是异步事务，按钮里可以 `.Forget()`，但关键流程建议 `await` 并检查返回值。
-- `BackTo` / `BackToRoot` 遇到同层事务正在播放动画时可能返回 `false`；如果没有实际关闭任何 UI，不会把 Router 标记为 dirty，调用方可稍后重试。
+- `BackTo` / `BackToRoot` 遇到同层事务忙时返回 `RejectedBusy`；未实际关闭 UI 时不会标 dirty，调用方可稍后重试。
 
 ## 接收打开参数
 
@@ -638,15 +645,16 @@ ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAl
 | API | 说明 |
 | --- | --- |
 | `GameApp.UI.Router` | Page 级导航 Router |
-| `IUIRouter.NavigateTo<T>()` | 前进导航到 Page |
-| `IUIRouter.Replace<T>()` | 替换当前 Page |
-| `IUIRouter.Back()` | 返回上一条 history |
-| `IUIRouter.CloseCurrent()` | routed page 关闭当前页 |
-| `IUIRouter.BackToRoot()` | 深回退到 root |
-| `IUIRouter.BackTo<T>()` | 回退到最近的指定 Page |
+| `IUIRouter.NavigateTo<T>()` | 前进导航到 Page，返回 `UIRouteResult` |
+| `IUIRouter.Replace<T>()` | 替换当前 Page，返回 `UIRouteResult` |
+| `IUIRouter.Back()` | 返回上一条 history，返回 `UIRouteResult` |
+| `IUIRouter.CloseCurrent()` | routed page 关闭当前页，返回 `UIRouteResult` |
+| `IUIRouter.BackToRoot()` | 深回退到 root，返回 `UIRouteResult` |
+| `IUIRouter.BackTo<T>()` | 回退到最近的指定 Page，返回 `UIRouteResult` |
 | `IUIRouter.ResetTo<T>()` | 重建 Router history，只保留目标 root |
 | `IUIRouter.ResetHistory()` | 只清空 Router history，不关闭 UI |
-| `IUIRouter.SyncFromCurrentUI(...)` | 用当前实际 UI 重建 Router root |
+| `IUIRouter.SyncFromCurrentUI(...)` | 用当前已 Opened 的 UI 重建 Router root |
+| `UIRouteResult` / `UIRouteStatus` | 导航结果；可隐式转 `bool`，关键路径读 `Status` |
 | `IUIService.ShowUI<T>()` | 异步打开 UI |
 | `IUIService.ShowUIResult<T>()` | 异步打开并返回精确状态 |
 | `IUIService.ShowUISync<T>()` | 同步准备 UI 并启动打开动画，立即返回 View |
@@ -674,7 +682,8 @@ ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAl
 3. `ShowUISync` 会同步完成资源绑定和 `OnInitialize`，但不等待打开动画完成，也不会执行 `OnInitializeAsync` 中真正异步的逻辑；需要完整异步初始化和动画完成时使用 `ShowUI`。
 4. routed page 使用 Router 打开；关闭建议用 Router API。`CloseSelf` / `CloseUI` 命中 Router 当前页时会自动转交 Router。
 5. `IsOpen` 只表示 UIBase 状态，不代表 Router 当前页。
-6. `Lifecycle` 遮挡会触发被遮挡窗口关闭和恢复打开。深回退必须走 Router，避免中间页被恢复后再关闭。
+6. 深回退（`BackTo` / `BackToRoot`）必须走 Router，依赖 `CloseManyAsync` 批量关闭中间页。
 7. 重复 `ShowUI` 打开已初始化后的窗口会刷新参数并触发 `OnRefresh`，包括 `Opening` 阶段。
-8. Router 发生事务失败时可能进入 dirty 状态。dirty 时导航 API 会返回 `false`，需要业务决定是 `ResetHistory`、`SyncFromCurrentUI` 还是重建 UI 流程。导航中或 pending route show 未完成时，`ResetHistory` / `SyncFromCurrentUI` 会被忽略。
+8. Router 发生事务失败时可能进入 dirty 状态。dirty 时导航 API 返回 `RejectedDirty`，需要业务决定是 `ResetHistory`、`SyncFromCurrentUI` 还是重建 UI 流程。导航中时，`ResetHistory` / `SyncFromCurrentUI` 会被忽略。
 9. UI 依赖 ObjectPool、Timer、Resource，启动场景需要保证组件注册顺序。
+10. 框架不再提供 `UIOcclusionMode`。同层多窗默认叠层显示；页面导航请用 Router，弹窗继续 `ShowUI` / `CloseSelf`。

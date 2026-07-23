@@ -96,5 +96,15 @@ namespace GameLogic.UI
         {
             return false;
         }
+
+        public bool HandleNavigationSubmit()
+        {
+            return false;
+        }
+
+        public bool IsNavigationFocusable(int dataIndex)
+        {
+            return true;
+        }
     }
 }

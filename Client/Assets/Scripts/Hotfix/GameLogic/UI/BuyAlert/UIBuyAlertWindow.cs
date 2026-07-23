@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace GameLogic.UI
 {
-    [Window(UILayer.Popup, UIOcclusionMode.None, 3)]
-    public class UIBuyAlertWindow : UITabWindow<ui_UIBuyAlertWindow>
+    [Window(UILayer.Popup, 3)]
+    public class UIBuyAlertWindow : UIWindow<ui_UIBuyAlertWindow>
     {
         private ShopGoodsData _goodsData;
         private IFakePlayerDataService _playerDataService;

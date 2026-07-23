@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace GameLogic.UI
 {
-    [Window(UILayer.UI, UIOcclusionMode.None, 30)]
+    [Window(UILayer.UI, 30)]
     public class UIHomeWindow : UIWindow<ui_UIHomeWindow>
     {
         private string currentLanguage;

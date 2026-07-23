@@ -14,8 +14,8 @@ using UnityEngine.UI;
 
 namespace GameLogic.UI
 {
-    [Window(UILayer.UI, UIOcclusionMode.Visible, 3)]
-    public class UIShopWindow : UITabWindow<ui_UIShopWindow>
+    [Window(UILayer.UI, 3)]
+    public class UIShopWindow : UIWindow<ui_UIShopWindow>
     {
         private readonly Dictionary<EShopCategory, List<ShopGoodsData>> _goodsByCategory = new();
         private UGList<ShopGoodsData> _goodsList;
