@@ -52,6 +52,8 @@ public enum UILayer
 - `Tips`：提示、Toast、跑马灯。
 - `Top`：最高层，例如新手引导遮罩。
 
+`UILayer.All` 不是可显示层。注册时传入非法 layer 会直接抛 `ArgumentOutOfRangeException`，不会静默落到 `UI`。
+
 ## WindowAttribute
 
 窗口逻辑类使用 `WindowAttribute` 描述显示层级和缓存时间。
@@ -150,8 +152,25 @@ public sealed class HomeWindow : UITabWindow<ui_HomeWindow>
 - 只重写 `OnInitialize`：同步 API 和异步 API 都会执行这段初始化。
 - 重写 `OnInitializeAsync`：异步 API 会等待它完成；同步 API 只调用 `OnInitialize`，不会执行异步初始化逻辑。
 - 只写异步初始化的 UI 不建议用 `ShowUISync` 打开，除非明确不依赖该异步初始化结果。
+- 从缓存重新打开时**不会**再次走 `OnInitialize` / `OnInitializeAsync`，只会重新 `OnOpen` / 刷新参数。
 - `OnOpen`、`OnRefresh`、`OnClose`、`OnDestroy`、`OnUpdate` 也是 `UIBase` 的虚方法。
-- `OnRefresh` 用于重复打开或重复传参后的刷新，调用前参数已经写入 `UserData` / `UserDatas`。
+- `OnRefresh` 用于已打开（`Opened`）后再次 `Show` 传参刷新；调用前参数已经写入 `UserData` / `UserDatas`。
+
+## 打开 / 关闭契约（摘要）
+
+| 路径 | 完成点（await / 返回） | 开场动画 | 关场动画 |
+| --- | --- | --- | --- |
+| `ShowUI` / `ShowUIResult` | 资源 + Init + 逻辑 `OnOpen`，进入稳定 `Opened` | 默认后台并行 | - |
+| `ShowUISync` | 同步资源 + `OnInitialize` + 逻辑 `OnOpen`，返回时已是 `Opened`（成功时） | 默认后台并行 | - |
+| `CloseUI` / `CloseUIAsync` | 逻辑 `OnClose` + 关场转场完成后再 Finalize/Cache | - | 默认 await 关场后再入缓存 |
+| `AwaitViewTransition()` | 等待当前 View 开/关转场 | 开场 opt-in | 关场也可用于 join |
+
+补充规则：
+
+- **同类型**已在 `Opening` / `Opened` / Show 进行中：只刷新 userData（latest wins），不重新走完整打开。
+- **同类型**正在 `Closing`：异步 `Show` 会等逻辑关闭完成后再用 latest 打开；`ShowUISync` 无法 await，返回 `null` 并打 Warning。
+- **同层不同类型**可并行打开/关闭；**没有**整层 FIFO 命令队列。
+- 页面导航用 `Router`；叠加弹窗/独立面板用 `ShowUI` / `CloseUI`。同一逻辑页不要混用两条路径。
 
 ## UIService API
 
@@ -181,6 +200,16 @@ if (result.IsAccepted)
 }
 ```
 
+需要等开场动画时：
+
+```csharp
+HomeWindow home = await GameApp.UI.ShowUI<HomeWindow>();
+await home.AwaitViewTransition();
+
+// 或链式
+await GameApp.UI.ShowUIResult<HomeWindow>().AwaitViewTransition();
+```
+
 可用重载：
 
 ```csharp
@@ -201,15 +230,17 @@ LoginWindow login = GameApp.UI.ShowUISync<LoginWindow>();
 LoginWindow loginWithArgs = GameApp.UI.ShowUISync<LoginWindow>("startup");
 ```
 
-同步打开的语义是“同步拿到可操作 View，并启动打开流程”：
+同步打开语义：
 
-- 同步完成 UI 实例创建、资源绑定、参数写入和 `OnInitialize`。
-- 打开动画仍会正常播放，但同步 API 不等待动画完成；返回时状态可能是 `Opening`。
-- 动画完成后才进入稳定 `Opened`，并触发 `OnWindowAfterShowEvent`。
-- 需要等待动画完成和稳定打开时，使用 `await ShowUI<T>()` 或 `ShowUIResult<T>()`。
-- 同步打开只适合资源可同步加载的场景；如果初始化依赖 `OnInitializeAsync`，应使用异步 API。
+- 同步完成实例创建、资源绑定、`OnInitialize`、逻辑 `OnOpen`。
+- **成功返回时状态为稳定 `Opened`**（不是“返回时仍是 Opening”）。
+- 开场转场默认在后台推进；需要等动画时用 `login.AwaitViewTransition()`。
+- `OnWindowAfterShowEvent` 在进入 `Opened` 时触发（逻辑打开完成），不依赖开场动画结束。
+- 同类型已在打开中/已打开：只刷新 userData，不重复打开。
+- 同类型正在关闭：返回 `null` 并 `Log.Warning`；关后再开请用异步 `ShowUI`。
+- 只适合资源可同步加载的场景；依赖 `OnInitializeAsync` 的 UI 应使用异步 API。
 
-重复 `ShowUI` 打开同一个正在打开或已打开的窗口时，不会重新初始化。框架会刷新参数，并在初始化完成后的状态调用 `OnRefresh`；`Opening` 阶段也会触发刷新。
+重复打开示例：
 
 ```csharp
 protected override void OnRefresh()
@@ -218,21 +249,30 @@ protected override void OnRefresh()
 }
 ```
 
+- `Opened`：刷新参数并调用 `OnRefresh`。
+- Show 进行中 / `Opening`：更新 latest 参数（sticky），join 当前打开结果；**不会**在半开态反复 `OnRefresh`。
+- Opening join 若被 Close 打断：异步结果为 `Cancelled`，需要业务再发一次 `Show`。
+
 ### 关闭 UI
 
 ```csharp
-GameApp.UI.CloseUI<LoginWindow>();
+// 后台推进关闭；可用 UICloseHandle 等待关场
+UICloseHandle handle = GameApp.UI.CloseUI<LoginWindow>();
+await handle.AwaitViewTransition();
+
 GameApp.UI.CloseUI<LoginWindow>(force: true);
 bool ok = await GameApp.UI.CloseUIAsync<LoginWindow>();
 ```
 
-`force: true` 会强制跳过缓存策略。
+- `force: true` 会跳过缓存，直接销毁。
+- 关场动画默认在 Finalize/Cache **之前**完成；缓存实例不会带着未播完的关场动画进 Cache。
+- `CloseUI` 返回 `UICloseHandle`；逻辑关闭在后台推进，`AwaitViewTransition` 等待整段关闭（含转场）结束。
 
 窗口内部关闭自身：
 
 ```csharp
 CloseSelf();
-ForceCloseSelf();
+CloseSelf(force: true);
 ```
 
 `CloseUI` / `CloseSelf` 进入 UIService 后会先检查目标是否为 Router 当前页。
@@ -254,7 +294,7 @@ RectTransform uiLayer = GameApp.UI.GetLayer(UILayer.UI);
 ```
 
 `IsOpen` 只表示该 UI 类型当前处于稳定 `Opened` 状态，不表示它一定是 Router 当前页。
-同步打开返回后如果动画仍在播放，`IsOpen<T>()` 可能暂时为 `false`。
+`Opening` / `Closing` 均为 `false`。成功的 `ShowUI` / `ShowUISync` 在逻辑打开完成后即为 `Opened`，不因开场动画未结束而为 `false`。
 
 ### 关闭最上层匹配 UI
 
@@ -263,35 +303,18 @@ bool closed = await GameApp.UI.TryCloseTopAsync(
     handle => handle.Equals(typeof(SettingsWindow).TypeHandle));
 ```
 
-`TryCloseTopAsync` 从最高层、最高栈位开始查找，关闭第一个满足谓词的 UI。
+`TryCloseTopAsync` 从最高层、最高栈位开始查找，关闭第一个满足谓词的 UI。谓词异常会直接抛出，框架不再吞掉。
 
-### CloseManyAsync
+### CloseMany（内部）
 
-`CloseManyAsync` 是 UIService 内部栈事务能力，主要给 Router 深回退使用。普通业务通常不直接调用。
+`CloseManyAsync` 是 **UIService 内部**能力（`internal`），主要给 Router 深回退使用，**不在** `IUIService` 公开接口上，业务不要直接调用。
 
-```csharp
-RuntimeTypeHandle[] handles =
-{
-    typeof(ShopWindow).TypeHandle,
-    typeof(TestWindow).TypeHandle,
-};
-
-UICloseManyMode[] modes =
-{
-    UICloseManyMode.Transition,
-    UICloseManyMode.SilentFinalize,
-};
-
-UICloseManyResult result = await GameApp.UI.CloseManyAsync(handles, modes, 2);
-```
-
-语义：
+语义（供理解 Router 行为）：
 
 - `Transition`：走正常关闭动画。
 - `SilentFinalize`：不播放关闭动画，但仍完成 UIBase 关闭状态机。
-- 一次事务内批量关闭目标，最终每个变更层只刷新一次深度排序。
-- preflight 不会反射注册 UI，也不会创建 metadata；未知 handle 返回 `UnknownHandle`。
-- 重复 handle 会被折叠，已缓存或不在栈中的 handle 会被跳过。
+- 一次批量关闭目标后，每个变更层再刷新深度排序。
+- preflight 不反射注册 UI；未知 handle 失败；重复 / 已缓存 / 不在栈 / 已在关闭中的目标会跳过。
 
 ## UIRouter
 
@@ -320,7 +343,7 @@ await GameApp.UI.Router.NavigateTo<UIHomeWindow>();
 UIRouteResult result = await GameApp.UI.Router.NavigateTo<UITestAWindow>();
 if (!result.Success)
 {
-    // result.Status: RejectedBusy / RejectedDirty / OpenFailed / CloseFailed ...
+    // result.Status: RejectedBusy / OpenFailed / CloseFailed / RejectedLimit ...
 }
 
 await GameApp.UI.Router.NavigateTo<UIShopWindow>(shopId);
@@ -333,9 +356,9 @@ await GameApp.UI.Router.NavigateTo<UIShopWindow>(shopId);
 - 如果目标类型等于当前 history 顶部类型，会刷新当前页参数，不新增 history。
 - `A -> B -> C -> D -> NavigateTo<A>()` 是正常前进导航，history 会变成 `A, B, C, D, A`，此后 `Back()` 返回 `D`。
 - 前进导航流程：先打开目标页，成功后再关闭旧 current（若类型不同），最后写入 history。
-- Router 关闭必须真实完成；layer busy 时返回 `RejectedBusy`，不会把“入队成功”当关闭完成，也不会提交 history。
+- Router 关闭必须真实完成；目标 per-meta 仍在 Show/Close 进行中时可能返回 `RejectedBusy`，不会把“开始关闭”当关闭完成，也不会提交 history。
 - history 上限 64；新增条目超限返回 `RejectedLimit`，不会静默截断。
-- 目标打开失败时不修改 history；旧页关闭失败时会按事务规则回滚，必要时进入 dirty。
+- 目标打开失败时不修改 history；旧页关闭失败时会按事务规则回滚，并记 Error 日志（**不再**进入永久 dirty / `RejectedDirty`）。
 
 ### Replace
 
@@ -344,7 +367,7 @@ await GameApp.UI.Router.Replace<SettingsWindow>();
 await GameApp.UI.Router.Replace<SettingsWindow>("from_home");
 ```
 
-`Replace` 用目标页替换当前 history 顶部。目标打开失败时不修改 history；旧页关闭失败时会按事务规则回滚或进入 dirty。
+`Replace` 用目标页替换当前 history 顶部。目标打开失败时不修改 history；旧页关闭失败时会按事务规则回滚并记日志。
 
 ### Back
 
@@ -389,7 +412,7 @@ A -> B -> C -> D -> BackToRoot()
 - `B`、`C` silent finalize，不播放关闭动画。
 - root `A` 若仍打开则直接保留，否则再 `ShowByRouter` 一次。
 
-这依赖 UIService 的 `CloseManyAsync`。Router 会先批量关闭目标以上的非 target UI，再根据目标是否仍打开决定是否需要显式 `ShowByRouter(target)`。
+这依赖 UIService 内部的批量关闭。Router 会先批量关闭目标以上的非 target UI，再根据目标是否仍打开决定是否需要显式 `ShowByRouter(target)`。
 
 ### BackTo
 
@@ -421,7 +444,7 @@ await GameApp.UI.Router.ResetTo<UIHomeWindow>("startup");
 GameApp.UI.Router.ResetHistory();
 ```
 
-只清空 Router history 并清除 dirty 状态，不关闭任何实际 UI。
+只清空 Router history，不关闭任何实际 UI。
 如果当前正在导航，调用会被忽略，避免同步修改 history 破坏异步导航事务。
 
 ### SyncFromCurrentUI
@@ -444,22 +467,23 @@ UIRouteEntry currentEntry = GameApp.UI.Router.CurrentEntry;
 UIRouteResult result = await GameApp.UI.Router.Back();
 if (result.Status == UIRouteStatus.RejectedBusy)
 {
-    // 可稍后重试
+    // 目标仍在 Show/Close 进行中，可稍后重试
 }
 ```
 
 `CurrentEntry` 返回快照，不要修改后期待影响 Router 内部 history。
-`UIRouteResult` 可隐式转 `bool`，但关键流程建议读 `Status`：
+`UIRouteResult` 可隐式转 `bool`，关键流程建议读 `Status`：
 
 | Status | 含义 | 建议 |
 |---|---|---|
 | `Success` | 成功 | - |
-| `RejectedBusy` | 同层事务忙 | 稍后重试 |
-| `RejectedDirty` | Router dirty | `ResetTo` / `SyncFromCurrentUI` / `ResetHistory` |
-| `RejectedLimit` | history 已满 | 收敛导航深度或 `BackTo/ResetTo` |
+| `RejectedBusy` | 目标仍在 Show/Close 进行中 | 稍后重试 |
+| `RejectedLimit` | history 已满 | 收敛导航深度或 `BackTo` / `ResetTo` |
 | `NotFound` | 无目标/无 history | 检查调用时机 |
-| `OpenFailed` / `CloseFailed` | 开关窗失败 | 查 UIService/资源；必要时 dirty 恢复 |
+| `OpenFailed` / `CloseFailed` | 开关窗失败 | 查 UIService/资源；必要时 `ResetTo` / `SyncFromCurrentUI` 重建 |
 | `InvalidTarget` | 目标类型非法 | 检查类型 |
+
+> 已移除永久 dirty / `RejectedDirty`。导航失败只记日志并返回失败 Status，不会熔断后续导航。
 
 ### Router 使用建议
 
@@ -468,7 +492,7 @@ if (result.Status == UIRouteStatus.RejectedBusy)
 - 不要让 UIService 参与 Router history；UIService 只管理实际 UI 生命周期。
 - routed page 的直接关闭入口会在 UIService 源头转交 Router；关键业务流程仍建议显式调用 Router API。
 - Router API 是异步事务，按钮里可以 `.Forget()`，但关键流程建议 `await` 并检查返回值。
-- `BackTo` / `BackToRoot` 遇到同层事务忙时返回 `RejectedBusy`；未实际关闭 UI 时不会标 dirty，调用方可稍后重试。
+- `BackTo` / `BackToRoot` 遇到目标 busy 时返回 `RejectedBusy`；调用方可稍后重试。
 
 ## 接收打开参数
 
@@ -556,7 +580,12 @@ await widget.CloseAsync();
 widget.Destroy();
 ```
 
-`CreateWidgetAsync` 会等待可见 Widget 的打开动画完成后返回。`CreateWidgetSync` 会同步完成资源绑定和 `OnInitialize`，然后以后台任务播放打开动画；返回时可见 Widget 可能仍处于 `Opening`。
+语义（与 Window 对齐的部分）：
+
+- `CreateWidgetAsync` / `CreateWidgetSync`：资源 + Init +（可见时）逻辑 `OnOpen`；开场转场默认后台并行。
+- 需要等开场动画：`await widget.AwaitViewTransition()`。
+- `OpenAsync`：已 `Opened` 只刷新参数；`Opening` 直接返回成功；`Closing` 先等关场再打开。
+- `CloseAsync` 会 await 关场转场。
 
 ## Tab 窗口
 
@@ -655,40 +684,38 @@ ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAl
 | `IUIRouter.ResetHistory()` | 只清空 Router history，不关闭 UI |
 | `IUIRouter.SyncFromCurrentUI(...)` | 用当前已 Opened 的 UI 重建 Router root |
 | `UIRouteResult` / `UIRouteStatus` | 导航结果；可隐式转 `bool`，关键路径读 `Status` |
-| `IUIService.ShowUI<T>()` | 异步打开 UI |
+| `IUIService.ShowUI<T>()` | 异步打开到逻辑 `Opened`；动画可用 `AwaitViewTransition` |
 | `IUIService.ShowUIResult<T>()` | 异步打开并返回精确状态 |
-| `IUIService.ShowUISync<T>()` | 同步准备 UI 并启动打开动画，立即返回 View |
-| `IUIService.CloseUI<T>(bool force)` | 关闭 UI |
-| `IUIService.CloseUIAsync<T>(bool force)` | 异步关闭 UI |
-| `IUIService.CloseManyAsync(...)` | 批量关闭 UIService 栈项，主要供 Router 使用 |
+| `IUIService.ShowUISync<T>()` | 同步完成资源/Init/逻辑 Open，返回已 `Opened` 的 View |
+| `IUIService.CloseUI<T>(bool force)` | 返回 `UICloseHandle`，逻辑关闭后台推进 |
+| `IUIService.CloseUIAsync<T>(bool force)` | 异步关闭 UI，等待整段关闭完成 |
 | `IUIService.TryCloseTopAsync(...)` | 关闭最上层匹配 UI |
-| `IUIService.IsOpen<T>()` | 查询 UI 是否稳定打开 |
+| `IUIService.IsOpen<T>()` | 查询 UI 是否稳定 `Opened` |
 | `IUIService.GetUI<T>()` | 获取已打开 UI |
 | `IUIService.GetLayer(UILayer)` | 获取层级根节点 |
-| `UIWindow<T>.CloseSelf()` | 关闭自身；若自身是 Router 当前页，会转交 Router |
-| `UIWindow<T>.ForceCloseSelf()` | 强制关闭自身；若自身是 Router 当前页，会转交 Router |
-| `UITabWindow<T>.CloseSelf(bool)` | TabWindow 关闭自身 |
-| `UIBase.CreateWidgetAsync<T>()` | 创建 Widget |
-| `UIBase.CreateWidgetSync<T>()` | 同步准备 Widget 并启动打开动画 |
+| `UIBase.AwaitViewTransition()` | 等待当前开/关转场 |
+| `UIWindowBase<T>.CloseSelf(bool force)` | 关闭自身；若自身是 Router 当前页，会转交 Router |
+| `UITabWindow<T>` | Tab 容器窗口（关闭仍走 `CloseSelf`） |
+| `UIBase.CreateWidgetAsync<T>()` | 创建 Widget（逻辑打开完成；动画 opt-in） |
+| `UIBase.CreateWidgetSync<T>()` | 同步创建 Widget（逻辑打开完成；动画后台） |
 | `UIBase.RemoveWidget(UIBase)` | 移除 Widget |
 | `UIWidget.Open/Close/Destroy` | Widget 自身打开、关闭、销毁 |
 | `UIMetaRegistry.Register(...)` | 手动注册窗口元数据 |
 | `UIResRegistry.Register(...)` | 手动注册 Holder 资源 |
 
-## 同层命令队列
+## 并发模型
 
-同一 `UILayer` 上的异步 `ShowUI` / `CloseUI` 走**统一 FIFO 命令队列**，不要求业务对同层连续调用 `await`。
+互斥粒度是 **单个 UI 类型（per-meta）**，不是整层队列。
 
 规则：
 
-- 同层 `Show` / `Close` 按入队顺序串行执行，避免并发改栈。
-- 同 type 折叠：
-  - pending `Show` + 新 `Show`：覆盖参数并 join 同一 completion。
-  - pending `Show` + `Close`：取消 pending `Show`（`Cancelled`）；若实例已在栈中仍继续真正 Close。
-  - pending `Close` + `Close`：join 已有 Close completion；`force` 可升级。
-- 正在进行的 `Show` 收到 `Close` 时：发 `RequestCancelShowLoad` 取消加载，**不插队**，等当前命令结束后再 drain Close。
-- `ShowUISync` **不入队**：仅当该层完全 idle 时执行；层忙或已有异步 Show 时返回 `null`。
-- `CloseManyAsync` 在 preflight 阶段若目标层有 pending 命令会拒绝，避免绕过 FIFO。
+- 同层不同类型：`Show` / `Close` 可并行。
+- 同类型：
+  - 已打开 / 打开中再次 `Show`：只刷 latest userData，不重复打开。
+  - 关闭中再次异步 `Show`：等关闭完成后再开（latest wins）。
+  - 关闭中 `ShowUISync`：返回 `null` + Warning。
+  - 打开中 `Close`：取消加载并进入关闭路径。
+- 没有整层 FIFO、没有“层 mutation busy 导致 Sync 一律失败”。
 
 ## Show 结果语义
 
@@ -696,9 +723,9 @@ ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAl
 
 | State | 含义 | 典型场景 |
 | --- | --- | --- |
-| `Opened` | 成功打开（稳定或已接受） | 正常 `ShowUI` / `ShowUIResult` |
-| `Cancelled` | 被业务取消或被后续操作顶替，**不是故障** | 加载中 `CloseUI`、pending Show 被 Close 折叠、服务销毁清空队列 |
-| `Failed` | 真实失败 | 资源加载失败、初始化异常、层事务阻塞且无法开始、非法参数 |
+| `Opened` | 逻辑打开成功（稳定 `Opened`） | 正常 `ShowUI` / `ShowUIResult`；同类型刷新也返回 `Opened` |
+| `Cancelled` | 被业务取消或被后续操作顶替，**不是故障** | 加载中 `CloseUI`、Opening join 被 Close 打断 |
+| `Failed` | 真实失败 | 资源加载失败、初始化异常、非法参数、打开状态机拒绝 |
 
 业务侧：
 
@@ -724,46 +751,49 @@ else { /* Failed：查日志/资源 */ }
 | `Show invalid after resource creation` | 资源创建/绑定结束后，元数据仍无效，且**不是**取消 | 资源加载成功但 View 未绑定、状态仍为 `CreatedUI`、或非法状态 | **否**。加载中被 Close 取消 → `Cancelled`，**不打此 Warning** |
 | `Show init failed` | `InternalInitlized` 返回 false，且**不是**取消 | `OnInitialize`/`OnInitializeAsync` 失败，或初始化后状态非法 | **否**。版本失效/CTS 取消 → `Cancelled`，无 Warning；真实异常在 UIBase 已有 `Error` |
 | `Show open rejected` | `InternalOpen` 未接受，且结果为 `Failed`、operation 仍当前 | 打开状态机拒绝、View 丢失、不在栈中等真实失败 | **否**。被 Close/新操作打断 → `Cancelled`，无 Warning |
-| `ShowSync invalid after resource creation` | Sync 路径资源创建后无效 | 同步资源/绑定问题 | **否**（Sync 无取消令牌，一般不是“取消”） |
+| `ShowSync invalid after resource creation` | Sync 路径资源创建后无效 | 同步资源/绑定问题 | **否** |
 | `ShowSync init failed` | Sync 初始化失败 | 同步 `OnInitialize` 失败 | **否** |
-| `Close interrupted` | `InternalClose` 后未进入 `Closed`，且 **operation 仍当前** | 关闭流程中途失败，当前关闭操作仍有效 | **否**。被新 Show/Close 顶替导致 version 变化 → **不告警** |
+| `Close interrupted` | `InternalClose` 后未进入 `Closed`，且 **operation 仍当前** | 关闭流程中途失败，当前关闭操作仍有效 | **否**。被新操作顶替导致 version 变化 → **不告警** |
 
-### Error（真实故障，运行时也保留）
+### Warning / Error（运行时）
 
 | 文案/位置 | 原因 |
 | --- | --- |
+| `ShowUISync rejected while closing` | 同类型正在关闭时调 Sync；Sync 无法 await 关闭 |
 | `UI resource load failed` / `missing holder component` | 资源路径错误或预制体缺 Holder |
 | `Failed to create UI instance` / Metadata 注册失败 | 类型/注册表问题 |
 | `Async/Sync initialize failed` / `OnOpen` / `OnClose` / transition failed | 业务生命周期或动画抛异常 |
-| `ShowUISync rejected while show is in progress` | 同实例异步 Show 进行中又调 Sync；Sync 不 join 半开 View |
 | UI 根节点 / Canvas / Camera 缺失 | 启动配置问题 |
+| `[UIRouter] ...` | 导航事务失败、回滚失败（不进入 dirty） |
 
 ### 明确**不会**再告警的路径
 
 这些属于正常并发/取消，控制台不应出现 Warning：
 
 1. `ShowUI` 加载资源过程中调用 `CloseUI` 同一类型 → 取消加载、销毁未绑定实例 → `Cancelled`。
-2. 同层 pending `Show` 被后续 `Close` 折叠 → completion 设为 `Cancelled`。
-3. Opening / Closing 动画过程中被新操作打断生命周期版本 → 回滚状态，静默失败返回。
-4. UI 服务销毁时清空未执行的队列命令 → pending Show 记为 `Cancelled`。
+2. Opening join 被 Close 打断 → `Cancelled`。
+3. 开/关转场过程中被新操作打断生命周期版本 → 静默失败返回。
 
 ### 调试提示
 
-- 若看到 `Show invalid after resource creation` 且业务刚调了 `CloseUI`：检查框架版本是否已按“取消→Cancelled”修复；正常不应再出现。
-- 若 `ShowUI` 返回 `null` 但无任何 Error：多半是 `Cancelled` 或层 busy 的 `Failed`；用 `ShowUIResult` 看 `State`。
+- 若看到 `Show invalid after resource creation` 且业务刚调了 `CloseUI`：正常应走 `Cancelled`，不应再出现该 Warning。
+- 若 `ShowUI` 返回 `null` 但无任何 Error：多半是 `Cancelled`；用 `ShowUIResult` 看 `State`。
+- `ShowUISync` 返回 `null` 且有 `rejected while closing`：改用异步 `ShowUI` 等关闭后再开。
 - Router 导航失败看 `UIRouteResult.Status`，不要只看控制台 Warning。
 
 ## 注意事项
 
 1. `WindowAttribute` 写在窗口逻辑类上；`UIResAttribute` 写在 Holder 类上。
-2. 窗口初始化重写 `OnInitialize` / `OnInitializeAsync`；`OnInitializeAsync` 默认会调用 `OnInitialize`。
-3. `ShowUISync` 会同步完成资源绑定和 `OnInitialize`，但不等待打开动画完成，也不会执行 `OnInitializeAsync` 中真正异步的逻辑；需要完整异步初始化和动画完成时使用 `ShowUI`。
-4. routed page 使用 Router 打开；关闭建议用 Router API。`CloseSelf` / `CloseUI` 命中 Router 当前页时会自动转交 Router。
-5. `IsOpen` 只表示 UIBase 状态，不代表 Router 当前页。
-6. 深回退（`BackTo` / `BackToRoot`）必须走 Router，依赖 `CloseManyAsync` 批量关闭中间页。
-7. 重复 `ShowUI` 打开已初始化后的窗口会刷新参数并触发 `OnRefresh`，包括 `Opening` 阶段。
-8. Router 发生事务失败时可能进入 dirty 状态。dirty 时导航 API 返回 `RejectedDirty`，需要业务决定是 `ResetHistory`、`SyncFromCurrentUI` 还是重建 UI 流程。导航中时，`ResetHistory` / `SyncFromCurrentUI` 会被忽略。
-9. UI 依赖 ObjectPool、Timer、Resource，启动场景需要保证组件注册顺序。
-10. 框架不再提供 `UIOcclusionMode`。同层多窗默认叠层显示；页面导航请用 Router，弹窗继续 `ShowUI` / `CloseSelf`。
-11. 同层连续 `ShowUI`/`CloseUI` 可不必 `await` 排队；框架 FIFO 保证顺序。需要结果态时用 `ShowUIResult` / `CloseUIAsync`。
-12. 日志语义：取消/打断不告警；资源、初始化、生命周期异常才 `Error`/`Warning`。详见上文「日志与警告语义」。
+2. 窗口初始化重写 `OnInitialize` / `OnInitializeAsync`；`OnInitializeAsync` 默认会调用 `OnInitialize`。缓存复用不会再次 Init。
+3. `ShowUI` / `ShowUISync` 都以**逻辑打开完成（`Opened`）**为完成点；开场动画默认后台，需要时 `AwaitViewTransition`。
+4. `ShowUISync` 不会执行 `OnInitializeAsync` 中真正异步的逻辑；需要完整异步初始化时使用 `ShowUI`。
+5. routed page 使用 Router 打开；关闭建议用 Router API。`CloseSelf` / `CloseUI` 命中 Router 当前页时会自动转交 Router。
+6. `IsOpen` 只表示 UIBase 稳定 `Opened`，不代表 Router 当前页。
+7. 深回退（`BackTo` / `BackToRoot`）必须走 Router；中间页由内部批量关闭处理。
+8. 重复 `ShowUI` 打开已 `Opened` 的窗口会刷新参数并触发 `OnRefresh`；打开中只更新 latest 参数。
+9. Router **没有**永久 dirty。导航失败返回 Status + 日志；可用 `ResetHistory` / `SyncFromCurrentUI` / `ResetTo` 重建 history。导航中时，`ResetHistory` / `SyncFromCurrentUI` 会被忽略。
+10. UI 依赖 ObjectPool、Timer、Resource，启动场景需要保证组件注册顺序。
+11. 框架不再提供 `UIOcclusionMode`。同层多窗默认叠层显示；页面导航请用 Router，弹窗继续 `ShowUI` / `CloseSelf`。
+12. 同层不同类型可并行 `Show`/`Close`；互斥只在同类型 per-meta。需要结果态时用 `ShowUIResult` / `CloseUIAsync`。
+13. 关场动画完成后再入缓存；`force` 或 `cacheTime == 0` 直接销毁。
+14. 日志语义：取消/打断不告警；资源、初始化、生命周期异常才 `Error`/`Warning`。详见上文「日志与警告语义」。
