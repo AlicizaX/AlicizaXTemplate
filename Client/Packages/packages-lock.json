@@ -27,7 +27,7 @@
       "dependencies": {
         "com.tuyoogame.yooasset": "3.0.5",
         "com.cysharp.zstring": "2.6.0",
-        "com.alicizax.unity.cysharp.unitask": "2.5.11"
+        "com.alicizax.unity.cysharp.unitask": "2.5.12"
       }
     },
     "com.alicizax.unity.input": {
