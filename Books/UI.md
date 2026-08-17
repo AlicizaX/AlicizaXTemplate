@@ -607,6 +607,62 @@ public sealed class RoleWindow : UITabWindow<ui_RoleWindow>
 
 第一次切换到某个 Tab 时会异步创建，后续切换复用已加载实例。
 
+## 开/关转场
+
+转场由 Holder 驱动，动画源只提供过程（`Play`）和终态（`Snap`）。取消、再开/再关、销毁打断都在 Holder 上完成，动画实现不要自己维护版本号或 `Stop`。
+
+```csharp
+public interface IUITransitionSource
+{
+    UniTask Play(bool open, CancellationToken cancellationToken);
+    void Snap(bool open);
+}
+```
+
+生命周期对应关系：
+
+| 路径 | Holder 行为 |
+| --- | --- |
+| 正常打开 | `Play(true)`，不等待；逻辑已是 `Opened` |
+| 正常关闭 | `await Play(false)`，完成后再 Finalize/Cache |
+| `skipTransition` / 销毁子节点 / `RemoveWidget` / Router 关下层 | `Snap(false)` |
+| 关场异常、Open 回滚 | 取消当前 Play，再 `Snap(false)` |
+| 再开 / 再关 / 销毁 | 只取消，不改画面 |
+
+被取消的 `Play` **不要**自己补终态。终态只由下一次完整 `Play` 或 `Snap` 负责。
+
+### 默认预设
+
+在 Holder 或子节点上挂 `UIPresetTransition`。Editor 会把它缓存到 Holder 的 Transition Source。没有源时开/关都是 no-op。
+
+### 代码自定义
+
+不要再继承一堆 Player 方法。在 `OnInitialize` 里替换源：
+
+```csharp
+protected override void OnInitialize()
+{
+    SetTransition(PlayMine, SnapMine);
+}
+
+private UniTask PlayMine(bool open, CancellationToken ct)
+{
+    return open ? IntroAsync(ct) : OutroAsync(ct);
+}
+
+private void SnapMine(bool open)
+{
+    canvasGroup.alpha = open ? 1f : 0f;
+    rect.anchoredPosition = open ? openPos : closedPos;
+}
+```
+
+也可以 `SetTransition(new MyAnimatorTransition())`，自己实现 `IUITransitionSource`。`SetTransition(null)` 会取消当前播放，并回到 Inspector 上的组件源。
+
+自定义源必须能 `Snap`。只写播放、不能瞬切时，强制关和回滚会把画面停在半途，下次打开第一帧会闪。
+
+不要在 `OnOpen` / `OnClose` 里另起一套动画：那会绕过 `skipTransition`、回滚和缓存前的关态钉死。
+
 ## Holder 生成
 
 Holder 是 UI 绑定工具生成的类，继承 `UIHolderObjectBase`，挂在 UI 预制体上，负责暴露序列化控件引用。
@@ -694,6 +750,8 @@ ui_UILogicTestAlert holder = UIHolderFactory.CreateUIHolderSync<ui_UILogicTestAl
 | `IUIService.GetUI<T>()` | 获取已打开 UI |
 | `IUIService.GetLayer(UILayer)` | 获取层级根节点 |
 | `UIBase.AwaitViewTransition()` | 等待当前开/关转场 |
+| `UIBase.SetTransition(...)` | 运行时替换开/关转场源（`Play` + `Snap`） |
+| `IUITransitionSource` | 转场源契约；默认实现是 `UIPresetTransition` |
 | `UIWindowBase<T>.CloseSelf(bool force)` | 关闭自身；若自身是 Router 当前页，会转交 Router |
 | `UITabWindow<T>` | Tab 容器窗口（关闭仍走 `CloseSelf`） |
 | `UIBase.CreateWidgetAsync<T>()` | 创建 Widget（逻辑打开完成；动画 opt-in） |
@@ -797,3 +855,4 @@ else { /* Failed：查日志/资源 */ }
 12. 同层不同类型可并行 `Show`/`Close`；互斥只在同类型 per-meta。需要结果态时用 `ShowUIResult` / `CloseUIAsync`。
 13. 关场动画完成后再入缓存；`force` 或 `cacheTime == 0` 直接销毁。
 14. 日志语义：取消/打断不告警；资源、初始化、生命周期异常才 `Error`/`Warning`。详见上文「日志与警告语义」。
+15. 开/关动画走 `IUITransitionSource`（`Play` + `Snap`）。代码自定义用 `SetTransition`，不要在 `OnOpen`/`OnClose` 另起动画，也不要再实现旧的 `IUITransitionPlayer`。
