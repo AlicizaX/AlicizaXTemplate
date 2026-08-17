@@ -30,7 +30,7 @@
 - `HotkeyConsumesInput`：触发后是否消费当前热键
 - `HotkeyHolder`：所属 `UIHolderObjectBase`
 - `AutoAssignHolder()`：自动向父级查找 Holder
-- `OnEnable` 注册热键，`OnDisable` / `OnDestroy` 反注册热键
+- `OnEnable` 注册热键，`OnDisable` 反注册热键
 
 热键系统只观察 InputAction，不负责 Enable/Disable。Action 必须由输入层（如 `InputActionProvider`）启用。
 
@@ -71,7 +71,7 @@ InputAction 触发
 | `Holder` | 所属 `UIHolderObjectBase`，由 `HotkeyComponentBase` 自动查找 |
 | `Input Action` | `InputActionReference`，例如 Submit、Cancel、Close |
 | `Press Type` | 热键触发阶段，默认 `Performed` |
-| `Consumes Input` | 当前热键触发后是否阻止继续向父级 scope 传播 |
+| `Consumes Input` | 当前热键触发成功后，是否停止沿同一焦点 Holder 的父级 scope 继续分发。不吞全局 Input System 事件 |
 
 ## 配置方式
 
@@ -112,43 +112,45 @@ public sealed class SwitchTabHotkey : HotkeyComponentBase
 
 ## 运行时生命周期
 
-1. `Awake` / `OnEnable` 自动查找父级 `UIHolderObjectBase`。
-2. `OnEnable` 注册热键。
-3. `OnDisable` / `OnDestroy` 解绑热键。
-4. `UXHotkeySystem` 在应用失焦 / 暂停时清理按压锁定目标（`_pressTargets`）。
-5. `HotkeyComponent` 在 EventSystem 变化或恢复焦点时重建 `BaseEventData`。
+1. `Reset` / `Awake` / `OnEnable` 查找父级 `UIHolderObjectBase`。
+2. `OnEnable` 注册热键。节点 `SetActive(false)` 或组件禁用会走 `OnDisable` 并解绑；重新启用会再注册。
+3. 热键必须从 `InputActionProvider` 解析到同一份已启用的 `InputAction`。解析失败则不注册（Development 下 warning），不会回退到 Prefab 上的 `InputActionReference.action`。
+4. `UXHotkeySystem` 在应用失焦 / 暂停时清掉当前按压锁定。
+5. `HotkeyComponent` 在 `EventSystem.current` 变化时才重建 `BaseEventData`。
 
-## CacheEventData
+## HotkeyPassThrough 与焦点
 
-`HotkeyComponent` 需要调用：
+热键焦点按 UI 栈从高到低取**第一个可见且未挂 `HotkeyPassThrough` 的 Holder**。焦点锁在这一层后，只在该 Holder 及其子 Holder 里找热键，**不会自动落到更下面的窗口**。
 
-```csharp
-_submitHandler.OnSubmit(_eventData);
+`HotkeyPassThrough` 是空的标记组件，挂在某个 `UIHolderObjectBase` 上后，这一层不当热键焦点，系统继续向下找。
+
+窗口例子：
+
+```text
+AWindow 有 Cancel 热键
+打开更高一层的 BWindow
 ```
 
-`ISubmitHandler.OnSubmit` 要求传入 `BaseEventData`，所以组件会缓存一个 `BaseEventData`，避免每次热键触发都 `new BaseEventData(...)`。
+| BWindow | 按 Cancel 的结果 |
+| --- | --- |
+| 没挂 `HotkeyPassThrough`，也没有热键 | 焦点在 B，A 的热键**不会**触发 |
+| 挂了 `HotkeyPassThrough` | 跳过 B，热键打到 A |
+| 自己有热键 | 打到 B |
 
-当 `EventSystem.current` 变化、组件初始化或应用恢复焦点时，会重新创建缓存，避免继续引用旧的 EventSystem。
-
-## HotkeyPassThrough
-
-`HotkeyPassThrough` 是空的标记组件。
-
-如果某个 `UIHolderObjectBase` 所在对象挂了 `HotkeyPassThrough`，它不会成为热键焦点 Holder。系统会跳过它，继续查找下层可用 Holder。
-
-适合用于：
+适合挂 `HotkeyPassThrough`：
 
 - Loading 遮罩
-- Toast
-- Tooltip
-- 纯展示浮层
-- 不希望拦截热键的顶层 UI
+- Toast / Tooltip
+- HUD、纯展示浮层
+- 明确不该拦截下层热键的顶层 UI
+
+不要依赖“B 没配热键就自动透传”。需要透传时必须主动挂 `HotkeyPassThrough`。
 
 ## 热键作用域和优先级
 
-热键按当前 UI Holder 作用域分发，不是所有打开窗口都会同时响应。
+热键按当前焦点 Holder 分发，不是所有打开窗口同时响应。
 
-系统会在当前可见 UI 中选择最合适的 scope：
+先锁定栈顶可用 Holder（见上节），再在该 Holder 内部选叶 scope：
 
 | 规则 | 说明 |
 | --- | --- |
@@ -196,8 +198,6 @@ _submitHandler.OnSubmit(_eventData);
 | `HotkeyComponentBase.HotkeyActionTrigger()` | 热键触发回调，业务层重写 |
 | `UXHotkeyExtension.BindHotKey(this HotkeyComponentBase)` | 手动注册热键 |
 | `UXHotkeyExtension.UnBindHotKey(this HotkeyComponentBase)` | 手动解绑热键 |
-| `UXHotkeyExtension.BindHotKeyBatch(this HotkeyComponentBase[])` | 批量注册 |
-| `UXHotkeyExtension.UnBindHotKeyBatch(this HotkeyComponentBase[])` | 批量解绑 |
 
 ## 排查清单
 
@@ -208,5 +208,5 @@ _submitHandler.OnSubmit(_eventData);
 5. 如果使用 `HotkeyComponent`，`Component` 是否实现 `ISubmitHandler`。
 6. 当前节点和 Holder 是否 active。
 7. 当前 Holder 的 Canvas 是否在 `UIComponent.UIShowLayer`。
-8. 是否有更上层非 `HotkeyPassThrough` Holder 抢占热键焦点。
+8. 是否有更上层、未挂 `HotkeyPassThrough` 的窗口抢走了焦点（该窗没有热键时也会挡住下层）。
 9. 同一个 Holder 内是否重复注册了相同 action 和 press type。

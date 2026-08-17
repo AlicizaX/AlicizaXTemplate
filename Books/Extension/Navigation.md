@@ -1,73 +1,71 @@
 # Navigation 导航模块
 
-`Navigation` 模块在 Input System 之上提供一套多输入设备的 UI 焦点管理系统。它解决的核心问题是：当玩家在鼠标、键盘、手柄之间切换时，UI 焦点应该跟随哪个窗口、选中哪个控件、以及如何防止焦点泄漏到被遮挡的窗口。
+`Navigation` 在 Input System 之上管理 UI 焦点域：哪个窗口还活着、谁能当手柄/键盘焦点、谁只挡下层、关闭进缓存后为什么不能再被方向键走进去。
 
 源码位置：
 
 - 本地包：`file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`
-- 源码目录：`Client/Packages/com.alicizax.unity.input/Runtime/Navigation`
-- 编辑器目录：`Client/Packages/com.alicizax.unity.input/Editor/Navigation`
+- 运行时：`Client/Packages/com.alicizax.unity.input/Runtime/Navigation`
+- 编辑器：`Client/Packages/com.alicizax.unity.input/Editor/Navigation`
 
-安装说明：先安装 `com.alicizax.unity.ui.extension`。如果项目需要导航、快捷键或 InputGlyph，再安装 `com.alicizax.unity.input`。Unity Package Manager 中本地包会显示为 `com.alicizax.unity.input@file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`。
+安装：先装 `com.alicizax.unity.ui.extension`。需要导航、快捷键或 InputGlyph 时再装 `com.alicizax.unity.input`。
 
-编译条件：不再需要手动添加 `UX_NAVIGATION`。`com.alicizax.unity.input` 的 asmdef 会在检测到 `com.unity.inputsystem` 后自动生成 `INPUTSYSTEM_SUPPORT`，导航文件受 `#if INPUTSYSTEM_SUPPORT` 保护。
+编译条件：`com.alicizax.unity.input` 的 asmdef 检测到 `com.unity.inputsystem` 后自动生成 `INPUTSYSTEM_SUPPORT`。导航代码受 `#if INPUTSYSTEM_SUPPORT` 保护，不需要手加 `UX_NAVIGATION`。
 
 ## 核心概念
 
 | 概念 | 类型 | 说明 |
 | --- | --- | --- |
-| 输入模式 | `UXInputMode` | 当前使用的输入设备类别：Keyboard / Gamepad / Touch |
-| 输入模式监听 | `UXNavigationModeListener` | 自动检测设备输入并维护 `CurrentMode`，设备切换时广播 `OnModeChanged` |
-| 导航管理器 | `UXNavigationManager` | 管理所有 `UXNavigationScope`，决定哪个 Scope 是当前顶层焦点域，并执行模式切换处理器 |
-| 导航域 | `UXNavigationScope` | 挂在窗口或面板根节点上，定义一个焦点域，管理域内的 `Selectable` 列表 |
-| 导航跳过标记 | `UXNavigationSkip` | 挂在节点上，让该节点子树内的所有 `UXNavigationScope` 被排除在导航系统之外 |
-| 模式切换处理器 | `IUXNavigationModeChangeProcessor` | 当输入模式或顶层 Scope 变化时执行项目自定义逻辑，例如鼠标显示、背景点击失焦策略 |
+| 导航系统 | `UXNavigationSystem` | 静态管理器。`InputActionProvider` 初始化时启动，关闭时 Shutdown。 |
+| 导航域 | `UXNavigationScope` | 挂在窗口或独立面板根上。管理烘焙/运行时 `Selectable`，并按策略改 `Navigation.Mode`。 |
+| 存活 | Alive | 节点激活、`canvas.enabled`、Holder/Canvas 处于 `UIComponent.UIShowLayer`。 |
+| 可焦点 | Focus / `Navigable` | Alive 且勾选 Focus、且有可用 Selectable 时，才能成为 Top。 |
+| 挡板 | Block / `BlockLowerScopes` | Alive 时挡住优先级更低的域。自己可以不当焦点（Loading）。 |
+| 选中音抑制 | `UXSelectionAudio` | 程序化补选时压住选中音。 |
+
+已删除：`UXNavigationSkip`、`UXNavigationManager`、`UXNavigationModeListener`。输入设备切换走 `UXInput.Watch`。
 
 ## 使用前提
 
-1. 工程已安装 `com.alicizax.unity.ui.extension`。
-2. 需要导航功能时，再安装本地包 `file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/`。
-3. 工程已安装 `com.unity.inputsystem` 并切换到 Input System 输入后端。
-4. 启动场景中存在 `EventSystem`（UGUI 标准要求）。
-5. 启动场景或常驻服务节点上存在 `UXNavigationManager`。
+1. 已安装 `com.alicizax.unity.ui.extension` 与 `com.alicizax.unity.input`。
+2. 已安装 `com.unity.inputsystem`，并切到 Input System 后端。
+3. 场景里有 `EventSystem`。
+4. 常驻节点上有 `InputActionProvider`（它会 `UXNavigationSystem.Initialize()`）。
 
-`UXNavigationModeListener` 会在 `BeforeSceneLoad` 自动创建并标记 `DontDestroyOnLoad`。`UXNavigationManager` 是导航域管理器，需要作为项目服务或常驻组件挂载；它会在初始化时收集已加载的 `UXNavigationScope`。
+不需要再挂 Navigation Manager。Scope 在 `Awake` 里自己注册。
 
 ## 快速接入
 
-### 1. 添加导航管理器
+### 1. 为窗口添加导航域
 
-在启动场景或常驻服务节点上添加：
+在窗口 Prefab 根节点（或独立焦点面板根）上挂 `UXNavigationScope`。
 
-```text
-Add Component > UI > UX Navigation Manager
-```
-
-默认 `Processor Type` 是 `DefaultUXNavigationModeChangeProcessor`，可配置键盘/手柄模式下鼠标是否显示，以及是否禁止空白区域点击导致失焦。
-
-### 2. 为窗口添加导航域
-
-在窗口 Prefab 的根节点（或需要独立焦点域的面板根节点）上挂 `UXNavigationScope`。
-
-Inspector 常用配置：
+Inspector：
 
 | 字段 | 说明 |
 | --- | --- |
-| `Default Selectable` | 进入该域时默认聚焦的控件 |
-| `Holder` | 绑定 `UIHolderObjectBase`，窗口打开/关闭时自动触发刷新 |
-| `Baked Selectables` | 编辑器烘焙的静态 `Selectable` 列表，点击 Inspector 上的刷新按钮生成 |
-| `Remember Last Selection` | 是否记住上次选中的控件，下次进入时恢复 |
-| `Block Lower Scopes` | 为 `true` 时，压制所有优先级更低的 Scope 的导航，防止焦点泄漏 |
+| `Default` | 进入该域时默认选中的控件 |
+| `Holder` | 绑定 `UIHolderObjectBase`。打开/关闭会刷新导航。点 Refresh 会自动绑。 |
+| `Selectables` | 烘焙的静态控件列表。点刷新按钮按层级收集。 |
+| `Remember` | 重新打开时优先恢复上次选中 |
+| `Focus` | 开：本域可以成为手柄/键盘焦点。关：本域不接收选中。 |
+| `Block` | 开：本域存活时挡住下层导航。关：不挡下层。 |
 
-### 3. 烘焙静态 Selectable 列表
+旧 Prefab 没有 `Focus` 字段时，反序列化会当成开启。
 
-在 Inspector 中点击 `UXNavigationScope` 组件上的 **Refresh** 按钮，系统会扫描子树内所有 `Selectable` 并写入 `_bakedSelectables`。静态窗口只需烘焙一次；如果 Prefab 结构变化，重新点击即可。
+### 2. 烘焙静态 Selectable
 
-### 4. 动态注册运行时控件
+点 Inspector 上的 Refresh。会收集本 Scope 子树里、导航模式不是 `None` 的 `Selectable`。Prefab 结构变了再点一次。
 
-虚拟列表等运行时生成的控件需要手动注册：
+局部不想进图：不要 bake、不要 `RegisterSelectable`，或把该控件 `Navigation.Mode` 设为 `None`。不要再挂 Skip 组件。
+
+### 3. 动态注册运行时控件
+
+虚拟列表等运行时生成的控件要手动注册：
 
 ```csharp
+using AlicizaX.UI.UXNavigation;
+using UnityEngine;
 using UnityEngine.UI;
 
 public sealed class VirtualListItem : MonoBehaviour
@@ -83,210 +81,128 @@ public sealed class VirtualListItem : MonoBehaviour
     public void AttachToScope(UXNavigationScope scope)
     {
         _scope = scope;
-        _scope.RegisterSelectable(_selectable);
+        _scope.RegisterSelectable(_selectable, rememberable: true);
     }
 
     private void OnDestroy()
     {
         if (_scope != null)
+        {
             _scope.UnregisterSelectable(_selectable);
+        }
     }
 }
 ```
 
-### 5. 监听输入模式变化
+`RecyclerViewNavigationController` 会把自己注册进父级 Scope，见 `RecyclerView.Navigation.md`。
+
+### 4. 强制补选策略
 
 ```csharp
-using AlicizaX.UI.UXNavigation;
-using UnityEngine;
-using UnityEngine.UI;
-
-public sealed class CursorVisibilityController : MonoBehaviour
-{
-    private void OnEnable()
-    {
-        UXNavigationModeListener.OnModeChanged += OnModeChanged;
-        Refresh(UXNavigationModeListener.CurrentMode);
-    }
-
-    private void OnDisable()
-    {
-        UXNavigationModeListener.OnModeChanged -= OnModeChanged;
-    }
-
-    private void OnModeChanged(UXInputMode mode)
-    {
-        Refresh(mode);
-    }
-
-    private void Refresh(UXInputMode mode)
-    {
-        // 手柄模式下隐藏鼠标光标，切回键鼠或触屏模式时恢复。
-        bool showCursor = mode == UXInputMode.Keyboard || mode == UXInputMode.Touch;
-        Cursor.visible = showCursor;
-        Cursor.lockState = showCursor ? CursorLockMode.None : CursorLockMode.Locked;
-    }
-}
+UXNavigationSystem.GamepadRequireSelection = true;   // 默认 true
+UXNavigationSystem.KeyboardRequireSelection = false; // 默认 false
+UXNavigationSystem.SetRequireSelection(gamepad: true, keyboard: false);
 ```
 
-### 6. 实现模式切换处理器
+只在「当前没有合法焦点」时补选。关掉策略不会清掉已有选中。切到手柄/摇杆且策略开启时才会 Ensure。
 
-当顶层 Scope 或输入模式发生变化时，`UXNavigationManager` 会回调 `IUXNavigationModeChangeProcessor`。适合在这里驱动手柄光标显示、位置更新、动画或项目自定义失焦策略。
+## Focus / Block 怎么配
 
-```csharp
-using AlicizaX.UI.UXNavigation;
-using UnityEngine;
+两个开关正交，不要再用 Skip。
 
-[System.Serializable]
-public sealed class GamepadCursorPolicy : IUXNavigationModeChangeProcessor
-{
-    public void OnNavigationModeChanged(
-        UXInputMode mode,
-        UXNavigationScope previousTopScope,
-        UXNavigationScope currentTopScope)
-    {
-        bool isGamepad = mode == UXInputMode.Gamepad;
-        Cursor.visible = !isGamepad;
-        Cursor.lockState = isGamepad ? CursorLockMode.Locked : CursorLockMode.None;
-        // 根据 currentTopScope 和 mode 更新手柄光标的目标位置。
-    }
-}
-```
+| 场景 | Focus | Block | 效果 |
+| --- | --- | --- | --- |
+| 普通窗 / 确认框 | 开 | 开 | 自己当焦点，挡住下层 |
+| Loading / 全屏挡板 | **关** | **开** | 自己不选中，下层全部 `Mode.None`，当前选中会被清掉 |
+| Toast / 飘字 | 关 | 关 | 当自己不存在，下层继续导航 |
+| 可点但不抢手柄的装饰面 | 关 | 按需 | 有按钮也不进 Top |
 
-实现后，在 `UXNavigationManager` 的 `Processor Type` 中选择该类型。处理器需要可序列化、非 `MonoBehaviour`，并提供无参构造函数。
-
-## 顶层 Scope 选择规则
-
-`UXNavigationManager` 在每次状态刷新时从所有已注册的 `UXNavigationScope` 中选出优先级最高的一个作为顶层 Scope。选择条件：
-
-1. Scope 所在节点处于激活状态。
-2. Scope 所在 Canvas 处于 `UIComponent.UIShowLayer`（UI 显示层）。
-3. Scope 未被 `UXNavigationSkip` 标记排除。
-4. Scope 内至少有一个 `IsActive() && IsInteractable()` 的 `Selectable`。
-
-满足以上条件的 Scope 之间按以下规则比较优先级（依次降级）：
-
-| 优先级 | 规则 |
-| --- | --- |
-| 1 | `Canvas.sortingOrder` 更高的 Scope 优先 |
-| 2 | 层级深度（父节点数量）更深的 Scope 优先 |
-| 3 | `ActivationSerial`（最近一次变为可用的序号）更大的 Scope 优先 |
-
-## 导航压制（Block Lower Scopes）
-
-当顶层 Scope 的 `BlockLowerScopes = true` 时，运行时会把所有优先级更低的 Scope 内的 `Selectable.navigation.mode` 临时设为 `None`，阻止手柄焦点跳入被遮挡的窗口。顶层 Scope 切换时，被压制的 Scope 会自动恢复原始导航配置。
-
-典型场景：弹窗打开时，弹窗的 Scope 成为顶层，背景窗口的所有按钮导航被压制，手柄无法越过弹窗操作背景。
+Loading 示例：
 
 ```text
-MainWindow (UXNavigationScope, BlockLowerScopes = false)
-└── ConfirmPopup (UXNavigationScope, BlockLowerScopes = true)  ← 顶层
-    ├── BtnConfirm
-    └── BtnCancel
+Loading (UXNavigationScope, Focus = 关, Block = 开)
+HUD     (UXNavigationScope, Focus = 开, Block = 开)  ← 被挡住，不能导航
 ```
 
-## 焦点恢复（Remember Last Selection）
+## 存活 / 焦点 / 压制
+
+每次刷新：
+
+1. **Alive**：`activeInHierarchy`、`canvas.enabled`、Holder（没有 Holder 则看 Canvas）layer == `UIComponent.UIShowLayer`。
+2. **Focusable**：Alive && `Navigable` && 至少有一个可用 Selectable。
+3. **Occluder**：Alive && `Block`。
+4. **Top**：Focusable 里按 `sortingOrder` → 层级深度 → `ActivationSerial` 取最高。若最高挡板自己不可焦点（Loading），Top 为空。
+5. **Suppress**：非 Alive、非 Focusable、或被更高 Occluder 挡住 → `Navigation.Mode = None`。
+
+关窗进缓存时 UI 只改 Holder layer、关掉 `canvas.enabled`，对象仍激活。因此 **非 Alive 也必须抑制**，否则 UGUI 的 `FindSelectable` 仍会走进缓存窗。
+
+优先级：
+
+| 顺序 | 规则 |
+| --- | --- |
+| 1 | `Canvas.sortingOrder` 更高优先 |
+| 2 | 层级更深优先 |
+| 3 | 最近一次变为 Alive 的序号更大优先 |
+
+## 焦点恢复
 
 ```csharp
-using AlicizaX.UI.Runtime;
-using Game.UI;
-using UnityEngine.UI;
-
 [Window(UILayer.UI)]
 public sealed class InventoryWindow : UIWindow<ui_InventoryWindow>
 {
     protected override void OnInitialize()
     {
-        // UXNavigationScope 挂在 Prefab 根节点，Inspector 中已配置：
-        //   RememberLastSelection = true
-        //   DefaultSelectable = baseui.BtnFirstItem
-        //   BlockLowerScopes = true
+        // Prefab 上 UXNavigationScope：
+        //   Remember = true
+        //   Default = 第一格
+        //   Focus = 开
+        //   Block = 开
     }
 }
 ```
 
-玩家在背包中选中第 5 格后打开装备详情弹窗，关闭弹窗后焦点会自动回到第 5 格，而不是重置到第 1 格。
+在背包选中第 5 格后打开详情，关掉详情后焦点回到第 5 格。只有烘焙控件、或 `RegisterSelectable(..., rememberable: true)` 的运行时控件会被记住。
 
-## 排除子树（UXNavigationSkip）
+## 与 UIHolder 的关系
 
-在不希望参与导航系统的节点上挂 `UXNavigationSkip`。该节点子树内的所有 `UXNavigationScope` 都会被排除，不会成为顶层 Scope，也不会被压制。
+`Holder` 绑上后订阅 `OnWindowAfterShowEvent` / `OnWindowAfterClosedEvent`，开关窗自动刷新。不侵入 UI 框架的 WindowAttribute。
 
-常见用途：
-
-- 常驻 HUD 上的辅助按钮，不希望被弹窗的 `BlockLowerScopes` 压制。
-- 调试面板，不参与正式导航流程。
-
-```text
-HUD (UXNavigationSkip)          ← 整个 HUD 子树排除在外
-└── BtnMenu (UXNavigationScope)  ← 不会被任何 Scope 压制，也不会成为顶层
-```
-
-## 与 UIHolderObjectBase 集成
-
-`UXNavigationScope` 的 `Holder` 字段绑定 `UIHolderObjectBase` 后，会自动订阅窗口的 `OnWindowAfterShowEvent` 和 `OnWindowAfterClosedEvent`，在窗口打开或关闭时触发导航状态刷新，无需业务代码手动通知。
-
-```csharp
-// Prefab Inspector 中配置：
-// UXNavigationScope._holder = GetComponent<UIHolderObjectBase>()
-// 运行时窗口打开/关闭时自动刷新，无需额外代码。
-```
+Alive 不靠 `UIState` 枚举，靠 Holder layer + `canvas.enabled`。缓存层会关 Canvas，关窗会把 Holder 改到 Hide 层，两者都会让域出局并保持抑制。
 
 ## API 速查
 
-### UXInputMode
-
-```csharp
-public enum UXInputMode : byte
-{
-    Touch    = 0,   // 触屏
-    Keyboard = 1,   // 键盘
-    Gamepad  = 2,   // 手柄
-}
-```
-
-### UXNavigationModeListener
+### UXNavigationSystem
 
 | API | 说明 |
 | --- | --- |
-| `static UXInputMode CurrentMode` | 当前输入模式（只读） |
-| `static event Action<UXInputMode> OnModeChanged` | 输入模式变化时触发 |
-| `static bool GamepadRequireLowFocus` | 手柄模式下是否强制保持一个可导航焦点 |
-| `static bool KeyBoardRequireLowFocus` | 键盘模式下是否强制保持一个可导航焦点 |
+| `GamepadRequireSelection` | 手柄/摇杆是否强制补选。默认 true |
+| `KeyboardRequireSelection` | 键鼠是否强制补选。默认 false |
+| `SetRequireSelection(bool gamepad, bool keyboard)` | 一次改两套策略 |
 
-### UXNavigationManager
-
-| API | 说明 |
-| --- | --- |
-| `static bool IsHolderWithinTopScope(UIHolderObjectBase)` | 判断某个 Holder 是否在当前顶层 Scope 内 |
+`Initialize` / `Shutdown` 由 `InputActionProvider` 调用，业务不要自己开。
 
 ### UXNavigationScope
 
 | API | 说明 |
 | --- | --- |
-| `void RegisterSelectable(Selectable)` | 运行时注册动态控件 |
-| `void UnregisterSelectable(Selectable)` | 运行时注销动态控件 |
-| `Selectable GetPreferredSelectable()` | 获取该域的首选聚焦控件 |
-| `bool BlockLowerScopes` | 是否压制低优先级 Scope 的导航 |
-| `bool RememberLastSelection` | 是否记住上次选中项 |
-| `int ActivationSerial` | 该 Scope 最近一次变为可用的序号，由运行时维护 |
+| `RegisterSelectable(Selectable, bool rememberable = false)` | 注册运行时控件 |
+| `UnregisterSelectable(Selectable)` | 注销运行时控件 |
+| `NotifySelectableStateChanged()` | interactable/active 变化后通知刷新 |
+| `Navigable` | 是否可当焦点（Inspector 名 Focus） |
+| `BlockLowerScopes` | 是否挡住下层（Inspector 名 Block） |
+| `RememberLastSelection` | 是否记住上次选中 |
+| `DefaultSelectable` | 默认选中 |
+| `NavigationSuppressed` | 当前是否被写成 `Mode.None` |
 
-### IUXNavigationModeChangeProcessor
+### UXSelectionAudio
 
-```csharp
-public interface IUXNavigationModeChangeProcessor
-{
-    void OnNavigationModeChanged(
-        UXInputMode mode,
-        UXNavigationScope previousTopScope,
-        UXNavigationScope currentTopScope);
-}
-```
+程序化 `SetSelectedGameObject` 时自动 Begin/End。业务若自己补选且不想播选中音，也可包一层。
 
 ## 注意事项
 
-1. `UXNavigationScope` 的 `_bakedSelectables` 在编辑器中烘焙，Prefab 结构变化后需要重新点击 Refresh，否则运行时可能找不到新增的控件。
-2. 运行时动态生成的控件（虚拟列表项等）必须手动调用 `RegisterSelectable` / `UnregisterSelectable`，烘焙列表不会自动感知。
-3. `BlockLowerScopes` 只压制导航，不影响鼠标点击。鼠标仍然可以点击被压制窗口的按钮，如需完全屏蔽需要配合 `CanvasGroup.blocksRaycasts`。
-4. `UXNavigationModeListener` 对摇杆输入有噪声过滤（`sqrMagnitude >= 0.04f`），轻微抖动不会触发模式切换。合成控件（`synthetic`）也会被忽略，避免虚拟输入误触发。
-5. 启动时有 30 帧的设备探测窗口（`InitialDeviceProbeFrames`），用于检测已连接的手柄。在此期间输入模式可能还未稳定，不要在 `Awake` 中依赖 `CurrentMode` 的最终值。
-6. `UXNavigationManager` 内部有重入保护，`FlushStateIfDirty` 不会递归触发。但业务代码不应在 `IUXNavigationModeChangeProcessor.OnNavigationModeChanged` 回调中直接修改 Scope 的激活状态，否则会推迟到下一帧刷新。
+1. Prefab 结构变了要重新 Refresh bake，否则新按钮不在列表里。
+2. 运行时生成的控件必须 `RegisterSelectable` / `UnregisterSelectable`。
+3. `Block` 只改导航图，不挡鼠标。要彻底点不透，配合 `CanvasGroup.blocksRaycasts` 或关 GraphicRaycaster。
+4. 输入类型来自 `UXInput.Watch`，不是旧的 `UXNavigationModeListener`。
+5. 不要在选中回调里反复改 Scope 激活状态；刷新有重入保护，但状态会推迟。
+6. 局部排除用「不进列表」，不要恢复 `UXNavigationSkip`。
