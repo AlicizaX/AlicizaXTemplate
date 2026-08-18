@@ -4,12 +4,12 @@
 
 源码位置：
 
-- `Client/Packages/com.alicizax.unity.framework/Runtime/MemoryPool`
-- Inspector：`Client/Packages/com.alicizax.unity.framework/Editor/Inspector/MemoryPoolComponentInspector.cs`
+- `Client/Packages/com.alicizax.unity.framework/Runtime/Modules/MemoryPool`
+- Inspector：`Client/Packages/com.alicizax.unity.framework/Editor/Common/Inspector/MemoryPoolComponentInspector.cs`
 
 ## 使用前提
 
-池对象必须继承 `MemoryObject`，不能只是实现 `IMemory`。
+池对象必须继承 `MemoryObject`。没有 `IMemory` 接口。
 
 ```csharp
 using AlicizaX;
@@ -38,7 +38,11 @@ public sealed class BattleDamageInfo : MemoryObject
 - 类型不能是 `abstract`。
 - 类型不能是 open generic。
 - 类型必须有 public 无参构造函数。
+- 只能在 Unity 主线程使用。
 - 使用完成后必须调用 `MemoryPool.Release` 归还。
+- `Clear()` / `OnEvict()` 里禁止再 `Acquire` / `Release`。
+
+对象真正被驱逐时（hard 溢出、Tick 缩容、`ClearAll` / tombstone），可选实现 `IPoolEvictable.OnEvict()` 做资源收取。`Release` 回池只调 `Clear()`，不调 `OnEvict()`。
 
 ## 获取和归还
 
@@ -67,11 +71,17 @@ MemoryPool<BattleDamageInfo>.Release(info);
 动态类型入口：
 
 ```csharp
-IMemory memory = MemoryPool.Acquire(typeof(BattleDamageInfo));
+MemoryObject memory = MemoryPool.Acquire(typeof(BattleDamageInfo));
 MemoryPool.Release(memory);
 ```
 
-重复使用动态类型时建议缓存 `MemoryPoolHandle`，避免反复走 Type 入口。
+重复使用动态类型时应提前缓存 `MemoryPoolHandle`，避免每次 Type 查表：
+
+```csharp
+MemoryPoolHandle handle = MemoryPool.GetHandle(typeof(BattleDamageInfo));
+MemoryObject memory = handle.Acquire();
+handle.Release(memory);
+```
 
 ## MemoryPoolComponentInspector 配置参数
 
@@ -81,20 +91,35 @@ MemoryPool.Release(memory);
 
 | 参数 | 默认值 | 作用 | 限制 |
 |---|---:|---|---|
-| `Short Decay Start` | `1800` | 池空闲多少帧后开始缩容。60 FPS 下约 30 秒。 | `>= 0` |
-| `Long Decay Start` | `7200` | 池空闲多少帧后加速降低历史峰值预测。60 FPS 下约 2 分钟。 | `>= Short Decay Start` |
+| `Short Decay Start` | `1800` | 池空闲多少帧后开始衰减目标空闲水位。60 FPS 下约 30 秒。实际每 Tick 驱逐数由 Phase 预算决定（Gameplay=2）。 | `>= 0` |
+| `Long Decay Start` | `7200` | 池空闲多少帧后加速衰减 Acquire 速率预测。60 FPS 下约 2 分钟。 | `>= Short Decay Start` |
 | `Zero Free Start` | `7200` | 池空闲多少帧后允许 `TargetFreeReserve` 最低降到 `0`。到达前仍保留 `MinKeep=4`。 | `>= Long Decay Start` |
 | `Unschedule Idle` | `18000` | 池空闲多少帧后允许停止 Tick，减少 CPU 调度成本。 | `>= Zero Free Start` |
 | `Auto Trim Native` | `18000` | 池空闲多少帧后，如果 `Using=0`、`Unused=0`、`Constructed=0`，自动释放 native metadata。`-1` 表示关闭自动 Trim。 | `-1` 或 `>= Zero Free Start` |
 
-默认三段式策略：
+默认时间轴（60 FPS / Gameplay）：
 
-- 0 到 30 秒：正常保留缓存。
-- 30 秒后：开始逐帧缩容空闲对象。
-- 2 分钟后：允许空闲对象最终降到 `0`。
-- 5 分钟后：如果池已经完全空，释放 native metadata。
+- 0 到 30 秒：目标空闲不往下掉，超过目标的多余对象仍按 Phase 预算逐帧驱逐。
+- 30 秒后：目标空闲开始衰减。
+- 2 分钟后：目标空闲允许降到 `0`。
+- 5 分钟后：停 Tick；若 `Using=0` 且对象也清完，自动释放 native metadata。
 
-注意：只要池重新发生 `Acquire`、`Release` 或仍有 `Using > 0`，`IdleFrames` 会被重置或保持活跃状态，冷池倒计时不会继续推进。
+`IdleFrames` 只在本帧有 `Acquire` / `Release` 或还有 miss 补仓时重置。**长租对象（`Using > 0`）不再锁死冷池倒计时**。租约本身不会被 Tick 杀掉，但同类型的空闲缓存会按上表缩容。
+
+`TargetFreeReserve` 由近期突发量、近 8 帧 Acquire 预估、miss×2、保底（默认 4，2 分钟后可为 0）取最大，再夹到 `[MinKeep或0, min(Soft, Hard)]`。
+
+### Phase 预算
+
+`MemoryPoolSetting.Phase` / `MemoryPoolRegistry.Phase` 控制每 Tick 最多创建 / 驱逐多少个：
+
+| Phase | Growth | Evict |
+|---|---:|---:|
+| Boot / Loading | 32 | 4 |
+| Gameplay | 2 | 2 |
+| Background | 8 | 16 |
+| LowMemory | 0 | 32 |
+
+`Acquire` 仍不会失败：缓存不够时当场 `new T()`。LowMemory 只是不预创建、加快驱逐。
 
 ### Capacity
 
@@ -136,7 +161,7 @@ MemoryPool.Release(memory);
 | `Created` | 累计创建对象次数。 | 持续增长说明池容量不足、对象峰值上升，或释放太慢导致频繁 miss。 |
 | `Target` | 当前目标空闲保留数量，即 `TargetFreeReserve`。 | 活跃期会升高，冷却后会下降。到 `Zero Free Start` 后允许降到 0。 |
 | `MaxCap` | 当前硬空闲缓存上限。 | 归还时超过该值会直接驱逐。 |
-| `Idle` | 当前空闲帧数。 | 判断是否进入冷池阶段。发生获取/归还/仍有借出时不会持续增长。 |
+| `Idle` | 当前空闲帧数。 | 判断是否进入冷池阶段。本帧有获取/归还/补仓时重置；仅 `Using > 0` 不会阻止增长。 |
 | `PageCap` | 当前活跃 page 的 slot 容量。 | `Unused=0 && Using=0 && PageCap=0` 表示对象和 native metadata 都已经清干净，只剩注册表 handle。 |
 
 ## 如何判断是否泄露
@@ -200,7 +225,7 @@ Acquire - Release ~= Using
 
 ## 调试按钮
 
-- `Clear Cached`：清理所有池的空闲缓存。仍在使用的对象不会被强行归零，会进入 tombstone 路径，等归还时再驱逐。
+- `Clear Cached`：清理所有池的空闲缓存。仍在使用的对象进入 tombstone，归还时驱逐并在最后一个租约归还后释放 native metadata。无租约时 `ClearAll` 会直接释放页表。
 - `Trim Native`：在没有借出对象的池上释放 native metadata。`Using > 0` 的池不会被强行释放。
 - `Reset Stats`：重置统计计数，例如 `Acquire`、`Release`、`Created`，方便重新压测一段业务。
 
@@ -235,4 +260,4 @@ MemoryPool.CompactAll();
 MemoryPool.TrimAllNativeMetadata();
 ```
 
-通常业务代码不需要在退出场景时手动清理全部池，框架生命周期会统一处理。手动清理主要用于调试、压测和低内存场景。
+通常业务代码不需要在退出场景时手动清理全部池。`RootModule` 关闭时调 `ClearAllNativeMetadata()`；`MemoryPoolSetting.OnDestroy` 只 `TrimAllNativeMetadata()`（有租约的池跳过，不会强杀已借出对象）。Editor domain reload 会强制释放 native 页表。手动清理主要用于调试、压测和低内存场景。
