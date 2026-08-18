@@ -72,6 +72,12 @@
       "dependencies": {},
       "url": "https://package.openupm.com"
     },
+    "com.farlocus.locus": {
+      "version": "file:com.farlocus.locus",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.kyrylokuzyk.primetween": {
       "version": "1.4.0",
       "depth": 0,

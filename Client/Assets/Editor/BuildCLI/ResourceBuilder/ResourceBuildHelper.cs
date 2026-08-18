@@ -60,7 +60,6 @@ public static class ResourceBuildHelper
                 ReplaceAssetPathWithAddress = buildParameter.ReplaceAssetPathWithAddress,
                 StripUnityVersion = buildParameter.StripUnityVersion,
                 DisableWriteTypeTree = buildParameter.DisableWriteTypeTree,
-                IgnoreTypeTreeChanges = buildParameter.IgnoreTypeTreeChanges,
                 TrackSpriteAtlasDependencies = buildParameter.TrackSpriteAtlasDependencies,
             };
 

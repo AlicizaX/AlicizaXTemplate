@@ -237,6 +237,7 @@ GameObject:
   - component: {fileID: 525796464807397116}
   - component: {fileID: 7966806373771437446}
   - component: {fileID: 5799881162768079374}
+  - component: {fileID: 5657505364094636721}
   m_Layer: 5
   m_Name: Btn@Role
   m_TagString: Untagged
@@ -359,8 +360,6 @@ MonoBehaviour:
       m_PressedSprite: {fileID: 0}
       m_SelectedSprite: {fileID: 0}
       m_DisabledSprite: {fileID: 0}
-  hoverAudioClip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
-  clickAudioClip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -384,6 +383,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &5657505364094636721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030808088580836086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392e6571a8ff0954792443c9449295c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _entries: []
 --- !u!1 &1075736645421591308
 GameObject:
   m_ObjectHideFlags: 0
@@ -1115,8 +1127,6 @@ MonoBehaviour:
       m_PressedSprite: {fileID: 0}
       m_SelectedSprite: {fileID: 0}
       m_DisabledSprite: {fileID: 0}
-  hoverAudioClip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
-  clickAudioClip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -1135,7 +1145,6 @@ MonoBehaviour:
   _holder: {fileID: 3268640359497331672}
   _hotkeyAction: {fileID: 2578644123212045086, guid: 5a8ec89654ebcd642af04da22f4406f8, type: 3}
   _hotkeyPressType: 1
-  _hotkeyActionOwnershipMode: 1
   _hotkeyConsumesInput: 1
   _component: {fileID: 5077209145104049990}
 --- !u!1 &3396890644259487134
@@ -1226,6 +1235,7 @@ GameObject:
   - component: {fileID: 4510033261505802681}
   - component: {fileID: 7848496680210931646}
   - component: {fileID: 5772767103062446805}
+  - component: {fileID: 7527937817460082874}
   m_Layer: 5
   m_Name: Btn@TestTips
   m_TagString: Untagged
@@ -1348,8 +1358,6 @@ MonoBehaviour:
       m_PressedSprite: {fileID: 0}
       m_SelectedSprite: {fileID: 0}
       m_DisabledSprite: {fileID: 0}
-  hoverAudioClip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
-  clickAudioClip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -1373,6 +1381,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &7527937817460082874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3419483815216083668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392e6571a8ff0954792443c9449295c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _entries: []
 --- !u!1 &3925157719956066574
 GameObject:
   m_ObjectHideFlags: 0
@@ -1386,6 +1407,7 @@ GameObject:
   - component: {fileID: 8915756084016459939}
   - component: {fileID: 5339333089336403222}
   - component: {fileID: 1771769920605742950}
+  - component: {fileID: 7596797356195034736}
   m_Layer: 5
   m_Name: Btn@Shop
   m_TagString: Untagged
@@ -1508,8 +1530,6 @@ MonoBehaviour:
       m_PressedSprite: {fileID: 0}
       m_SelectedSprite: {fileID: 0}
       m_DisabledSprite: {fileID: 0}
-  hoverAudioClip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
-  clickAudioClip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -1533,6 +1553,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &7596797356195034736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3925157719956066574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392e6571a8ff0954792443c9449295c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _entries: []
 --- !u!1 &4088570292278183941
 GameObject:
   m_ObjectHideFlags: 0
@@ -1690,6 +1723,7 @@ GameObject:
   - component: {fileID: 6700414270192899098}
   - component: {fileID: 8599430375733818942}
   - component: {fileID: 2614726377646931371}
+  - component: {fileID: 8205437588985168568}
   m_Layer: 5
   m_Name: Btn@Bag
   m_TagString: Untagged
@@ -1812,8 +1846,6 @@ MonoBehaviour:
       m_PressedSprite: {fileID: 0}
       m_SelectedSprite: {fileID: 0}
       m_DisabledSprite: {fileID: 0}
-  hoverAudioClip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
-  clickAudioClip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -1837,6 +1869,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &8205437588985168568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4585706831238106064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392e6571a8ff0954792443c9449295c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _entries: []
 --- !u!1 &4596221726219254468
 GameObject:
   m_ObjectHideFlags: 0

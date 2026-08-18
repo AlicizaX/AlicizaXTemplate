@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 2743220822528631473}
   - component: {fileID: 384188759147332599}
   - component: {fileID: -2757217256295162926}
+  - component: {fileID: 4191179546961670748}
   m_Layer: 5
   m_Name: UIShopGoodsItemWidget
   m_TagString: Untagged
@@ -356,11 +357,23 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 2743220822528631473}
   m_ChildTransitions: []
-  hoverAudioClip: {fileID: 0}
-  clickAudioClip: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4191179546961670748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3587052072691864339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 392e6571a8ff0954792443c9449295c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 1
+  _entries: []
 --- !u!1 &4294269013868450167
 GameObject:
   m_ObjectHideFlags: 0

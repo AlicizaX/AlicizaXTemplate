@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bc158ee140177a488502af54ffe40b5, type: 3}
+  m_Name: UXUiAudioProfile
+  m_EditorClassIdentifier: 
+  _rules:
+  - Cue: 0
+    Devices: 2
+    IgnoreProgrammatic: 0
+    Clip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
+  - Cue: 2
+    Devices: 12
+    IgnoreProgrammatic: 1
+    Clip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
+  - Cue: 4
+    Devices: 15
+    IgnoreProgrammatic: 0
+    Clip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}
+  - Cue: 5
+    Devices: 15
+    IgnoreProgrammatic: 0
+    Clip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}
+  - Cue: 6
+    Devices: 15
+    IgnoreProgrammatic: 0
+    Clip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}
