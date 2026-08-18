@@ -16,7 +16,7 @@ GameObjectPool 只池化 Unity `GameObject` 实例。资源系统管 Prefab 引�
 - `ResourceComponent`
 - `GameObjectPoolComponent`
 
-`GameObjectPoolComponent` 在 `Awake` 注册 `IGameObjectPoolService`。Prefab 加载走 `IResourceService.LoadAsset<GameObject>`，**不会**走 `LoadGameObject`（那个 API 会绑 `ResourceOwner`，和池生命周期冲突）。
+`GameObjectPoolComponent` 在 `Awake` 注册 `IGameObjectPoolService`。Prefab 源资产走内部 `IPrefabLoader`：`LoadLease<GameObject>` 持有租约，`UnloadPrefab` 成对 `Dispose`。**不会**走 `LoadGameObject`（那个 API 会实例化并绑 `ResourceOwner`，和池生命周期冲突）。
 
 ```csharp
 using AlicizaX;
@@ -32,7 +32,7 @@ GameApp.GameObjectPool.LoadCatalog("GameObjectPoolConfig");
 GameApp.GameObjectPool.LoadCatalog(configAsset);
 ```
 
-`LoadCatalog(string)` 的参数是 YooAsset location，不是磁盘路径。加载完会立刻 `UnloadAsset` 配置资源，规则已编译进内存。
+`LoadCatalog(string)` 的参数是 YooAsset location，不是磁盘路径。内部用 `LoadLease<PoolConfigScriptableObject>` 读配置，`BuildCatalog` 完立刻 `Dispose`，规则已编译进内存。
 
 ## 公开接口
 
@@ -126,7 +126,7 @@ GameApp.GameObjectPool.Despawn(fx);
 | `softCapacity` | 空闲修剪目标上限 |
 | `hardCapacity` | 总实例硬顶（含在场）。到达后 Spawn 返回 `null` |
 | `idleSeconds` | 仅 Burst：最老空闲超过该秒才剪 |
-| `unloadPrefab` | 池被剪空后是否 `UnloadAsset` Prefab |
+| `unloadPrefab` | 池被剪空后是否 `Dispose` Prefab 源租约 |
 | `priority` | 配置窗拖拽顺序自动维护，越靠上越先匹配 |
 
 路径 Normalize：
@@ -150,7 +150,7 @@ Effects/**                               -> 递归匹配 Effects 下所有 locat
 | **Burst** | 可涨到 hard。`total > soft` 时立刻剪空闲；未超 soft 时最老空闲超过 `idleSeconds` 再剪。适合特效 / 弹体 |
 | **Sticky** | 只涨不自动剪，等 `Flush` 或 `Application.lowMemory`。适合关卡常驻 |
 
-`Flush` / 低内存：所有策略（含 Sticky）按 `minIdle` 剪空闲；剪空后若 `unloadPrefab` 为真则 `UnloadAsset` Prefab。普通 Tick 不会动 Sticky。每次维护有剪裁预算（约 `soft/4`，封顶 16；低内存 16），不一定一帧剪完。
+`Flush` / 低内存：所有策略（含 Sticky）按 `minIdle` 剪空闲；剪空后若 `unloadPrefab` 为真则释放 Prefab 源租约（进入资源模块 Idle TTL，不是立刻从内存抠掉）。普通 Tick 不会动 Sticky。每次维护有剪裁预算（约 `soft/4`，封顶 16；低内存 16），不一定一帧剪完。
 
 ## 请求
 
@@ -257,7 +257,7 @@ GameApp.GameObjectPool.FlushGroup("FX");
 GameApp.GameObjectPool.FlushAll();
 ```
 
-`Flush` 按低内存计划剪到 `minIdle`，空池且允许时卸 Prefab。Sticky 也吃 Flush。
+`Flush` 按低内存计划剪到 `minIdle`，空池且允许时释放 Prefab 源租约。Sticky 也吃 Flush。
 
 ## 编辑器
 

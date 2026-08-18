@@ -2,16 +2,18 @@
 
 Resources 模块是框架对 YooAsset 的资源服务封装，负责资源包初始化、资源查询、同步/异步加载、Prefab 实例化、资源租约、组件绑定、下载器创建、缓存清理和资源回收。
 
+底层 YooAsset 句柄只活在资源记录（AssetSlot）里。业务不要直接拿 `AssetHandle`。同一地址的同步/异步加载会合流到同一条记录。
+
 源码位置：
 
-- `Client/Packages/com.alicizax.unity.framework/Runtime/Resource`
+- `Client/Packages/com.alicizax.unity.framework/Runtime/Modules/Resource/Resource`
 
 运行时主要入口：
 
 - `ResourceComponent`：Unity 场景组件，负责注册 `IResourceService`、初始化 YooAsset、驱动自动回收。
-- `IResourceService`：资源服务接口，业务代码通过 `AppServices.Require<IResourceService>()` 获取。
+- `IResourceService`：资源服务接口，业务代码通过 `AppServices.Require<IResourceService>()` 或 `GameApp.Resource` 获取。
 - `IResourceBindingService`：资源绑定服务，管理 `Image`、`SpriteRenderer`、`Renderer` 等组件上的资源引用。
-- `ResourceOwner`：绑定生命周期组件，目标对象销毁时自动释放绑定资源。
+- `ResourceOwner`：绑定生命周期组件，目标对象销毁时自动释放绑定资源。运行时字段不序列化。
 
 ## 使用前提
 
@@ -27,7 +29,10 @@ using AlicizaX;
 using AlicizaX.Resource.Runtime;
 
 IResourceService resources = AppServices.Require<IResourceService>();
+// 或 GameApp.Resource
 ```
+
+编辑器 Play Mode 注意：`Assets/Scenes/Main.unity` 里 `Procedure`、`Localization`、`UI`、`Audio`、`GameObjectPool` 默认可能是关闭的。不启用 `Procedure` 时包不会走启动流程初始化；不启用 `Localization` 时 Hotfix 读表会失败。
 
 ## ResourceComponent Inspector 参数
 
@@ -35,9 +40,9 @@ IResourceService resources = AppServices.Require<IResourceService>();
 
 | 字段 | 默认值 | 作用 |
 | --- | --- | --- |
-| `Min Unload Unused Assets Interval` | `60` | 最小自动回收间隔，单位秒。预留回收请求只有超过该间隔后才会执行。当前代码中主要配合内部预回收标记使用。 |
-| `Max Unload Unused Assets Interval` | `300` | 最大自动回收间隔，单位秒。超过该时间后会自动调用 `IResourceService.UnloadUnusedAssets()`。 |
-| `Use System Unload Unused Assets` | `true` | 强制回收并请求 GC 时，是否额外调用 Unity 的 `Resources.UnloadUnusedAssets()`。普通自动回收只执行 YooAsset/资源服务回收。 |
+| `Min Unload Unused Assets Interval` | `60` | 最小自动回收间隔，单位秒。预留回收请求只有超过该间隔后才会执行。 |
+| `Max Unload Unused Assets Interval` | `300` | 最大自动回收间隔，单位秒。超过该时间后会自动调用 `UnloadUnusedAssets()`。 |
+| `Use System Unload Unused Assets` | `true` | 强制回收并请求 GC 时，是否额外调用 Unity 的 `Resources.UnloadUnusedAssets()`。普通自动回收只执行资源服务回收。 |
 | `Min GC Collect Interval` | `30` | `GC.Collect()` 的最小触发间隔，单位秒。即使多次请求 GC，也会受该间隔保护。 |
 | `Decryption Services` | 空 | YooAsset 解密服务类型名。非空时通过 `AlicizaX.Utility.Assembly.GetType()` 查找类型并创建 `IDecryptionServices` 实例。 |
 | `Auto Unload Bundle When Unused` | `false` | 传给 YooAsset 初始化参数的 `AutoUnloadBundleWhenUnused`。开启后，资源包引用计数归零时 YooAsset 可自动卸载 Bundle。 |
@@ -47,13 +52,37 @@ IResourceService resources = AppServices.Require<IResourceService>();
 | `Downloading Max Num` | `10` | 创建资源下载器时的最大并发下载数量。 |
 | `Failed Try Again` | `3` | 创建资源下载器时单个下载失败后的最大重试次数。 |
 | `Asset Record Capacity` | `64` | 资源记录预热容量。用于资源记录表、加载 Key 索引等内部结构，降低运行中扩容。 |
-| `Asset Lease Capacity` | `128` | 资源租约槽预热容量。直接租约和绑定租约都会消耗该容量。 |
+| `Asset Lease Capacity` | `128` | 资源租约槽预热容量。直接租约和绑定租约会消耗该容量。 |
 | `Binding Owner Capacity` | `64` | 绑定 Owner 预热容量。一个 `ResourceOwner` 对应一个 Owner 记录。 |
-| `Binding Slot Capacity` | `128` | 绑定槽预热容量。每个被绑定的组件属性占用一个绑定槽，例如 `Image.sprite` 或 `Renderer.sharedMaterial`。 |
+| `Binding Slot Capacity` | `128` | 绑定槽预热容量。每个被绑定的组件属性占用一个绑定槽。 |
 | `Registered Target Capacity` | `128` | 已注册目标组件预热容量，用于快速根据组件定位所属 Owner。 |
-| `Idle Asset Expire Time` | `60` | 无引用资源进入 Idle 状态后的过期时间，单位秒。过期后才会释放底层 YooAsset 句柄。 |
+| `Idle Asset Expire Time` | `60` | 无引用资源进入 Idle 后的过期秒数。这是释放底层句柄的权威 TTL。 |
+| `Expire Process Count Per Frame` | `16` | 每帧处理 Idle / KeepAlive 过期桶的上限。 |
+| `Expire Process Count When Unloading` | `256` | 触发 `UnloadUnusedAssets` 当帧允许处理的过期数量。 |
 
-低内存回调 `Application.lowMemory` 会触发 `ResourceService.OnLowMemory()`，最终请求强制释放未使用资源并执行 GC。
+低内存回调 `Application.lowMemory` 会触发 `ResourceService.OnLowMemory()`，最终请求强制释放未使用资源并执行 GC。Audio 不再单独挂 `Application.lowMemory`。
+
+## 所有权模型
+
+YooAsset / Unity 都不知道业务还在不在用这份资源。句柄必须有明确 Owner，不能靠 `Resources.UnloadUnusedAssets()` 去猜。
+
+| 场景 | 推荐 API | 谁释放 |
+| --- | --- | --- |
+| 临时读表、配置、音频 Clip | `LoadLease<T>` / `LoadLeaseAsync<T>` | `Dispose()`。引用归零后进入 Idle，等 `IdleAssetExpireTime` 再卸句柄 |
+| 绑到 Image / Renderer | Binding 扩展方法 | 物体销毁或换绑时由 `ResourceOwner` 自动放 |
+| 实例化到场景的 Prefab | `LoadGameObject` / `LoadGameObjectAsync` | `Destroy(instance)`，实例上的 `ResourceOwner` 自动解除源 Prefab 绑定 |
+| 对象池 Prefab 源 | `IGameObjectPoolService`（内部已用 `LoadLease`） | 池空且策略允许，或 Shutdown 时放租约 |
+
+不要把对象池的源 Prefab 改成 `LoadGameObject`。那条路会实例化并挂 `ResourceOwner`，和池生命周期冲突。
+
+资源记录状态：
+
+- `Active`：存在直接租约、旧式直接引用或绑定引用。
+- `KeepAlive`：内部过渡态。绑定上的 `KeepAliveOnRelease` 已并入 Idle TTL，Release 不再进独立 KeepAlive 队列。
+- `Idle`：没有引用，等待 `IdleAssetExpireTime` 到期后释放底层句柄。
+- `Released`：记录已释放。
+
+`UnloadUnusedAssets()` 只回收引用为零且已过期的记录。`UnloadUnusedAssets(true)` 忽略 Idle TTL，立即卸无引用记录。`ForceUnloadAllAssets()` 清空全部记录，并复用 BindingService 的 Owner 重注册路径。
 
 ## 初始化资源包
 
@@ -83,10 +112,17 @@ public sealed class ResourceInitExample : MonoBehaviour
 
 不同运行模式的初始化参数：
 
-- `EditorSimulateMode`：使用 `EditorSimulateModeHelper.SimulateBuild(packageName)` 和编辑器文件系统。
+- `EditorSimulateMode`：编辑器模拟构建 + 编辑器文件系统。收集路径以 `AssetBundleCollectorSetting` 为准（当前工程是 `Assets/Bundles/...`）。
 - `OfflinePlayMode`：使用内置文件系统，可配置解密服务。
-- `HostPlayMode`：同时使用内置文件系统和远端缓存文件系统。
-- `WebPlayMode`：使用 WebServer 文件系统；WebGL 微信小游戏宏下会创建微信缓存文件系统。
+- `HostPlayMode`：同时使用内置文件系统和远端缓存文件系统。必须传入非空 `hostServerURL`。
+- `WebPlayMode`：使用 WebServer 文件系统；WebGL 微信小游戏宏下会创建微信缓存文件系统。必须传入非空 `hostServerURL`。
+
+YooAsset 3 注意：
+
+- `InitPackageAsync` 成功不等于 ActiveManifest 已就绪。`GetPackageVersion()` 在无 Manifest 时会抛 `Active package manifest not found.`。服务内部会在 `PackageValid` 为假时跳过版本刷新，并在 `LoadPackageManifestAsync` 成功后再写版本。
+- 同一包的并发 `InitPackageAsync` 会合流到同一个 `TaskCompletionSource<bool>`，可以多次等待。不要自己对内部 UniTask 做 `Preserve()` + `WhenAll`。
+
+启动流程通常是：`InitPackageAsync` → `RequestPackageVersionAsync` → `LoadPackageManifestAsync` → 创建下载器。
 
 ## 查询资源
 
@@ -101,8 +137,8 @@ public sealed class ResourceCheckExample : MonoBehaviour
     {
         IResourceService resources = AppServices.Require<IResourceService>();
 
-        string location = "Assets/Bundles/UI/Login.prefab";
-        if (!resources.CheckLocationValid(location))
+        string location = "UIHomeWindow";
+        if (!resources.IsLocationValid(location))
         {
             Debug.LogError($"Invalid location: {location}");
             return;
@@ -114,7 +150,7 @@ public sealed class ResourceCheckExample : MonoBehaviour
 }
 ```
 
-`HasAssetResult` 取值：
+`HasAsset` 内部只查一次 `GetAssetInfo`。`HasAssetResult` 取值：
 
 - `NotExist`：资源不存在。
 - `AssetOnline`：资源存在，但需要从远端更新下载。
@@ -124,16 +160,20 @@ public sealed class ResourceCheckExample : MonoBehaviour
 - `BinaryOnFileSystem`：二进制资源存在并位于文件系统。
 - `Valid`：资源定位地址无效。
 
-## 加载普通资源
+## 加载普通资源（推荐租约）
 
-同步加载适合启动阶段或确认已经在本地的小资源：
+新代码一律用 `LoadLease` / `LoadLeaseAsync`。租约是一次明确所有权；`Dispose()` 只交还所有权，不会立刻从内存抠掉资源。引用归零后走 Idle TTL。
+
+同步：
 
 ```csharp
-Texture2D icon = resources.LoadAsset<Texture2D>("Assets/Bundles/Icons/icon_start.png");
-resources.UnloadAsset(icon);
+using (ResourceAssetLease<Texture2D> lease = resources.LoadLease<Texture2D>("icon_start"))
+{
+    Texture2D icon = lease.Asset;
+}
 ```
 
-异步加载建议传入 `CancellationToken`，对象销毁或界面关闭时取消：
+异步建议传入 `CancellationToken`，对象销毁或界面关闭时取消：
 
 ```csharp
 using System.Threading;
@@ -145,14 +185,14 @@ using UnityEngine;
 public sealed class LoadSpriteExample : MonoBehaviour
 {
     private CancellationTokenSource _cts;
-    private Sprite _avatar;
+    private ResourceAssetLease<Sprite> _avatar;
 
     private async UniTaskVoid OnEnable()
     {
         _cts = new CancellationTokenSource();
         IResourceService resources = AppServices.Require<IResourceService>();
-        _avatar = await resources.LoadAssetAsync<Sprite>(
-            "Assets/Bundles/UI/avatar_default.png",
+        _avatar = await resources.LoadLeaseAsync<Sprite>(
+            "avatar_default",
             _cts.Token);
     }
 
@@ -161,85 +201,16 @@ public sealed class LoadSpriteExample : MonoBehaviour
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = null;
-
-        if (_avatar != null && AppServices.TryGet<IResourceService>(out var resources))
-        {
-            resources.UnloadAsset(_avatar);
-            _avatar = null;
-        }
+        _avatar.Dispose();
     }
 }
 ```
 
-也可以使用回调式异步加载：
-
-```csharp
-var callbacks = new LoadAssetCallbacks(
-    loadAssetSuccessCallback: (assetName, asset, duration, userData) =>
-    {
-        Debug.Log($"Load success: {assetName}, duration={duration:F3}");
-    },
-    loadAssetFailureCallback: (assetName, status, errorMessage, userData) =>
-    {
-        Debug.LogError($"Load failure: {assetName}, status={status}, error={errorMessage}");
-    },
-    loadAssetUpdateCallback: (assetName, progress, userData) =>
-    {
-        Debug.Log($"Loading {assetName}: {progress:P0}");
-    });
-
-resources.LoadAssetAsync(
-    location: "Assets/Bundles/UI/Login.prefab",
-    priority: 0,
-    loadAssetCallbacks: callbacks,
-    userData: this).Forget();
-```
-
-## 加载并实例化 Prefab
-
-`LoadGameObject()` 和 `LoadGameObjectAsync()` 会加载 Prefab 并实例化到场景中。实例对象会自动挂载或复用 `ResourceOwner`，用于绑定 Prefab 源资源租约。销毁实例时，`ResourceOwner.OnDestroy()` 会释放绑定。
-
-```csharp
-GameObject window = await resources.LoadGameObjectAsync(
-    "Assets/Bundles/UI/Login.prefab",
-    parent);
-
-Destroy(window);
-```
-
-同步版本：
-
-```csharp
-GameObject window = resources.LoadGameObject("Assets/Bundles/UI/Login.prefab", parent);
-```
-
-## 使用 AssetHandle
-
-如果需要直接控制 YooAsset 句柄生命周期，可以使用 Handle API。使用这些 API 时，调用方负责 `Dispose()`。
-
-```csharp
-using YooAsset;
-
-AssetHandle handle = resources.LoadAssetAsyncHandle<AudioClip>("Assets/Bundles/Audios/click.wav");
-handle.Completed += completed =>
-{
-    AudioClip clip = completed.AssetObject as AudioClip;
-};
-
-// 不再使用时释放
-if (handle is { IsValid: true })
-{
-    handle.Dispose();
-}
-```
-
-## 使用资源租约
-
-当前模块新增了显式租约模型。`ResourceLeaseHandle` 表示一次资源引用，释放租约会减少引用计数。相比旧的 `UnloadAsset(object)`，租约不会因为多个资源记录指向同一个 Unity 对象而产生歧义。
+也可以只拿句柄：
 
 ```csharp
 ResourceLeaseHandle handle = await resources.AcquireDirectAsync(
-    ResourceKey.Asset<Sprite>("Assets/Bundles/UI/avatar_default.png"),
+    ResourceKey.Asset<Sprite>("avatar_default"),
     cancellationToken);
 
 if (handle.IsValid && resources.TryGetLeaseAsset(handle, out UnityEngine.Object asset))
@@ -250,12 +221,38 @@ if (handle.IsValid && resources.TryGetLeaseAsset(handle, out UnityEngine.Object 
 resources.Release(handle);
 ```
 
-相关状态：
+同一地址正在异步加载时，同步 `LoadLease` 会加入同一个 Provider，最终只保留一条记录。合流后必须从记录读资源，不要再碰可能已被 Dispose 的临时句柄。
 
-- `Active`：存在直接引用、旧式直接引用或绑定引用。
-- `KeepAlive`：绑定释放后短暂保活，当前固定 5 秒，用于避免组件频繁切换资源时反复加载。
-- `Idle`：没有引用，等待 `IdleAssetExpireTime` 到期后释放句柄。
-- `Released`：资源记录已释放。
+## 旧式 LoadAsset（已 Obsolete）
+
+`LoadAsset` / `LoadAssetAsync` / `UnloadAsset` 仍保留，因为业务和启动代码还在用，但已标 Obsolete。它们按 Unity 对象指针配对释放，多条记录共享同一 instanceId 时可能卸错。新代码不要再写：
+
+```csharp
+Texture2D icon = resources.LoadAsset<Texture2D>("icon_start");
+resources.UnloadAsset(icon);
+```
+
+回调式 `LoadAssetAsync(..., LoadAssetCallbacks)` 同样 Obsolete，请改成 `LoadLeaseAsync`。
+
+## 加载并实例化 Prefab
+
+`LoadGameObject()` 和 `LoadGameObjectAsync()` 会加载 Prefab 并实例化到场景中。实例对象会自动挂载或复用 `ResourceOwner`，用于绑定 Prefab 源资源租约。销毁实例时，`ResourceOwner.OnDestroy()` 会释放绑定。
+
+```csharp
+GameObject window = await resources.LoadGameObjectAsync(
+    "UIHomeWindow",
+    parent);
+
+Destroy(window);
+```
+
+同步版本：
+
+```csharp
+GameObject window = resources.LoadGameObject("UIHomeWindow", parent);
+```
+
+对象池不要走这两条 API。`GameObjectPool` 内部用 `LoadLease<GameObject>` 持有源 Prefab，按池策略 `Dispose`。
 
 ## 组件资源绑定
 
@@ -266,16 +263,16 @@ resources.Release(handle);
 ```csharp
 using UnityEngine.UI;
 
-image.SetSprite("Assets/Bundles/UI/icon_start.png", setNativeSize: true);
-image.SetSubSprite("Assets/Bundles/UI/CommonAtlas.spriteatlas", "btn_start");
-image.SetMaterial("Assets/Bundles/Materials/ui_mask.mat", isAsync: true);
+image.SetSprite("icon_start", setNativeSize: true);
+image.SetSubSprite("CommonAtlas", "btn_start");
+image.SetMaterial("ui_mask", isAsync: true);
 
-spriteRenderer.SetSprite("Assets/Bundles/Sprites/player.png");
-spriteRenderer.SetSubSprite("Assets/Bundles/Sprites/atlas.spriteatlas", "idle_0");
-spriteRenderer.SetMaterial("Assets/Bundles/Materials/shared.mat");
+spriteRenderer.SetSprite("player");
+spriteRenderer.SetSubSprite("atlas", "idle_0");
+spriteRenderer.SetMaterial("shared");
 
-meshRenderer.SetMaterial("Assets/Bundles/Materials/role.mat", needInstance: true, isAsync: true);
-meshRenderer.SetSharedMaterial("Assets/Bundles/Materials/shared.mat");
+meshRenderer.SetMaterial("role", needInstance: true, isAsync: true);
+meshRenderer.SetSharedMaterial("shared");
 ```
 
 绑定槽类型：
@@ -291,7 +288,7 @@ meshRenderer.SetSharedMaterial("Assets/Bundles/Materials/shared.mat");
 可选项：
 
 - `SetNativeSize`：绑定成功后对 `Image` 调用 `SetNativeSize()`。
-- `KeepAliveOnRelease`：枚举已定义，当前绑定实现主要依赖统一的绑定释放后 5 秒 KeepAlive 机制。
+- `KeepAliveOnRelease`：释放后进入 Idle，TTL 使用 `IdleAssetExpireTime`，避免组件频繁换图时反复加载。
 
 ## 多资源包
 
@@ -303,8 +300,8 @@ await resources.InitPackageAsync(
     hostServerURL: "https://cdn.example.com/DLC",
     fallbackHostServerURL: "https://fallback-cdn.example.com/DLC");
 
-Texture2D dlcIcon = await resources.LoadAssetAsync<Texture2D>(
-    "Assets/DLC/Icons/icon_dlc.png",
+using ResourceAssetLease<Texture2D> lease = await resources.LoadLeaseAsync<Texture2D>(
+    "icon_dlc",
     packageName: "DlcPackage");
 ```
 
@@ -337,15 +334,18 @@ if (downloader.TotalDownloadCount > 0)
 
 ```csharp
 RequestPackageVersionOperation versionOperation = resources.RequestPackageVersionAsync();
-await versionOperation;
+await versionOperation.ToUniTask();
 
-if (versionOperation.Status == EOperationStatus.Succeed)
+if (versionOperation.Status == EOperationStatus.Succeeded)
 {
-    UpdatePackageManifestOperation manifestOperation =
-        resources.UpdatePackageManifestAsync(versionOperation.PackageVersion);
-    await manifestOperation;
+    resources.PackageVersion = versionOperation.PackageVersion;
+    LoadPackageManifestOperation manifestOperation =
+        resources.LoadPackageManifestAsync(versionOperation.PackageVersion);
+    await manifestOperation.ToUniTask();
 }
 ```
+
+编辑器模拟模式下清单版本通常是 `"Simulate"`，不要用远端版本号去加载模拟清单。
 
 获取当前包版本：
 
@@ -353,40 +353,39 @@ if (versionOperation.Status == EOperationStatus.Succeed)
 string version = resources.GetPackageVersion();
 ```
 
+仅在 `PackageValid`（ActiveManifest 已就绪）后调用。初始化刚成功时请用 `RequestPackageVersionAsync` / `PackageVersion`，不要立刻 `GetPackageVersion()`。
+
 ## 缓存清理
 
 ```csharp
-// 清理未使用的 Bundle 缓存文件。
-ClearCacheFilesOperation clearUnused =
-    resources.ClearCacheFilesAsync(EFileClearMode.ClearUnusedBundleFiles);
-await clearUnused;
+using YooAsset;
 
-// 清理指定资源包的所有 Bundle 缓存文件。
+ClearCacheOperation clearUnused =
+    resources.ClearCacheAsync(new ClearCacheOptions(ClearCacheMethods.ClearUnusedBundleFiles));
+await clearUnused.ToUniTask();
+
 resources.ClearAllBundleFiles("DlcPackage");
 ```
 
-`ClearAllBundleFiles()` 当前内部调用 `ClearCacheFilesAsync(EFileClearMode.ClearAllBundleFiles)`，不会等待操作完成；需要等待结果时使用 `ClearCacheFilesAsync()`。
+`ClearAllBundleFiles()` 内部调用 `ClearCacheAsync(ClearCacheMethods.ClearAllBundleFiles)`，不会等待操作完成；需要等待结果时使用 `ClearCacheAsync()`。
 
 ## 资源回收
 
 ```csharp
-// 卸载通过 LoadAsset / LoadAssetAsync 获取的旧式直接引用。
-resources.UnloadAsset(sprite);
+lease.Dispose();
 
-// 释放引用计数为 0 的资源记录，并触发 YooAsset 包回收。
 resources.UnloadUnusedAssets();
+resources.UnloadUnusedAssets(force: true);
 
-// 请求 ResourceComponent 在 Update 中强制释放未使用资源，可选择是否 GC。
 resources.ForceUnloadUnusedAssets(performGCCollect: true);
 
-// 强制卸载所有资源包资源。WebGL 不支持。
 resources.ForceUnloadAllAssets();
 ```
 
 自动回收流程：
 
-1. `ResourceComponent.Update()` 每帧调用 `ResourceService.ProcessKeepAlive(Time.unscaledTime)`，处理绑定释放后的 KeepAlive 和 Idle 过期队列。
-2. 达到 `Max Unload Unused Assets Interval` 后，调用 `UnloadUnusedAssets()`。
+1. `ResourceComponent.Update()` 每帧调用 `ProcessKeepAlive`，按 `Expire Process Count Per Frame` 处理过期桶。
+2. 达到 `Max Unload Unused Assets Interval` 后，调用 `UnloadUnusedAssets()`，当帧可用 `Expire Process Count When Unloading`。
 3. 低内存或显式 `ForceUnloadUnusedAssets(true)` 会请求强制回收、Unity 系统卸载和 GC。
 4. GC 受 `Min GC Collect Interval` 限制，避免短时间重复触发。
 
@@ -413,50 +412,50 @@ int totalBindingCount = resources.BindingService.GetBindingInfos(bindings, 0, bi
 void Initialize();
 UniTask<bool> InitPackageAsync(string packageName = "", string hostServerURL = "", string fallbackHostServerURL = "");
 
-bool CheckLocationValid(string location, string packageName = "");
+bool IsLocationValid(string location, string packageName = "");
 HasAssetResult HasAsset(string location, string packageName = "");
 AssetInfo GetAssetInfo(string location, string packageName = "");
 AssetInfo[] GetAssetInfos(string resTag, string packageName = "");
 AssetInfo[] GetAssetInfos(string[] tags, string packageName = "");
 
-T LoadAsset<T>(string location, string packageName = "") where T : UnityEngine.Object;
-UniTask<T> LoadAssetAsync<T>(string location, CancellationToken cancellationToken = default, string packageName = "") where T : UnityEngine.Object;
-UniTask LoadAsset<T>(string location, Action<T> callback, string packageName = "") where T : UnityEngine.Object;
-UniTask LoadAssetAsync(string location, int priority, LoadAssetCallbacks callbacks, object userData, string packageName = "");
-UniTask LoadAssetAsync(string location, Type assetType, int priority, LoadAssetCallbacks callbacks, object userData, string packageName = "");
-
-GameObject LoadGameObject(string location, Transform parent = null, string packageName = "");
-UniTask<GameObject> LoadGameObjectAsync(string location, Transform parent = null, CancellationToken cancellationToken = default, string packageName = "");
-
-AssetHandle LoadAssetSyncHandle<T>(string location, string packageName = "") where T : UnityEngine.Object;
-AssetHandle LoadAssetAsyncHandle<T>(string location, string packageName = "") where T : UnityEngine.Object;
-
+ResourceAssetLease<T> LoadLease<T>(string location, string packageName = "") where T : UnityEngine.Object;
+UniTask<ResourceAssetLease<T>> LoadLeaseAsync<T>(string location, CancellationToken cancellationToken = default, string packageName = "") where T : UnityEngine.Object;
 ResourceLeaseHandle AcquireDirect(ResourceKey key);
 UniTask<ResourceLeaseHandle> AcquireDirectAsync(ResourceKey key, CancellationToken cancellationToken = default);
 bool TryAcquireDirect(ResourceKey key, out ResourceLeaseHandle handle);
 void Release(ResourceLeaseHandle handle);
 bool TryGetLeaseAsset(ResourceLeaseHandle handle, out UnityEngine.Object asset);
 
-void UnloadAsset(object asset);
+GameObject LoadGameObject(string location, Transform parent = null, string packageName = "");
+UniTask<GameObject> LoadGameObjectAsync(string location, Transform parent = null, CancellationToken cancellationToken = default, string packageName = "");
+
+[Obsolete] T LoadAsset<T>(string location, string packageName = "") where T : UnityEngine.Object;
+[Obsolete] UniTask<T> LoadAssetAsync<T>(string location, CancellationToken cancellationToken = default, string packageName = "") where T : UnityEngine.Object;
+[Obsolete] void UnloadAsset(object asset);
+
 void UnloadUnusedAssets();
+void UnloadUnusedAssets(bool force);
 void ForceUnloadUnusedAssets(bool performGCCollect);
 void ForceUnloadAllAssets();
 
 ResourceDownloaderOperation CreateResourceDownloader(string customPackageName = "");
 RequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks = false, int timeout = 60, string customPackageName = "");
-UpdatePackageManifestOperation UpdatePackageManifestAsync(string packageVersion, int timeout = 60, string customPackageName = "");
+LoadPackageManifestOperation LoadPackageManifestAsync(string packageVersion, int timeout = 60, string customPackageName = "");
 string GetPackageVersion(string customPackageName = "");
 
-ClearCacheFilesOperation ClearCacheFilesAsync(EFileClearMode clearMode = EFileClearMode.ClearUnusedBundleFiles, string customPackageName = "");
+ClearCacheOperation ClearCacheAsync(ClearCacheOptions options, string customPackageName = "");
 void ClearAllBundleFiles(string customPackageName = "");
 ```
 
+公开 API 不再提供 `LoadAssetSyncHandle` / `LoadAssetAsyncHandle`。Yoo 类型仍出现在 `IResourceService` 上，因为启动和热更流程要直接操作下载器、版本和清单。
+
 ## 注意事项
 
-- `LoadAsset<T>()` 和 `LoadAssetAsync<T>()` 属于旧式直接引用，用完后需要调用 `UnloadAsset(asset)`。新代码优先使用 `ResourceLeaseHandle`，引用关系更明确。
+- 新代码优先 `LoadLease` / Binding / `LoadGameObject`。`LoadAsset` + `UnloadAsset` 只为兼容旧业务保留。
 - `LoadGameObject()` / `LoadGameObjectAsync()` 实例化出的对象通过 `Destroy(instance)` 释放，实例上的 `ResourceOwner` 会自动解除 Prefab 源绑定。
 - 组件图片、材质等资源优先使用绑定扩展方法，避免手动维护引用和释放。
-- 直接使用 `AssetHandle` 时，调用方必须负责 `Dispose()`。
 - 异步加载建议传入 `CancellationToken`，对象销毁或界面关闭时取消加载。
 - 多包资源必须显式传入 `packageName` / `customPackageName`，否则默认使用 `ResourceComponent.PackageName`。
 - `Decryption Services` 必须填写可被框架程序集工具查找到的完整类型名，并且该类型需要实现 YooAsset 的 `IDecryptionServices`。
+- `InitPackageAsync` 成功后仍要 `LoadPackageManifestAsync`，再读 `GetPackageVersion()`。
+- 对象池、音频缓存已经改为内部持有租约，业务继续走各自模块 API 即可。

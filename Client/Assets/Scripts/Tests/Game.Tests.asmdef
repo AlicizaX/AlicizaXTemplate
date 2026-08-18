@@ -1,0 +1,24 @@
+{
+    "name": "Game.Tests",
+    "rootNamespace": "Game.Tests",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UniTask.Runtime",
+        "UniTask.YooAsset",
+        "YooAsset",
+        "AlicizaX.Framework.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
