@@ -2,8 +2,7 @@
 
 `UXButton` 继承 `UXSelectable`，用法接近 Unity `Button`，仍然通过 `onClick` 注册点击事件。额外支持：
 
-- 指针悬停和点击音效。
-- 非鼠标选择时播放悬停音效。
+- 向 UI 音效模块上报 Pointer / Focus / Press，本身不持有 clip。
 - 子节点随按钮状态同步颜色或图片。
 - Input System 导航选中通知。
 
@@ -71,37 +70,19 @@ public sealed class DeleteConfirmWindow : UIWindow<ui_DeleteConfirmWindow>
 }
 ```
 
-## 音效适配器
+## 音效
 
-如果要接入项目自己的 UI 音效播放，在启动时注入音频适配器：
+`UXButton` 不再序列化 hover / click clip，也不再注入 `IUXAudioHelper`。
 
-```csharp
-using AlicizaX;
-using AlicizaX.Audio.Runtime;
-using UnityEngine;
+- 指针进入 / 离开、非指针选中 / 取消选中由 `UXSelectable` 上报。
+- 左键点击、`OnSubmit`、`PlayClickFeedback` 上报 `Press`。
 
-public sealed class UXAudioAdapter : IUXAudioHelper
-{
-    public void PlayAudio(AudioClip clip)
-    {
-        GameApp.Audio.Play(AudioType.UISound, clip);
-    }
-
-    public void PlayAudio(string clipName)
-    {
-        GameApp.Audio.Play(AudioType.UISound, clipName);
-    }
-}
-
-UXComponentExtensionsHelper.SetAudioHelper(new UXAudioAdapter());
-```
+主题 clip 配在 `UXUiAudioProfile`，启动场景用 `UXUiAudioBinder` 注入。单个按钮要换音、只要点击音或完全静音，挂 `UXUiAudioOverride`。详见 [UXUiAudio](UXUiAudio.md)。
 
 ## Inspector 配置
 
 | 配置 | 说明 |
 | --- | --- |
-| `Hover Audio Clip` | 指针进入按钮、键盘或手柄导航选中按钮时播放 |
-| `Click Audio Clip` | 左键点击或提交按钮时播放 |
 | `Transition` | 沿用 `Selectable` 的状态过渡，通常用 `ColorTint` 或 `SpriteSwap` |
 | `Navigation` | 沿用 UGUI 导航配置，可与 `UXNavigationScope` 配合 |
 | `Child Transitions` | 继承自 `UXSelectable`，让图标、文本等子节点跟随状态变化 |
@@ -112,7 +93,7 @@ UXComponentExtensionsHelper.SetAudioHelper(new UXAudioAdapter());
 2. `OnSubmit` 会触发 `onClick`，所以键盘、手柄和 `HotkeyComponent` 都可以复用同一套按钮逻辑。
 3. `onClick` 的类型仍然是 `Button.ButtonClickedEvent`，旧代码里 `baseui.BtnConfirm.onClick.AddListener(...)` 的写法可以保留。
 4. 按钮禁用或节点未激活时，`Press()` 会直接返回，不会触发业务回调。
-5. 音效播放依赖 `UXComponentExtensionsHelper.AudioHelper`，没有注入音频适配器时不会播放，也不会报错。
+5. 音效走全局 Profile。没挂 `UXUiAudioBinder` 或不想出声时静默跳过，不报错。
 
 ## UXSelectable 子节点状态
 
@@ -165,10 +146,10 @@ protected override void OnInitialize()
 | `UXButton.onClick` | 按钮点击事件，类型为 `Button.ButtonClickedEvent` |
 | `UXSelectable.navigation` | 配置方向导航 |
 | `UXSelectable.interactable` | 启用/禁用按钮 |
-| `UXComponentExtensionsHelper.SetAudioHelper(...)` | 注入 UI 音效播放适配器 |
+| `PlayClickFeedback()` | 上报 `Press` 并做按下视觉反馈 |
 
 ## 注意事项
 
 1. `UXButton` 不继承 Unity `Button`，但保留了 `Button.ButtonClickedEvent` 类型的 `onClick`，业务调用方式基本一致。
 2. `UXSelectable` 的子节点状态使用当前控件的 `transition` 类型决定是颜色还是图片切换，同一控件内不要混用两种过渡类型。
-3. 音效播放依赖注入的 `IUXAudioHelper`，未注入时静默跳过，不报错。
+3. 不要在按钮上再挂 clip 字段。主题进 Profile，特例进 `UXUiAudioOverride`。

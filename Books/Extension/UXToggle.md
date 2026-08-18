@@ -54,7 +54,7 @@ group.SetAllTogglesOff(sendCallback: false);
 | `Graphic` | 选中标记，例如勾选图、页签底线、高亮框 |
 | `Toggle Transition` | `None` 立即切换，`Fade` 使用透明度淡入淡出 |
 | `Group` | 所属 `UXGroup`，有分组时自动互斥 |
-| `Hover Audio Clip` / `Click Audio Clip` | 与 `UXButton` 一样使用注入的音频适配器 |
+| 音效 | 不持有 clip。点击 / Submit 上报 `ToggleOn` / `ToggleOff`，悬停和焦点由 `UXSelectable` 上报。见 [UXUiAudio](UXUiAudio.md) |
 
 `UXToggle` 选中后会把自身视觉状态强制当作 `Selected`，所以 `UXSelectable` 的子节点状态也能用于"选中页签文字变色、图标变亮"这类效果。`SetIsOnWithoutNotify` 适合初始化或同步服务端状态，避免触发业务回调。
 

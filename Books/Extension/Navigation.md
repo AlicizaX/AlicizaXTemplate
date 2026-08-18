@@ -21,9 +21,9 @@
 | 存活 | Alive | 节点激活、`canvas.enabled`、Holder/Canvas 处于 `UIComponent.UIShowLayer`。 |
 | 可焦点 | Focus / `Navigable` | Alive 且勾选 Focus、且有可用 Selectable 时，才能成为 Top。 |
 | 挡板 | Block / `BlockLowerScopes` | Alive 时挡住优先级更低的域。自己可以不当焦点（Loading）。 |
-| 选中音抑制 | `UXSelectionAudio` | 程序化补选时压住选中音。 |
+| 焦点原因 | `UXFocusChange` | 程序化补选时标记 `Cause.Programmatic`。音频模块据此丢掉 Focus 音。 |
 
-已删除：`UXNavigationSkip`、`UXNavigationManager`、`UXNavigationModeListener`。输入设备切换走 `UXInput.Watch`。
+已删除：`UXNavigationSkip`、`UXNavigationManager`、`UXNavigationModeListener`、`UXSelectionAudio`。输入设备切换走 `UXInput.Watch`。UI 音效见 [UXUiAudio](UXUiAudio.md)。
 
 ## 使用前提
 
@@ -194,9 +194,18 @@ Alive 不靠 `UIState` 枚举，靠 Holder layer + `canvas.enabled`。缓存层�
 | `DefaultSelectable` | 默认选中 |
 | `NavigationSuppressed` | 当前是否被写成 `Mode.None` |
 
-### UXSelectionAudio
+### UXFocusChange
 
-程序化 `SetSelectedGameObject` 时自动 Begin/End。业务若自己补选且不想播选中音，也可包一层。
+导航补选、开窗默认选中、手柄强制选中都走 `UXNavigationSystem.SetSelected`，内部会：
+
+```csharp
+using (new UXFocusChange.Scope(UXFocusChange.Cause.Programmatic))
+    eventSystem.SetSelectedGameObject(selected);
+```
+
+玩家拨杆 / Tab 走 `InputSystemUIInputModule`，不会打这个戳，`UXFocusChange.Current` 保持 `User`。
+
+业务若自己 `SetSelectedGameObject` 且不想播 Focus 音，同样包一层。导航包不播音，也不再提供 `UXSelectionAudio`。
 
 ## 注意事项
 

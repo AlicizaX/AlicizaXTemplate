@@ -1,6 +1,6 @@
 # UXComponent 扩展组件
 
-`UXComponent` 提供一组基于 UGUI 的增强控件。它们主要解决按钮音效、子节点状态切换、Toggle 分组、渐变图片、状态绑定和本地化文本等问题。快捷键、导航和 InputGlyph 已拆到独立输入扩展包中。
+`UXComponent` 提供一组基于 UGUI 的增强控件。它们主要解决子节点状态切换、Toggle 分组、渐变图片、状态绑定、本地化文本和 UI 语义音效等问题。快捷键、导航和 InputGlyph 已拆到独立输入扩展包中。
 
 源码位置：
 
@@ -17,29 +17,18 @@
 
 | 文档 | 内容 |
 | --- | --- |
-| [UXButton](UXButton.md) | `UXButton`、`UXSelectable` 子节点状态、音效适配器 |
+| [UXButton](UXButton.md) | `UXButton`、`UXSelectable` 子节点状态 |
 | [UXToggle](UXToggle.md) | `UXToggle`、`UXGroup` 分组、页签切换 |
+| [UXUiAudio](UXUiAudio.md) | UI Cue、`UXUiAudioProfile`、Binder、单控件 Override |
 | [UXImage](UXImage.md) | 渐变绘制、镜像模式、进度条 |
 | [UXTextMeshPro](UXTextMeshPro.md) | 本地化 key 绑定、本地化适配器注入 |
 | [UXController](UXController.md) | `UXController` 多状态管理、`UXBinding` 属性绑定 |
 | [UXDraggable](UXDraggable.md) | 拖拽事件转发、可拖拽弹窗 |
 | [HotkeyComponent](HotkeyComponent.md) | 可选 input 包：Input System 快捷键绑定、优先级规则 |
 
-## 适配器注入
+## UI 音效绑定
 
-部分控件依赖项目注入适配器才能工作：
-
-| 适配器 | 注入方法 | 影响控件 |
-| --- | --- | --- |
-| `IUXAudioHelper` | `UXComponentExtensionsHelper.SetAudioHelper(...)` | `UXButton`、`UXToggle` 音效 |
-| `IUXLocalizationHelper` | `UXComponentExtensionsHelper.SetLocalizationHelper(...)` | `UXTextMeshPro` 本地化 |
-
-建议在项目启动流程中统一注入，例如在 `RootModule` 初始化完成后：
-
-```csharp
-UXComponentExtensionsHelper.SetAudioHelper(new UXAudioAdapter());
-UXComponentExtensionsHelper.SetLocalizationHelper(new UXLocalizationAdapter());
-```
+`UXButton` / `UXToggle` 不再持有 clip，也不再注入 `IUXAudioHelper`。启动场景的 `Entry/UI` 上挂 `UXUiAudioBinder`，指定 `UXUiAudioProfile`。详见 [UXUiAudio](UXUiAudio.md)。
 
 ## 编译条件
 
