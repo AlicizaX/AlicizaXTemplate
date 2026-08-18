@@ -62,14 +62,14 @@ void LoadCatalog(string poolConfigPath);
 
 | API | 会加载 Prefab | 会 Instantiate | 硬顶 / 未登记 |
 | --- | --- | --- | --- |
-| `TrySpawn` / `Spawn` | 否 | 仅 idle，或 Prefab 已在内存 | `null` / `false` |
+| `TrySpawn` / `Spawn` | 否 | 仅当 Prefab 已在内存且无 idle | `null` / `false` |
 | `SpawnAsync` | 会 | idle 或新建 | `null` |
 | `LoadPrefab*` | 会 | 否 | `null` |
 | `WarmupAsync` | 会 | 填 idle，分帧 | 停在 hard |
 
-同步 API **禁止**内部转异步。Prefab 没在内存时 `Spawn` 直接返回 `null`，不要指望它偷偷 `LoadAsync`。
+同步 `Spawn` **不会** `LoadPrefab`，也不会转异步。Prefab 没在内存时直接 `null`；已加载且有 idle 则弹尾复用，没有 idle 则 `Instantiate` 直到 hard。要先钉住 Prefab 再同步出对象，调 `LoadPrefab` / `LoadPrefabAsync` / `WarmupAsync` / `SpawnAsync`。
 
-硬顶不会排队。没有空闲实例且 `total == hard` 时，同步和异步都立刻 `null`。
+`LoadCatalog`（string 或资源引用）会重编目录并 **清掉当前所有运行时池**。硬顶不会排队。没有空闲实例且 `total == hard` 时，同步和异步都立刻 `null`。
 
 ## 创建 PoolConfig
 
@@ -91,30 +91,26 @@ GameObjectPoolConfig
 
 不要把 Windows 路径或 `Assets/...` 当 `LoadCatalog` 参数，除非 Collector 地址规则明确支持。
 
-模板工程已带一份可运行示例：
-
-```text
-Client/Assets/Bundles/Configs/sciptableObject/GameObjectPoolConfig.asset
-```
+模板里 `Assets/Bundles/Configs/sciptableObject/` 目录已存在，但 **没有内置 `GameObjectPoolConfig.asset`**，`Assets/Bundles/Entity` / `Effects` 也是空的。要自己建配置和 Prefab，再 `LoadCatalog`。
 
 Yoo 初始化后：
 
 ```csharp
 GameApp.GameObjectPool.LoadCatalog("GameObjectPoolConfig");
-var cube = await GameApp.GameObjectPool.SpawnAsync("Cube", transform);
-GameApp.GameObjectPool.Despawn(cube);
+var fx = await GameApp.GameObjectPool.SpawnAsync("Explosion", transform);
+GameApp.GameObjectPool.Despawn(fx);
 ```
 
-示例规则（可按项目改数字，不要当最终容量）：
+规则示例（数字仅供参考，不是工程里的现成配置）：
 
 | 规则 | pattern | group | policy | min-soft-hard | 用途 |
 | --- | --- | --- | --- | --- | --- |
-| Example/Cube (Burst) | `Cube` | Entity | Burst | 0-8-16 | 当前唯一实体 Prefab，精确匹配 |
-| Example/Effects (Burst glob) | `Effects/**` | FX | Burst | 0-16-64 | 以后放进 Effects 的特效 |
-| Example/HUD (Fixed) | `HUD*` | HUD | Fixed | 2-8-16 | 文件名以 HUD 开头的控件 |
-| Example/Entity (Sticky) | `Entity/**` | Entity | Sticky | 0-4-8 | 路径型实体地址；文件名地址请写精确规则 |
+| Explosion (Burst) | `Explosion` | FX | Burst | 0-8-16 | 文件名地址的精确匹配 |
+| Effects (Burst glob) | `Effects/**` | FX | Burst | 0-16-64 | 路径型地址下的特效 |
+| HUD (Fixed) | `HUD*` | HUD | Fixed | 2-8-16 | 文件名以 HUD 开头的控件 |
+| Entity (Sticky) | `Entity/**` | Entity | Sticky | 0-4-8 | 路径型实体；文件名地址请写精确规则 |
 
-当前 Collector 是 `AddressByFileName`，所以 `Cube.prefab` 的请求必须是 `Cube`，不会命中 `Entity/**`。
+当前 Collector 是 `AddressByFileName`，`Explosion.prefab` 的请求必须是 `Explosion`，不会命中 `Effects/**` 或 `Entity/**`。
 
 ## 规则字段
 
@@ -150,11 +146,11 @@ Effects/**                               -> 递归匹配 Effects 下所有 locat
 
 | Policy | 行为 |
 | --- | --- |
-| **Fixed** | 总实例卡在 `[minIdle, hard]`；超过 soft 立刻剪。适合 HUD |
-| **Burst** | 可涨到 hard；最老空闲超过 `idleSeconds` 再剪回。适合特效 / 弹体 |
+| **Fixed** | 可涨到 hard。一有空闲且 `total > retain` 就立刻剪空闲；`retain = clamp(minIdle, 0, soft)`。在场对象不剪。适合 HUD |
+| **Burst** | 可涨到 hard。`total > soft` 时立刻剪空闲；未超 soft 时最老空闲超过 `idleSeconds` 再剪。适合特效 / 弹体 |
 | **Sticky** | 只涨不自动剪，等 `Flush` 或 `Application.lowMemory`。适合关卡常驻 |
 
-低内存：所有池按 `minIdle` 剪；`unloadPrefab` 为真则卸空池 Prefab。
+`Flush` / 低内存：所有策略（含 Sticky）按 `minIdle` 剪空闲；剪空后若 `unloadPrefab` 为真则 `UnloadAsset` Prefab。普通 Tick 不会动 Sticky。每次维护有剪裁预算（约 `soft/4`，封顶 16；低内存 16），不一定一帧剪完。
 
 ## 请求
 
@@ -267,10 +263,10 @@ GameApp.GameObjectPool.FlushAll();
 
 配置窗：左列表一行 `group / pattern  Policy  min-soft-hard`。右栏编辑当前规则；`idleSeconds` 仅 Burst 显示。保存前看重复 `assetPath` 警告。
 
-Play 模式选中 `Entry/GameObjectPool`：
+Play 模式选中 `Assets/Scenes/Main.unity` 里的 `Entry/GameObjectPool`：
 
-- Summary：pools / prefab / active / idle / pending maintain
-- 每池一行：`[FX] Explosion  A12/I20/T32 | Hit 98/100`
+- Runtime Summary：Ready / Pools / Loaded Prefabs / Instances / Active / Inactive / Pending Maintenance
+- 每池一行：`[FX] Explosion` + `A12/I20/T32 | Hit 98/120`（Hit / Spawn）
 - 展开才列出实例，可点到 Hierarchy
 - `Flush This` / `Flush Group`
 
