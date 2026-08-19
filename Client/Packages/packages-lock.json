@@ -27,7 +27,7 @@
       "dependencies": {
         "com.tuyoogame.yooasset": "3.0.5",
         "com.cysharp.zstring": "2.6.0",
-        "com.alicizax.unity.cysharp.unitask": "2.5.12"
+        "com.alicizax.unity.cysharp.unitask": "2.5.13"
       }
     },
     "com.alicizax.unity.input": {
@@ -54,16 +54,6 @@
       "source": "git",
       "dependencies": {},
       "hash": "4feac30cb2e105992986c737f7f54992b8300e1a"
-    },
-    "com.coffee.ui-particle": {
-      "version": "https://github.com/mob-sakai/ParticleEffectForUGUI.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0",
-        "com.unity.modules.particlesystem": "1.0.0"
-      },
-      "hash": "92fb173507ece2c135c38733deeca82a6d49cacd"
     },
     "com.cysharp.zstring": {
       "version": "2.6.0",
@@ -103,15 +93,6 @@
       "source": "builtin",
       "dependencies": {}
     },
-    "com.unity.burst": {
-      "version": "1.8.7",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.mathematics": "1.2.1"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.ext.nunit": {
       "version": "1.0.6",
       "depth": 1,
@@ -146,24 +127,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.mathematics": {
-      "version": "1.2.6",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.render-pipelines.core": {
-      "version": "14.0.8",
-      "depth": 1,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0",
-        "com.unity.modules.physics": "1.0.0",
-        "com.unity.modules.terrain": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0"
-      }
-    },
     "com.unity.render-pipelines.universal": {
       "version": "17.0.3",
       "depth": 0,
@@ -181,22 +144,6 @@
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
-    },
-    "com.unity.searcher": {
-      "version": "4.9.2",
-      "depth": 2,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.shadergraph": {
-      "version": "14.0.8",
-      "depth": 1,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.render-pipelines.core": "14.0.8",
-        "com.unity.searcher": "4.9.2"
-      }
     },
     "com.unity.test-framework": {
       "version": "1.1.33",

@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "com.code-philosophy.hybridclr": "https://gitee.com/focus-creative-games/hybridclr_unity.git",
-    "com.coffee.ui-particle": "https://github.com/mob-sakai/ParticleEffectForUGUI.git",
     "com.kyrylokuzyk.primetween": "1.4.0",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.ide.rider": "3.0.38",
