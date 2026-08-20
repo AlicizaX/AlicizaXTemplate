@@ -135,7 +135,7 @@ protected override void OnInitialize()
 }
 ```
 
-子节点过渡类型跟随根节点 `UXSelectable.transition`，不能在同一控件内混用"根节点颜色过渡、子节点图片过渡"。需要混用时，建议拆成两个控件或用 `UXController + UXBinding` 控制额外状态。
+子节点过渡类型跟随根节点 `UXSelectable.transition`，不能在同一控件内混用"根节点颜色过渡、子节点图片过渡"。需要混用时，建议拆成两个控件。
 
 导航行为增强：当 `Navigation.Mode` 是 `Explicit` 时，如果显式配置的目标不可交互，`FindSelectableOnLeft/Right/Up/Down` 会返回 `null`，避免焦点跳到禁用按钮上。
 

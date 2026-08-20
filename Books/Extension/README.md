@@ -13,13 +13,12 @@
 
 | 文档 | 内容 |
 | --- | --- |
-| [UXComponent](UXComponent.md) | `UXButton`、`UXToggle`、`UXImage`、`UXTextMeshPro`、`UXController`、`UXDraggable` 索引 |
+| [UXComponent](UXComponent.md) | `UXButton`、`UXToggle`、`UXImage`、`UXTextMeshPro`、`UXDraggable` 索引 |
 | [UXButton](UXButton.md) | `UXButton`、`UXSelectable` 子节点状态 |
 | [UXToggle](UXToggle.md) | `UXToggle`、`UXGroup` 分组、页签切换 |
 | [UXUiAudio](UXUiAudio.md) | UI 语义音效、`UXUiAudioProfile`、Binder、单控件 Override |
 | [UXImage](UXImage.md) | 渐变绘制、镜像模式、进度条 |
 | [UXTextMeshPro](UXTextMeshPro.md) | 本地化 key 绑定、本地化适配器注入 |
-| [UXController](UXController.md) | `UXController` 多状态管理、`UXBinding` 属性绑定 |
 | [UXDraggable](UXDraggable.md) | 拖拽事件转发、可拖拽弹窗 |
 | [HotkeyComponent](HotkeyComponent.md) | 可选 input 包：Input System 快捷键绑定、优先级规则 |
 | [RecyclerView](RecyclerView.md) | 虚拟列表、`ViewHolder`、`ItemRender`、普通列表、循环列表、混合模板列表和分组列表 |
@@ -52,7 +51,7 @@ file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/
 
 | 类型 | 命名空间 |
 | --- | --- |
-| `UXButton`、`UXToggle`、`UXImage`、`UXTextMeshPro`、`UXController` | `UnityEngine.UI` |
+| `UXButton`、`UXToggle`、`UXImage`、`UXTextMeshPro` | `UnityEngine.UI` |
 | `RecyclerView`、`ViewHolder`、`UGList`、`ItemRender` | `AlicizaX.UI` |
 | `UXInput`、`InputActionProvider`、`InputGlyphImage`、`InputGlyphText`、`InputVisualizer` | 全局命名空间，位于 `com.alicizax.unity.input` |
 | `HotkeyComponent`、`HotkeyComponentBase` | `UnityEngine.UI`，位于 `com.alicizax.unity.input` |

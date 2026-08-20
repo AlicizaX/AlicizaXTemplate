@@ -1,6 +1,6 @@
 # UXComponent 扩展组件
 
-`UXComponent` 提供一组基于 UGUI 的增强控件。它们主要解决子节点状态切换、Toggle 分组、渐变图片、状态绑定、本地化文本和 UI 语义音效等问题。快捷键、导航和 InputGlyph 已拆到独立输入扩展包中。
+`UXComponent` 提供一组基于 UGUI 的增强控件。它们主要解决子节点状态切换、Toggle 分组、渐变图片、本地化文本和 UI 语义音效等问题。快捷键、导航和 InputGlyph 已拆到独立输入扩展包中。
 
 源码位置：
 
@@ -22,7 +22,6 @@
 | [UXUiAudio](UXUiAudio.md) | UI Cue、`UXUiAudioProfile`、Binder、单控件 Override |
 | [UXImage](UXImage.md) | 渐变绘制、镜像模式、进度条 |
 | [UXTextMeshPro](UXTextMeshPro.md) | 本地化 key 绑定、本地化适配器注入 |
-| [UXController](UXController.md) | `UXController` 多状态管理、`UXBinding` 属性绑定 |
 | [UXDraggable](UXDraggable.md) | 拖拽事件转发、可拖拽弹窗 |
 | [HotkeyComponent](HotkeyComponent.md) | 可选 input 包：Input System 快捷键绑定、优先级规则 |
 
