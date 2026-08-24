@@ -2,6 +2,8 @@
 
 `RecyclerView` 是 `com.alicizax.unity.ui.extension` 中的虚拟滚动列表组件，负责列表项复用、滚动、布局、吸附、滚动条和局部刷新。业务层通常通过 `UGList`、`UGMixedList`、`UGLoopList`、`UGGroupList` 使用它，而不是直接操作内部 `IAdapter`。
 
+对应包版本：`com.alicizax.unity.ui.extension` `2.1.11`。
+
 源码位置：
 
 ```text
@@ -50,6 +52,17 @@ public interface IGroupViewData : IMixedViewData
 
 `TemplateId` 对应 `RecyclerView.Templates` 数组下标。当前代码中不存在 `TemplateName` 匹配机制。
 
+变高列表数据额外实现 `IMeasuredViewData`，用来预声明滚动轴长度。它不替代绑定后实测：
+
+```csharp
+public interface IMeasuredViewData : ISimpleViewData
+{
+    bool TryGetItemLength(out float length);
+}
+```
+
+只有 `LinearLayoutManager` / `MixedLayoutManager` 打开 `Variable Item Length` 后才支持变高。`Grid` / `Page` / `Circle` 必须保持定高；变高开关打开时，编辑器和列表启动都会拒绝。
+
 ## ViewHolder
 
 列表项渲染逻辑写在 `ViewHolder<TData>` 子类中。当前模块没有独立的 `ItemRender<TData, THolder>` 类。
@@ -60,9 +73,9 @@ public interface IGroupViewData : IMixedViewData
 | --- | --- |
 | `CurrentData` | 当前绑定的数据 |
 | `CurrentIndex` | 当前数据索引 |
-| `CurrentLayoutIndex` | 当前布局索引；循环或圆形布局中可能不同于数据索引 |
 | `CurrentBindingVersion` | 当前绑定版本，可用于异步加载回调校验 |
 | `IsBindingCurrent(version)` | 判断异步回调是否仍对应当前绑定 |
+| `RequestResize()` | 绑定后文本或资源改高时，按当前 Holder 实测长度写回偏移表 |
 | `SetSelect()` | 将当前 `DataIndex` 提交为列表选择项 |
 | `OnSelectionChange(bool)` | 选择状态变化回调 |
 | `OnClear()` | Holder 被回收或重新绑定前的清理回调 |
@@ -173,7 +186,7 @@ public sealed class BagWindow : UIWindow<ui_BagWindow>
         _items.OnChoiceIndexChanged += OnChoiceChanged;
         _items.ScrollStopped += OnScrollStopped;
 
-        _items.Data = CreateItems();
+        _items.SetData(CreateItems());
         _items.ChoiceIndex = 0;
         _items.ScrollToChoice(ScrollAlignment.Start);
     }
@@ -247,6 +260,54 @@ _items.ScrollToStart(0);
 _items.ScrollToCenter(20, smooth: true);
 _items.ScrollTo(20, ScrollAlignment.End, offset: 0f, smooth: true, duration: 0.3f);
 ```
+
+## 变高与聊天列表
+
+聊天对话框用定高 `LinearLayoutManager` 不够。需要同时满足：
+
+1. Inspector 打开 `LinearLayoutManager.Variable Item Length`。
+2. 数据实现 `IMeasuredViewData.TryGetItemLength`，给出预估高度。
+3. Holder 绑定文本后改根节点高度，再调用 `RequestResize()`。
+4. 刷新模式用 `ListRefreshMode.AfterSettle`，避免拖拽中反复改高闪一下。
+
+```csharp
+public sealed class ChatMessageData : IMeasuredViewData
+{
+    public string Text;
+    public float DeclaredLength;
+
+    public bool TryGetItemLength(out float length)
+    {
+        length = DeclaredLength;
+        return DeclaredLength > 0f;
+    }
+}
+
+_list = UGListCreateHelper.Create<ChatMessageData>(baseui.ScrollViewChat);
+_list.ApplyUpdateOptions(new ListUpdateOptions
+{
+    ApplyRefreshMode = true,
+    RefreshMode = ListRefreshMode.AfterSettle
+});
+_list.SetData(history, ListScrollPolicy.KeepAnchor);
+_list.StickToEnd();
+
+// 底部发消息：仅贴底时 StickToEnd。
+if (_list.IsAtEnd)
+{
+    _list.Add(message);
+    _list.StickToEnd();
+}
+else
+{
+    _list.Add(message);
+}
+
+// 顶部插入历史：KeepAnchor，当前可见消息屏幕位置不变。
+_list.InsertRange(0, older);
+```
+
+`Content`、`Templates`、`Adapter`、`LayoutManager` 运行期不可更换。`SetAdapter` 只允许首次绑定。模板根节点不要在滚动轴上 Stretch。
 
 ## UGMixedList 混合模板列表
 
@@ -944,37 +1005,39 @@ _quests.Adapter.NotifyDataChanged();
 
 ## 数据更新
 
-`UGListBase` 暴露 `Adapter`，可以直接增删改数据并刷新。
+`UGList` / `UGMixedList` / `UGLoopList` / `UGGroupList` 已直接暴露增删改接口，业务层优先走这些方法，不要再绕到 `Adapter`。
 
 ```csharp
-_items.Adapter.Add(new BagItemData
+_items.Add(new BagItemData
 {
     ItemId = 1003,
     Name = "Gem",
     Count = 3,
 });
 
-_items.Adapter.RemoveAt(0);
-_items.Adapter.NotifyItemChanged(1);
-_items.Adapter.NotifyItemChanged(1, relayout: true);
-_items.Adapter.NotifyDataChanged();
+_items.RemoveAt(0);
+_items.RefreshItem(1);
+_items.RefreshItem(1, relayout: true);
+_items.SetData(newList, ListScrollPolicy.KeepAnchor);
 ```
 
 常用策略：
 
 | 场景 | 推荐 API |
 | --- | --- |
-| 替换整份数据 | `_items.Data = newList` |
-| 可见项内容变化且尺寸不变 | `_items.Adapter.NotifyItemChanged(index)` |
-| 可见项尺寸或模板变化 | `_items.Adapter.NotifyItemChanged(index, relayout: true)` |
-| 一段可见项内容变化 | `_items.Adapter.NotifyItemRangeChanged(index, count)` |
-| 添加单项 | `_items.Adapter.Add(data)` |
-| 插入单项 | `_items.Adapter.Insert(index, data)` |
-| 删除单项 | `_items.Adapter.RemoveAt(index)` |
-| 清空列表 | `_items.Adapter.Clear()` |
-| 反转顺序 | `_items.Adapter.Reverse()` |
+| 替换整份数据 | `_items.SetData(newList)` 或 `_items.Data = newList` |
+| 替换时保持当前可见位置 | `_items.SetData(newList, ListScrollPolicy.KeepAnchor)` |
+| 替换时滚回起点 | `_items.SetData(newList, ListScrollPolicy.ResetScroll)` |
+| 可见项内容变化且尺寸不变 | `_items.RefreshItem(index)` |
+| 可见项尺寸或模板变化 | `_items.RefreshItem(index, relayout: true)` |
+| 添加单项 | `_items.Add(data)` |
+| 批量添加 | `_items.AddRange(items)` |
+| 插入单项 | `_items.Insert(index, data)` |
+| 顶部插入历史 | `_items.InsertRange(0, older)` |
+| 删除单项 | `_items.RemoveAt(index)` |
+| 清空列表 | `_items.Clear()` |
 
-`AddRange`、`InsertRange`、`RemoveAll`、`Sort` 当前是 `internal`，不要在程序集外文档示例中当作公开 API 使用。
+`ListRefreshMode.Immediate` 是默认刷新。聊天列表用 `AfterSettle`：拖拽或惯性未停稳时先记脏，停稳后再刷。
 
 ## 选择、滚动和事件
 
@@ -1001,7 +1064,7 @@ _items.ScrollStopped += () => { };
 _items.ScrollDraggingChanged += dragging => { };
 ```
 
-当前 `UGList` 没有 `FocusIndex`、`TryFocus`、`CommitFocusToChoice` 这些 API。
+`ChoiceIndex`、`ScrollDataIndex`、`FocusedDataIndex` 是三套索引。业务选择、当前滚动项、导航焦点不要混用。未接导航包时 `FocusedDataIndex` 为 `-1`。
 
 ## Inspector 配置
 
@@ -1027,11 +1090,11 @@ _items.ScrollDraggingChanged += dragging => { };
 
 | 类型 | 说明 |
 | --- | --- |
-| `LinearLayoutManager` | 单列或单行列表，所有项使用第一个模板尺寸 |
-| `GridLayoutManager` | 网格列表，`cellCount` 控制每行或每列数量 |
-| `PageLayoutManager` | 分页列表，继承线性布局并对可见项做缩放动画 |
-| `MixedLayoutManager` | 多模板或不同尺寸列表，按每项 `TemplateId` 读取模板长度 |
-| `CircleLayoutManager` | 圆形布局，使用虚拟布局区间并按角度摆放 |
+| `LinearLayoutManager` | 单列或单行。定高读模板尺寸；打开 `Variable Item Length` 后按每条声明/实测高度排 |
+| `GridLayoutManager` | 定高网格，`cellCount` 控制每行或每列数量。可见窗口按行头步进 |
+| `PageLayoutManager` | 定高分页，继承线性布局并对可见项做近大远小缩放。横向封面卡需要 `Snap` |
+| `MixedLayoutManager` | 多模板列表。未开变高时按 `TemplateId` 读模板长度；打开变高后同模板也可不同高 |
+| `CircleLayoutManager` | 定高圆形布局，使用虚拟布局区间并按角度摆放 |
 
 滚动条在 `WhenScrollable` 模式下只会在内容尺寸大于视口尺寸时显示并允许交互。对 `Direction.Custom`，溢出检测不生效。
 
@@ -1043,16 +1106,15 @@ _items.ScrollDraggingChanged += dragging => { };
 | `UGListCreateHelper.CreateMixed<T>(RecyclerView)` | 创建混合模板列表 |
 | `UGListCreateHelper.CreateLoop<T>(RecyclerView)` | 创建循环列表 |
 | `UGListCreateHelper.CreateGroup<T>(RecyclerView, int)` | 创建分组列表，第二个参数是组头模板下标 |
-| `UGListBase.Data` | 替换数据源并刷新 |
-| `UGListBase.DataCount` | 原始数据数量 |
-| `UGListBase.ChoiceIndex` | 获取或设置业务选择 |
-| `UGListBase.HasChoice` | 是否已有选择 |
-| `UGListBase.ScrollPosition` | 当前滚动位置 |
-| `UGListBase.ScrollTo(...)` | 按对齐方式滚动到索引 |
-| `UGListBase.ScrollToChoice(...)` | 滚动到当前选择 |
-| `Adapter.GetData(index)` | 获取原始数据 |
-| `Adapter.NotifyDataChanged()` | 重新布局并刷新 |
-| `Adapter.NotifyItemChanged(index, relayout)` | 重绑可见项或重新布局 |
+| `UGListBase.SetData(list, policy)` | 替换数据源；`KeepAnchor` 保可见位置，`ResetScroll` 回起点 |
+| `UGListBase.Add` / `Insert` / `RemoveAt` | 结构增量更新 |
+| `UGListBase.RefreshItem(index, relayout)` | 重绑可见项；`relayout: true` 时重测高度 |
+| `UGListBase.StickToEnd()` | 贴底，聊天发消息用 |
+| `UGListBase.IsAtEnd` / `IsScrolling` | 是否贴底 / 是否正在滚动 |
+| `UGListBase.ScrollDataIndex` | 当前滚动对应的数据索引 |
+| `UGListBase.ChoiceIndex` | 业务选择索引 |
+| `UGListBase.FocusedDataIndex` | 导航焦点索引；未接导航包时为 `-1` |
+| `ViewHolder.RequestResize()` | 绑定后实测高度写回 |
 | `RecyclerView.TrimInactivePool()` | 裁剪对象池中的非活动实例 |
 | `RecyclerView.PoolStats` | 开发环境下查看对象池统计 |
 
@@ -1061,6 +1123,8 @@ _items.ScrollDraggingChanged += dragging => { };
 1. `Templates` 必须非空，且每个模板都必须挂 `ViewHolder` 子类。
 2. 混合模板和分组列表的 `TemplateId` 必须是合法的模板数组下标。
 3. 分组列表的 `groupTemplateId` 必须是组头模板下标，子项不要使用同一个模板下标，除非业务确实希望它被识别为组头。
-4. 动态改变列表项尺寸或模板后，需要使用 `relayout: true` 或 `NotifyDataChanged()`。
-5. `ScrollMode.AlwaysDisable` 会阻止 `ScrollTo` 定位。
-6. 所有 Unity 对象和 UI 操作都应在 Unity 主线程执行。
+4. 动态改变列表项尺寸后，Holder 里改完高度再 `RequestResize()`，或调用 `RefreshItem(index, relayout: true)`。
+5. `Content` / `Templates` / `Adapter` / `Layout` 运行期不可更换；`SetAdapter` 只允许首次绑定。
+6. 一个 `.cs` 里只能有一个可挂到 Prefab 的 `MonoBehaviour`，类名必须和文件名一致，否则模板会变成 Missing Script。
+7. `ScrollMode.AlwaysDisable` 会阻止 `ScrollTo` 定位。
+8. 所有 Unity 对象和 UI 操作都应在 Unity 主线程执行。

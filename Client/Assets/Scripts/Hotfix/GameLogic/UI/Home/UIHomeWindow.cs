@@ -75,8 +75,7 @@ namespace GameLogic.UI
 
         private void OnBtnBagClick()
         {
-            Log.Info("点击背包按钮");
-
+            GameApp.UI.ShowUI<UIRecyclerViewTestHubWindow>();
         }
 
         private void OnBtnRoleClick()

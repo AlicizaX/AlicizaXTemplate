@@ -1,6 +1,6 @@
 # UI Extension 扩展包
 
-`com.alicizax.unity.ui.extension` 是 UI 框架之外的一组常用 UI 控件和列表扩展。输入图标、快捷键和导航能力已拆到可选输入扩展包 `com.alicizax.unity.input`。它不负责窗口生命周期，窗口打开、关闭、层级和 Holder 生成仍然由框架 UI 模块处理。
+`com.alicizax.unity.ui.extension` 是 UI 框架之外的一组常用 UI 控件和列表扩展。当前文档对应包版本 `2.1.11`。输入图标、快捷键和导航能力已拆到可选输入扩展包 `com.alicizax.unity.input`。它不负责窗口生命周期，窗口打开、关闭、层级和 Holder 生成仍然由框架 UI 模块处理。
 
 源码位置：
 
@@ -21,7 +21,7 @@
 | [UXTextMeshPro](UXTextMeshPro.md) | 本地化 key 绑定、本地化适配器注入 |
 | [UXDraggable](UXDraggable.md) | 拖拽事件转发、可拖拽弹窗 |
 | [HotkeyComponent](HotkeyComponent.md) | 可选 input 包：Input System 快捷键绑定、优先级规则 |
-| [RecyclerView](RecyclerView.md) | 虚拟列表、`ViewHolder`、`ItemRender`、普通列表、循环列表、混合模板列表和分组列表 |
+| [RecyclerView](RecyclerView.md) | 虚拟列表、`ViewHolder`、定高/变高、普通列表、循环列表、混合模板列表和分组列表 |
 | [RecyclerView.Navigation](RecyclerView.Navigation.md) | 可选 input 包：RecyclerView 手柄/键盘导航、虚拟焦点、ViewHolder 导航接口和 UXNavigation 接入 |
 | [InputGlyph](InputGlyph.md) | 可选 input 包：Input System 按键图标、TMP Sprite 标签和图标数据库 |
 | [UXInput](UXInput.md) | 可选 input 包：设备监听、输入读取、运行时重绑定、震动和输入诊断 |
@@ -52,7 +52,7 @@ file:/G:/UnityProject/AlicizaXTemplate/Client/Packages/com.alicizax.unity.input/
 | 类型 | 命名空间 |
 | --- | --- |
 | `UXButton`、`UXToggle`、`UXImage`、`UXTextMeshPro` | `UnityEngine.UI` |
-| `RecyclerView`、`ViewHolder`、`UGList`、`ItemRender` | `AlicizaX.UI` |
+| `RecyclerView`、`ViewHolder`、`UGList` | `AlicizaX.UI` |
 | `UXInput`、`InputActionProvider`、`InputGlyphImage`、`InputGlyphText`、`InputVisualizer` | 全局命名空间，位于 `com.alicizax.unity.input` |
 | `HotkeyComponent`、`HotkeyComponentBase` | `UnityEngine.UI`，位于 `com.alicizax.unity.input` |
 | `UXNavigationScope`、`UXNavigationSystem`、`UXFocusChange` | `AlicizaX.UI.UXNavigation`，位于 `com.alicizax.unity.input` |
@@ -119,7 +119,6 @@ public sealed class BagWindow : UIWindow<ui_BagWindow>
         baseui.BtnClose.onClick.AddListener(CloseSelf);
 
         _items = UGListCreateHelper.Create<BagItemData>(baseui.ScrollViewItems);
-        _items.RegisterItemRender<BagItemRender>();
     }
 }
 ```
