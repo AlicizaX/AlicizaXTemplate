@@ -395,6 +395,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392e6571a8ff0954792443c9449295c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mode: 0
   _entries: []
 --- !u!1 &1075736645421591308
 GameObject:
@@ -973,7 +974,6 @@ MonoBehaviour:
   targetRect: {fileID: 8828091370361466877}
   canvasGroup: {fileID: 826950546506153899}
   useUnscaledTime: 1
-  initializeAsClosed: 1
   followAnimationInteractable: 0
   openDuration: 0.22
   closeDuration: 0.18
@@ -1393,6 +1393,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392e6571a8ff0954792443c9449295c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mode: 0
   _entries: []
 --- !u!1 &3925157719956066574
 GameObject:
@@ -1565,6 +1566,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392e6571a8ff0954792443c9449295c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mode: 0
   _entries: []
 --- !u!1 &4088570292278183941
 GameObject:
@@ -1881,6 +1883,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392e6571a8ff0954792443c9449295c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mode: 0
   _entries: []
 --- !u!1 &4596221726219254468
 GameObject:

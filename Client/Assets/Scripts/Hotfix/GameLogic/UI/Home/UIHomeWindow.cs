@@ -22,8 +22,11 @@ namespace GameLogic.UI
             "Japanese",
         };
 
+        private UITestAWidget _aWidget;
         protected override void OnInitialize()
         {
+
+
             baseui.BtnShop.onClick.AddListener(OnBtnShopClick);
             baseui.BtnBag.onClick.AddListener(OnBtnBagClick);
             baseui.BtnRole.onClick.AddListener(OnBtnRoleClick);
@@ -31,6 +34,8 @@ namespace GameLogic.UI
             baseui.BtnExit.onClick.AddListener(OnBtnExitClick);
             baseui.DropdownLanguages.onValueChanged.AddListener(OnDropdownLanguageChange);
             List<TMP_Dropdown.OptionData> optionDatas = new List<TMP_Dropdown.OptionData>();
+
+            _aWidget=CreateWidgetSync<UITestAWidget>(baseui.RectTransform,false);
 
             currentLanguage = GameApp.Localization.Language;
 
@@ -81,11 +86,13 @@ namespace GameLogic.UI
         private void OnBtnRoleClick()
         {
             Log.Info("点击角色属性按钮");
+            _aWidget.Open();
         }
 
         private void OnBtnTestTipsClick()
         {
             Log.Info("点击测试提示按钮");
+            _aWidget.Close();
         }
 
         private void OnBtnExitClick()

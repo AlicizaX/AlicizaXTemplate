@@ -738,6 +738,8 @@ MonoBehaviour:
   movementType: 0
   scroll: 1
   snap: 0
+  snapDuration: 0.12
+  refreshMode: 0
   inertia: 1
   decelerationRate: 0.135
   scrollSpeed: 1
@@ -1587,6 +1589,7 @@ GameObject:
   - component: {fileID: 665100842215895111}
   - component: {fileID: 6632951170448113532}
   - component: {fileID: -4639290678824064717}
+  - component: {fileID: 5019894679281548058}
   m_Layer: 5
   m_Name: UIShopWindow
   m_TagString: Untagged
@@ -1700,15 +1703,25 @@ MonoBehaviour:
   openEase: 4
   closeEase: 3
   targetRect: {fileID: 1537036592558011597}
-  canvasGroup: {fileID: 0}
+  canvasGroup: {fileID: 5019894679281548058}
   useUnscaledTime: 1
-  initializeAsClosed: 1
-  followAnimationInteractable: 0
   openDuration: 0.22
   closeDuration: 0.18
   slideDistance: 120
   toastDistance: 40
-  closedScale: 0.94
+  closedScale: 0.6657
+--- !u!225 &5019894679281548058
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3448168187203640000}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &3846200000159972780
 GameObject:
   m_ObjectHideFlags: 0
@@ -2958,6 +2971,8 @@ MonoBehaviour:
   movementType: 1
   scroll: 1
   snap: 0
+  snapDuration: 0.12
+  refreshMode: 0
   inertia: 1
   decelerationRate: 0.135
   scrollSpeed: 0.5
@@ -2977,7 +2992,8 @@ MonoBehaviour:
     RefIds:
     - rid: 2030763224953782274
       type: {class: LinearLayoutManager, ns: AlicizaX.UI, asm: AlicizaX.UI.Extension}
-      data: 
+      data:
+        variableItemLength: 0
 --- !u!114 &5230824957045635145
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3187,6 +3203,8 @@ MonoBehaviour:
   movementType: 1
   scroll: 1
   snap: 0
+  snapDuration: 0.12
+  refreshMode: 0
   inertia: 1
   decelerationRate: 0.135
   scrollSpeed: 0.5
@@ -3206,7 +3224,8 @@ MonoBehaviour:
     RefIds:
     - rid: 2030763224953782272
       type: {class: LinearLayoutManager, ns: AlicizaX.UI, asm: AlicizaX.UI.Extension}
-      data: 
+      data:
+        variableItemLength: 0
 --- !u!114 &3892860807093325091
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -25,7 +25,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.tuyoogame.yooasset": "3.0.5",
+        "com.tuyoogame.yooasset": "3.0.6",
         "com.cysharp.zstring": "2.6.0",
         "com.alicizax.unity.cysharp.unitask": "2.5.13"
       }
@@ -62,12 +62,6 @@
       "dependencies": {},
       "url": "https://package.openupm.com"
     },
-    "com.farlocus.locus": {
-      "version": "file:com.farlocus.locus",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.kyrylokuzyk.primetween": {
       "version": "1.4.0",
       "depth": 0,
@@ -76,8 +70,8 @@
       "url": "https://registry.npmjs.org"
     },
     "com.tuyoogame.yooasset": {
-      "version": "3.0.5",
-      "depth": 1,
+      "version": "3.0.6",
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.assetbundle": "1.0.0",
@@ -94,11 +88,12 @@
       "dependencies": {}
     },
     "com.unity.burst": {
-      "version": "1.8.7",
+      "version": "1.8.21",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.mathematics": "1.2.1"
+        "com.unity.mathematics": "1.2.1",
+        "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -128,7 +123,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.6.3",
+      "version": "1.14.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -144,7 +139,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
-      "version": "14.0.8",
+      "version": "14.0.12",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
@@ -160,9 +155,18 @@
       "source": "builtin",
       "dependencies": {
         "com.unity.mathematics": "1.2.1",
-        "com.unity.burst": "1.8.4",
-        "com.unity.render-pipelines.core": "14.0.8",
-        "com.unity.shadergraph": "14.0.8"
+        "com.unity.burst": "1.8.9",
+        "com.unity.render-pipelines.core": "14.0.12",
+        "com.unity.shadergraph": "14.0.12",
+        "com.unity.render-pipelines.universal-config": "14.0.9"
+      }
+    },
+    "com.unity.render-pipelines.universal-config": {
+      "version": "14.0.10",
+      "depth": 1,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.render-pipelines.core": "14.0.10"
       }
     },
     "com.unity.scriptablebuildpipeline": {
@@ -180,11 +184,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.shadergraph": {
-      "version": "14.0.8",
+      "version": "14.0.12",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
-        "com.unity.render-pipelines.core": "14.0.8",
+        "com.unity.render-pipelines.core": "14.0.12",
         "com.unity.searcher": "4.9.2"
       }
     },

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using AlicizaX;
 using AlicizaX.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -56,12 +55,10 @@ public static class AppBuildHelper
         PlayerSettings.bundleVersion = buildParams.Version;
         Debug.Log($"开始构建应用 - 目标平台: {buildParams.BuildTarget}");
 
-        // 生成应用设置
-        GeneratAppBuilderSetting(buildParams);
-        Debug.Log("生成 AppBuilderSetting.bytes 完成");
-
         try
         {
+            ApplyLaunchContext(buildParams);
+
             var options = new BuildPlayerOptions
             {
                 scenes = buildParams.Scenes,
@@ -83,6 +80,10 @@ public static class AppBuildHelper
         catch (Exception e)
         {
             Debug.LogError($"构建过程中发生异常: {e.Message}\n{e.StackTrace}");
+        }
+        finally
+        {
+            BuildLaunchContext.Clear();
         }
     }
 
@@ -158,15 +159,18 @@ public static class AppBuildHelper
     }
 
 
-    public static void GeneratAppBuilderSetting(IBuildParameters buildParameters)
+    private static void ApplyLaunchContext(IBuildParameters buildParameters)
     {
-        const string AppBuilderSettingPath = "Assets/Resources/ServiceDynamicBindInfo.bytes";
-        ServiceDynamicBindInfo appBuilderSetting = new ServiceDynamicBindInfo();
-        appBuilderSetting.Language = buildParameters.Language;
-        appBuilderSetting.ResMode = buildParameters.ResMode;
-        appBuilderSetting.DecryptionServices = buildParameters.DecryptionServices;
-        File.WriteAllText(AppBuilderSettingPath, Utility.Json.ToJson(appBuilderSetting));
-        AssetDatabase.ImportAsset(AppBuilderSettingPath, ImportAssetOptions.ForceUpdate);
+        BuildLaunchContext.Set(BuildLaunchContext.ResourcePlayMode, buildParameters.ResMode.ToString());
+        if (buildParameters.DecryptionServices != null)
+        {
+            BuildLaunchContext.Set(BuildLaunchContext.ResourceDecryption, buildParameters.DecryptionServices);
+        }
+
+        if (!string.IsNullOrEmpty(buildParameters.Language))
+        {
+            BuildLaunchContext.Set(BuildLaunchContext.LocalizationLanguage, buildParameters.Language);
+        }
     }
 
     private static void HandleBuildReport(UnityEditor.Build.Reporting.BuildReport report)
