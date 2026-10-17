@@ -1,0 +1,28 @@
+{
+    "name": "AlicizaX.BuildCLI.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:99a2a63c2a1143c4ba448165a98a5108",
+        "GUID:fb064c8bf96bac94e90d2f39090daa94",
+        "GUID:e34a5702dd353724aa315fb8011f08c3",
+        "GUID:4d1926c9df5b052469a1c63448b7609a",
+        "GUID:1619e00706139ce488ff80c0daeea8e7"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.code-philosophy.hybridclr",
+            "expression": "",
+            "define": "HYBIRDCLR_SUPPORT"
+        }
+    ],
+    "noEngineReferences": false
+}

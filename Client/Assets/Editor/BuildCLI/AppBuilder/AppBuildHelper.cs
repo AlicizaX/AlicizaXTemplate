@@ -12,11 +12,7 @@ public static class AppBuildHelper
     /// </summary>
     public static void BuildAndroid(AndroidBuildParameters androidParams, bool showExplorer = false)
     {
-        if (!PreBuildCheck(androidParams))
-        {
-            Debug.LogError("Android 构建前检查失败！");
-            return;
-        }
+        PreBuildCheck(androidParams);
 
         // 设置 Android 特定参数
         ApplyAndroidSpecificSettings(androidParams);
@@ -30,11 +26,7 @@ public static class AppBuildHelper
     /// </summary>
     public static void BuildStandalone(StandaloneBuildParameters standaloneParams, bool showExplorer = false)
     {
-        if (!PreBuildCheck(standaloneParams))
-        {
-            Debug.LogError("Standalone 构建前检查失败！");
-            return;
-        }
+        PreBuildCheck(standaloneParams);
 
         // 设置 Standalone 特定参数
         ApplyStandaloneSpecificSettings(standaloneParams);
@@ -68,18 +60,18 @@ public static class AppBuildHelper
             };
 
             var report = BuildPipeline.BuildPlayer(options);
-            HandleBuildReport(report);
+            if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            {
+                throw new Exception(CollectBuildErrors(report));
+            }
 
-            if (showExplorer && report.summary.result == UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            Debug.Log($"构建完成: {report.summary.outputPath}");
+            if (showExplorer)
             {
                 DirectoryInfo directoryInfo = Directory.GetParent(report.summary.outputPath);
                 if (directoryInfo != null)
                     OpenFolder.Execute(directoryInfo.FullName);
             }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"构建过程中发生异常: {e.Message}\n{e.StackTrace}");
         }
         finally
         {
@@ -123,39 +115,30 @@ public static class AppBuildHelper
         Debug.Log($"Standalone 特定设置应用完成 - 分辨率: {standaloneParams.DefaultScreenWidth}x{standaloneParams.DefaultScreenHeight}, 全屏: {standaloneParams.FullScreenMode}");
     }
 
-    private static bool PreBuildCheck(IBuildParameters buildParams)
+    private static void PreBuildCheck(IBuildParameters buildParams)
     {
-        // 检查场景
         if (buildParams.Scenes == null || buildParams.Scenes.Length == 0)
         {
-            Debug.LogError("构建场景列表为空！");
-            return false;
+            throw new Exception("构建场景列表为空");
         }
 
         foreach (string scenePath in buildParams.Scenes)
         {
             if (!File.Exists(scenePath))
             {
-                Debug.LogError($"场景文件不存在: {scenePath}");
-                return false;
+                throw new Exception($"场景文件不存在: {scenePath}");
             }
         }
 
-        // 检查输出路径
         if (string.IsNullOrEmpty(buildParams.OutPutPath))
         {
-            Debug.LogError("输出路径为空！");
-            return false;
+            throw new Exception("输出路径为空");
         }
 
-        // 检查文件名
         if (string.IsNullOrEmpty(buildParams.FileName))
         {
-            Debug.LogError("文件名为空！");
-            return false;
+            throw new Exception("文件名为空");
         }
-
-        return true;
     }
 
 
@@ -173,32 +156,25 @@ public static class AppBuildHelper
         }
     }
 
-    private static void HandleBuildReport(UnityEditor.Build.Reporting.BuildReport report)
+    private static string CollectBuildErrors(UnityEditor.Build.Reporting.BuildReport report)
     {
-        if (report.summary.result == UnityEditor.Build.Reporting.BuildResult.Succeeded)
-        {
-            Debug.Log($"构建完成: {report.summary.outputPath}");
-        }
-        else
-        {
 #if UNITY_2023_1_OR_NEWER
-            Debug.LogError(report.SummarizeErrors());
+        return report.SummarizeErrors();
 #else
-            var errors = new List<string>();
-            foreach (var step in report.steps)
+        var errors = new List<string>();
+        foreach (var step in report.steps)
+        {
+            foreach (var msg in step.messages)
             {
-                foreach (var msg in step.messages)
+                if (msg.type == LogType.Error || msg.type == LogType.Exception)
                 {
-                    if (msg.type == LogType.Error || msg.type == LogType.Exception)
-                    {
-                        errors.Add($"[Step: {step.name}] {msg.content}");
-                    }
+                    errors.Add($"[Step: {step.name}] {msg.content}");
                 }
             }
-
-            Debug.LogError($"构建失败，错误信息:\n{string.Join("\n", errors)}");
-#endif
         }
+
+        return $"构建失败:\n{string.Join("\n", errors)}";
+#endif
     }
 
     #endregion

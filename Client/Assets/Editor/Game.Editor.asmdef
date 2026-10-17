@@ -2,7 +2,6 @@
     "name": "Game.Editor",
     "rootNamespace": "Game.Editor",
     "references": [
-        "GUID:8d62da4aabd2a19419c7378d23ea5849",
         "GUID:99a2a63c2a1143c4ba448165a98a5108",
         "GUID:e34a5702dd353724aa315fb8011f08c3",
         "GUID:4d1926c9df5b052469a1c63448b7609a",

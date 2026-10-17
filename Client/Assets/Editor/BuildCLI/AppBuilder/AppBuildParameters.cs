@@ -59,8 +59,13 @@ public class AndroidBuildParameters : IBuildParameters
 [System.Serializable]
 public class StandaloneBuildParameters : IBuildParameters
 {
+    public StandaloneBuildParameters(BuildTarget buildTarget)
+    {
+        BuildTarget = buildTarget;
+    }
+
     // 通用参数
-    public BuildTarget BuildTarget => BuildTarget.StandaloneWindows64;
+    public BuildTarget BuildTarget { get; }
     public string OutPutPath { get; set; }
     public bool DevelopBuild { get; set; }
     public int ResMode { get; set; }
