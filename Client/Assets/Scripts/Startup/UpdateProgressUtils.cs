@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections;
 using AlicizaX.Resource.Runtime;
 using AlicizaX;
+using AlicizaX.Localization.Runtime;
 using UnityEngine;
 
 
@@ -68,12 +69,14 @@ namespace Unity.Startup.Procedure
             float progress = gameEventArgs.CurrentDownloadSizeBytes / (gameEventArgs.TotalDownloadSizeBytes * 1f);
             string currentSizeMb = Utility.File.GetBytesSize(gameEventArgs.CurrentDownloadSizeBytes);
             string totalSizeMb = Utility.File.GetBytesSize(gameEventArgs.TotalDownloadSizeBytes);
-            string speed = Utility.File.GetLengthString((int)CurrentSpeed);
+            float bytesPerSecond = CurrentSpeed;
+            string speed = Utility.File.GetLengthString((int)bytesPerSecond);
 
 
-            string line1 = Utility.Text.Format("正在更新，已更新 {0}/{1} ({2:F2}%)", gameEventArgs.CurrentDownloadCount, gameEventArgs.TotalDownloadCount, progress);
-            string line2 = Utility.Text.Format("已更新大小 {0}MB/{1}MB", currentSizeMb, totalSizeMb);
-            string line3 = Utility.Text.Format("当前网速 {0}/s，剩余时间 {1}", speed, GetRemainingTime(gameEventArgs.TotalDownloadSizeBytes, gameEventArgs.CurrentDownloadSizeBytes, CurrentSpeed));
+            string line1 = UpdateLocalizationKey.Bootstrap.UPDATE_DOWNLOADING(gameEventArgs.CurrentDownloadCount, gameEventArgs.TotalDownloadCount, progress * 100f);
+            string line2 = UpdateLocalizationKey.Bootstrap.UPDATE_SIZE(currentSizeMb, totalSizeMb);
+            string line3 = UpdateLocalizationKey.Bootstrap.UPDATE_SPEED(speed,
+                GetRemainingTime(gameEventArgs.TotalDownloadSizeBytes, gameEventArgs.CurrentDownloadSizeBytes, bytesPerSecond));
 
 
             Log.Info($"{line1} \n {line2}\n {line3}");

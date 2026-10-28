@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using AlicizaX.UI.Runtime;
+using TMPro;
+
 namespace Game.UI
 {
 	[UIRes(ui_UIShopWindow.ResTag, EUIResLoadType.AssetBundle)]
@@ -43,16 +45,16 @@ namespace Game.UI
 		public RecyclerView ScrollViewGoodsLoopList => mScrollViewGoodsLoopList;
 
 		[SerializeField]
-		private UXTextMeshPro mTextCurrency;
-		public UXTextMeshPro TextCurrency => mTextCurrency;
+		private TextMeshProUGUI mTextCurrency;
+		public TextMeshProUGUI TextCurrency => mTextCurrency;
 
 		[SerializeField]
-		private UXTextMeshPro mTextSubTitle;
-		public UXTextMeshPro TextSubTitle => mTextSubTitle;
+		private TextMeshProUGUI mTextSubTitle;
+		public TextMeshProUGUI TextSubTitle => mTextSubTitle;
 
 		[SerializeField]
-		private UXTextMeshPro mTextTitle;
-		public UXTextMeshPro TextTitle => mTextTitle;
+		private TextMeshProUGUI mTextTitle;
+		public TextMeshProUGUI TextTitle => mTextTitle;
 
 		[SerializeField]
 		private UXToggle mTogItem;

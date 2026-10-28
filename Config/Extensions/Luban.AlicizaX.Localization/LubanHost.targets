@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'Luban' and '$(AlicizaXLocalizationProject)' != ''">
+    <ProjectReference Include="$(AlicizaXLocalizationProject)" />
+  </ItemGroup>
+</Project>

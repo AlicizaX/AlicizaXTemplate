@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2736110057453612791}
   - component: {fileID: 3786131069577868217}
   - component: {fileID: 159717384260041338}
+  - component: {fileID: 8760368498655217174}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -54,7 +55,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 517746426798887356}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -134,9 +135,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 10050004
-  m_localizationKey: UI.Home.ButtonShop
-  m_localizationFormatArgs: []
+--- !u!114 &8760368498655217174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517746426798887356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _target: {fileID: 159717384260041338}
+  _key: UI.Home.ButtonShop
+  _arguments: []
 --- !u!1 &901675699257454640
 GameObject:
   m_ObjectHideFlags: 0
@@ -723,6 +736,7 @@ GameObject:
   - component: {fileID: 2135287179112501577}
   - component: {fileID: 6522801210855172382}
   - component: {fileID: 6065947780219168907}
+  - component: {fileID: 771471432080923097}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -766,7 +780,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2433884436691897193}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -846,9 +860,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 10050003
-  m_localizationKey: UI.Home.ButtonRole
-  m_localizationFormatArgs: []
+--- !u!114 &771471432080923097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2433884436691897193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _target: {fileID: 6065947780219168907}
+  _key: UI.Home.ButtonRole
+  _arguments: []
 --- !u!1 &2925661357764734874
 GameObject:
   m_ObjectHideFlags: 0
@@ -974,7 +1000,6 @@ MonoBehaviour:
   targetRect: {fileID: 8828091370361466877}
   canvasGroup: {fileID: 826950546506153899}
   useUnscaledTime: 1
-  followAnimationInteractable: 0
   openDuration: 0.22
   closeDuration: 0.18
   slideDistance: 120
@@ -2205,6 +2230,7 @@ GameObject:
   - component: {fileID: 4738069575793883926}
   - component: {fileID: 2379645270219928906}
   - component: {fileID: 2874433260124150067}
+  - component: {fileID: 8827414859610735462}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -2248,7 +2274,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5565846567527681942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -2328,9 +2354,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 10050002
-  m_localizationKey: UI.Home.ButtonExit
-  m_localizationFormatArgs: []
+--- !u!114 &8827414859610735462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5565846567527681942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _target: {fileID: 2874433260124150067}
+  _key: UI.Home.ButtonExit
+  _arguments: []
 --- !u!1 &5796944451290305027
 GameObject:
   m_ObjectHideFlags: 0
@@ -2873,6 +2911,7 @@ GameObject:
   - component: {fileID: 5745345902207447247}
   - component: {fileID: 90373397348076100}
   - component: {fileID: 6176165716805231566}
+  - component: {fileID: 548889571216889419}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -2916,7 +2955,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8247201031624705409}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -2996,9 +3035,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 10050001
-  m_localizationKey: UI.Home.ButtonBag
-  m_localizationFormatArgs: []
+--- !u!114 &548889571216889419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8247201031624705409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _target: {fileID: 6176165716805231566}
+  _key: UI.Home.ButtonBag
+  _arguments: []
 --- !u!1 &9066661303960329366
 GameObject:
   m_ObjectHideFlags: 0
@@ -3010,6 +3061,7 @@ GameObject:
   - component: {fileID: 1243289823461270290}
   - component: {fileID: 4572192014419716733}
   - component: {fileID: 4172962130377506350}
+  - component: {fileID: 1626736920241725775}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -3053,7 +3105,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 9066661303960329366}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -3133,6 +3185,18 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 10050005
-  m_localizationKey: UI.Home.ButtonTips
-  m_localizationFormatArgs: []
+--- !u!114 &1626736920241725775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9066661303960329366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _target: {fileID: 4172962130377506350}
+  _key: UI.Home.ButtonTips
+  _arguments: []

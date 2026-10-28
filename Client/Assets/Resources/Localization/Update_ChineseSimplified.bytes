@@ -1,0 +1,1 @@
+	Bootstrap.Update.Checking正在检查更新…Bootstrap.Update.DownloadFailed资源更新失败。Bootstrap.Update.Downloading!正在下载 {0}/{1}（{2:F2}%）Bootstrap.Update.NetworkError!网络连接失败，请重试。Bootstrap.Update.NoAssets没有需要下载的资源。Bootstrap.Update.Ready更新完成Bootstrap.Update.Retry重试Bootstrap.Update.Size已下载 {0}MB/{1}MBBootstrap.Update.Speed%当前速度 {0}/s，剩余时间 {1}

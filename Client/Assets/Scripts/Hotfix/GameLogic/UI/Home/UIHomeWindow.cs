@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using AlicizaX;
-using AlicizaX.Localization;
-using AlicizaX.Resource.Runtime;
+using AlicizaX.Localization.Runtime;
 using AlicizaX.UI.Runtime;
 using Cysharp.Threading.Tasks;
-using Game.Config;
 using Game.UI;
 using TMPro;
 using UnityEngine;
@@ -15,18 +13,10 @@ namespace GameLogic.UI
     public class UIHomeWindow : UIWindow<ui_UIHomeWindow>
     {
         private string currentLanguage;
-        static readonly IReadOnlyList<string> Languages = new List<string>
-        {
-            "ChineseSimplified",
-            "English",
-            "Japanese",
-        };
-
         private UITestAWidget _aWidget;
+
         protected override void OnInitialize()
         {
-
-
             baseui.BtnShop.onClick.AddListener(OnBtnShopClick);
             baseui.BtnBag.onClick.AddListener(OnBtnBagClick);
             baseui.BtnRole.onClick.AddListener(OnBtnRoleClick);
@@ -37,40 +27,47 @@ namespace GameLogic.UI
 
             _aWidget=CreateWidgetSync<UITestAWidget>(baseui.RectTransform,false);
 
-            currentLanguage = GameApp.Localization.Language;
+            currentLanguage = LocalizationKit.CurrentLanguage;
 
-            foreach (var language in LanguageTypes.Languages)
+            foreach (var language in LocalizationKit.SupportedLanguages)
             {
                 optionDatas.Add(new TMP_Dropdown.OptionData(language));
             }
 
             baseui.DropdownLanguages.options = optionDatas;
-            baseui.DropdownLanguages.SetValueWithoutNotify(LanguageTypes.StringToIndex(currentLanguage));
+            baseui.DropdownLanguages.SetValueWithoutNotify(Mathf.Max(0, optionDatas.FindIndex(option => option.text == currentLanguage)));
         }
 
         private void OnDropdownLanguageChange(int arg0)
         {
             var selectedLanguage = baseui.DropdownLanguages.options[arg0].text;
-            //example临时这么判断看有没有语言资源 自己做的话 别整奥
-            var existState = GameApp.Resource.HasAsset($"tables_tblocalization_{selectedLanguage}");
-            if (existState == HasAssetResult.NotExist)
-            {
-                Debug.Log("没有这个语言...吊");
-                return;
-            }
-
             if (currentLanguage == selectedLanguage) return;
-            currentLanguage = selectedLanguage;
-            GameApp.Localization.SwitchLanguage(currentLanguage);
-            SwitchLanguage().Forget();
+            SwitchLanguageAsync(selectedLanguage).Forget();
         }
 
-        private async UniTask SwitchLanguage()
+        private async UniTask SwitchLanguageAsync(string selectedLanguage)
         {
-            Debug.Log("切换语言" + GameApp.Localization.Language);
-            await AppServices.Require<IConfigService>().SwitchLanguageAsync();
-            GameApp.Localization.ApplyLanguage();
-            LocalizationChangeEvent.Publisher(GameApp.Localization.Language);
+            baseui.DropdownLanguages.interactable = false;
+            try
+            {
+                if (await LocalizationKit.SetLanguageAsync(selectedLanguage))
+                {
+                    currentLanguage = selectedLanguage;
+                }
+            }
+            catch (System.Exception error)
+            {
+                Debug.LogException(error);
+            }
+            finally
+            {
+                currentLanguage = LocalizationKit.CurrentLanguage;
+                if (baseui.DropdownLanguages != null)
+                {
+                    baseui.DropdownLanguages.SetValueWithoutNotify(Mathf.Max(0, baseui.DropdownLanguages.options.FindIndex(option => option.text == currentLanguage)));
+                    baseui.DropdownLanguages.interactable = true;
+                }
+            }
         }
 
         private void OnBtnShopClick()

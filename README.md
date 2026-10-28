@@ -19,18 +19,18 @@
 
 ## 核心能力
 
-| 模块 | 核心价值 | 亮点特性 |
-| :--- | :--- | :--- |
-| **Event**<br>事件系统 | **0 GC 高频通信** | 无堆分配设计 · 自动解绑 · 轻松应对战斗同步与万级派发 |
-| **Timer**<br>时间轮 | **极致性能计时** | 四级时间轮算法 · 无全量扫描 · 精准承载技能 CD / 心跳 / 延时任务 |
-| **MemoryPool**<br>内存池 | **低 GC 引用管理** | 分页 Slab 架构 · 句柄校验 · 动态容量策略 · 内存与性能平衡 |
-| **ObjectPool**<br>对象池 | **全生命周期管控** | 分页槽位管理 · 支持锁定/多 Spawn · 低内存清理 · 帧预算释放 |
-| **Resources**<br>资源服务 | **智能缓存策略** | 基于 YooAsset · 资源租约 · 热资源保活 · 闲置回收 · 高缓存命中率 |
-| **HybridCLR**<br>热更新 | **无缝 C# 热更** | AOT / Hotfix 分层 · 内置反射调用示例 · 资源与代码一体化流程 |
-| **UI**<br>界面系统 | **高效窗口管理** | 窗口栈与层级 · Holder 自动生成 · Widget / Tab 复用 · 逻辑视图分离 |
-| **RecyclerView**<br>虚拟列表 | **海量数据承载** | 可见区增量刷新 · 支持循环 / 分组 / 网格 / 分页 / 圆形布局 · 惯性滚动 |
-| **UI Extension**<br>UI 扩展 | **开箱即用组件** | 强封装 Button / Switch / Image · 拖拽导航 · 多端输入图标 · 减少胶水代码 |
-| **Navigation**<br>导航热键 | **多设备输入** | 基于 New Input System · 自动设备识别 · 顶层焦点域 · 热键转发 |
+| 模块                         | 核心价值           | 亮点特性                                                                   |
+| :--------------------------- | :----------------- | :------------------------------------------------------------------------- |
+| **Event**事件系统        | **0 GC 高频通信**  | 无堆分配设计 · 自动解绑 · 轻松应对战斗同步与万级派发                     |
+| **Timer**时间轮          | **极致性能计时**   | 四级时间轮算法 · 无全量扫描 · 精准承载技能 CD / 心跳 / 延时任务          |
+| **MemoryPool**内存池     | **低 GC 引用管理** | 分页 Slab 架构 · 句柄校验 · 动态容量策略 · 内存与性能平衡               |
+| **ObjectPool**对象池     | **全生命周期管控** | 分页槽位管理 · 支持锁定/多 Spawn · 低内存清理 · 帧预算释放              |
+| **Resources**资源服务    | **智能缓存策略**   | 基于 YooAsset · 资源租约 · 热资源保活 · 闲置回收 · 高缓存命中率        |
+| **HybridCLR**热更新      | **无缝 C# 热更**   | AOT / Hotfix 分层 · 内置反射调用示例 · 资源与代码一体化流程              |
+| **UI**界面系统           | **高效窗口管理**   | 窗口栈与层级 · Holder 自动生成 · Widget / Tab 复用 · 逻辑视图分离       |
+| **RecyclerView**虚拟列表 | **海量数据承载**   | 可见区增量刷新 · 支持循环 / 分组 / 网格 / 分页 / 圆形布局 · 惯性滚动     |
+| **UI Extension**UI 扩展  | **开箱即用组件**   | 强封装 Button / Switch / Image · 拖拽导航 · 多端输入图标 · 减少胶水代码 |
+| **Navigation**导航热键   | **多设备输入**     | 基于 New Input System · 自动设备识别 · 顶层焦点域 · 热键转发            |
 
 ## 新工程安装指南
 
@@ -66,17 +66,18 @@ com.alicizax.unity.framework
 
 | 包名 | 说明 |
 | :--- | :--- |
-| `com.alicizax.unity.ui.extension` | UI 扩展组件 |
-| `com.alicizax.unity.editor.extension` | 编辑器扩展工具 |
-| `com.alicizax.unity.input` | 输入系统扩展 |
-| `com.alicizax.unity.debugger` | 运行时调试面板 |
+| [`com.alicizax.unity.ui.extension`](https://github.com/AlicizaX/com.alicizax.unity.ui.extension) | UI 扩展组件 |
+| [`com.alicizax.unity.editor.extension`](https://github.com/AlicizaX/com.alicizax.unity.editor.extension) | 编辑器扩展工具 |
+| [`com.alicizax.unity.input`](https://github.com/AlicizaX/com.alicizax.unity.input) | 输入系统扩展 |
+| [`com.alicizax.unity.debugger`](https://github.com/AlicizaX/com.alicizax.unity.debugger) | 运行时调试面板 |
+| [`com.alicizax.unity.localization`](https://github.com/AlicizaX/com.alicizax.unity.localization) | 多语言包 |
 
 ### 5. 选择项目模板
 
 根据你的项目需求，选择并导入对应模板：
 
-| 模板类型 | 适用场景 |
-| :--- | :--- |
+| 模板类型   | 适用场景     |
+| :--------- | :----------- |
 | **Normal** | 标准项目开发 |
 | **Hybrid** | 混合开发模式 |
 

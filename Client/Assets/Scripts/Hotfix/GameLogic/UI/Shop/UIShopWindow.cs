@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AlicizaX;
 using AlicizaX.Localization;
+using AlicizaX.Localization.UI;
 using AlicizaX.UI;
 using AlicizaX.UI.Runtime;
 using Cysharp.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace GameLogic.UI
         private UGLoopList<ShopGoodsData> _goodsLoopList;
         private IFakePlayerDataService _playerDataService;
         private IConfigService _configService;
+        private LocalizedText _currencyBinding;
 
         protected override void OnInitialize()
         {
@@ -31,6 +33,7 @@ namespace GameLogic.UI
             _goodsLoopList = UGListCreateHelper.CreateLoop<ShopGoodsData>(baseui.ScrollViewGoodsLoopList);
             _playerDataService = AppServices.Require<IFakePlayerDataService>();
             _configService = AppServices.Require<IConfigService>();
+            _currencyBinding = baseui.TextCurrency.GetComponent<LocalizedText>();
 
             baseui.TogRecommend.onValueChanged.AddListener(OnTogRecommendChanged);
             baseui.TogItem.onValueChanged.AddListener(OnTogItemChanged);
@@ -60,7 +63,7 @@ namespace GameLogic.UI
 
         private void RefreshCurrencyText()
         {
-            baseui.TextCurrency.SetLocalizationArgs(_playerDataService.Credit.ToStringNonAlloc());
+            _currencyBinding.SetArguments(_playerDataService.Credit);
         }
 
 
@@ -154,10 +157,10 @@ namespace GameLogic.UI
         {
             return category switch
             {
-                EShopCategory.MATERIAL => LocalizationKey.UI.SHOP_TAG_ITEM,
-                EShopCategory.EQUIPMENT => LocalizationKey.UI.SHOP_TAG_SKIN,
-                EShopCategory.CONSUMABLE => LocalizationKey.UI.SHOP_TAG_PACK,
-                _ => LocalizationKey.UI.SHOP_TAG_RECOMMEND
+                EShopCategory.MATERIAL => LocalizationKey.UI.SHOP_TAG_ITEM_Raw,
+                EShopCategory.EQUIPMENT => LocalizationKey.UI.SHOP_TAG_SKIN_Raw,
+                EShopCategory.CONSUMABLE => LocalizationKey.UI.SHOP_TAG_PACK_Raw,
+                _ => LocalizationKey.UI.SHOP_TAG_RECOMMEND_Raw
             };
         }
     }

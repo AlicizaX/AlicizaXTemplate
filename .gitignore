@@ -6,6 +6,9 @@ UnityProject/UserSettings/Search.settings
 .vs/
 /**/.claude/
 #Luban
+/Config/Luban/
+/Config/Tools.build/
+/Config/Tools.backup/
 Configs/.cache.meta
 GenerateDatas/
 #FileServer

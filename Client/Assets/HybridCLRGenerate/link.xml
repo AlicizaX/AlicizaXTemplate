@@ -4,8 +4,6 @@
     <type fullname="GameApp" preserve="all" />
   </assembly>
   <assembly fullname="AlicizaX.Framework.Runtime">
-    <type fullname="AlicizaX.Localization.GameLocaizationTable" preserve="all" />
-    <type fullname="AlicizaX.Localization.Runtime.ILocalizationModule" preserve="all" />
     <type fullname="AlicizaX.Resource.Runtime.IResourceModule" preserve="all" />
     <type fullname="AlicizaX.UI.Runtime.EUIResLoadType" preserve="all" />
     <type fullname="AlicizaX.UI.Runtime.IUIModule" preserve="all" />
@@ -19,13 +17,9 @@
     <type fullname="AlicizaX.UI.Runtime.WindowAttribute" preserve="all" />
   </assembly>
   <assembly fullname="AlicizaX.UI.Extension">
-    <type fullname="IUXLocalizationHelper" preserve="all" />
     <type fullname="UXButton" preserve="all" />
     <type fullname="UXComponentExtensionsHelper" preserve="all" />
     <type fullname="UnityEngine.UI.UXImage" preserve="all" />
-  </assembly>
-  <assembly fullname="Luban.Runtime">
-    <type fullname="Luban.ByteBuf" preserve="all" />
   </assembly>
   <assembly fullname="System">
     <type fullname="System.CodeDom.Compiler.GeneratedCodeAttribute" preserve="all" />

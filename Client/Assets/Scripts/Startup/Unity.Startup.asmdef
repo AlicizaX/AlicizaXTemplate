@@ -10,7 +10,9 @@
         "Unity.TextMeshPro",
         "ZString",
         "AlicizaX.Framework.Runtime",
-        "AlicizaX.UI.Extension"
+        "AlicizaX.UI.Extension",
+        "AlicizaX.Localization.Runtime",
+        "AlicizaX.Localization.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

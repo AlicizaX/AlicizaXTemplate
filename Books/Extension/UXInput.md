@@ -105,11 +105,11 @@ private void OnInputContextChanged(UXInput.Watch.InputContext context)
 | `InputProfile` | 当前 Profile。 |
 | `ControlScheme` | 控制方案。 |
 | `DeviceId` | Input System 设备 ID。 |
-| `VendorId` / `ProductId` | 设备 VID/PID。 |
 | `DeviceName` | 设备显示名。 |
-| `Layout` | Input System layout。 |
-| `InterfaceName` | 设备接口名。 |
-| `Manufacturer` / `Product` | 设备厂商和产品名。 |
+
+`InputContext` 只保留运行时真正使用的字段。设备连接期间 `Watch` 会按设备缓存上下文，输入事件不会重复构造字符串。
+
+Profile 的稳定 ID、显示名、回退链和绑定组提示由 `InputProfileCatalog` 统一定义，编辑器和运行时共用同一份数据。
 
 ## Rebind 运行时重绑定
 
@@ -141,16 +141,23 @@ private void OnInputContextChanged(UXInput.Watch.InputContext context)
 开始重绑定：
 
 ```csharp
-UXInput.Rebind.BeginRebind("UI/Submit");
-UXInput.Rebind.BeginRebind("UI/Submit", RebindTarget.KeyboardMouse);
-UXInput.Rebind.BeginRebind("UI/Submit", RebindTarget.Gamepad);
+UXInput.Rebind.Begin("UI/Submit");
+UXInput.Rebind.Begin("UI/Submit", RebindRequest.ForTarget(RebindTarget.Gamepad));
 ```
 
 Composite Part 重绑定：
 
 ```csharp
-UXInput.Rebind.BeginCompositePartRebind("Gameplay/Move", "Up");
-UXInput.Rebind.BeginCompositePartRebind("Gameplay/Move", "Up", RebindTarget.KeyboardMouse);
+UXInput.Rebind.Begin("Gameplay/Move", RebindRequest.Default.WithCompositePart("Up"));
+```
+
+`RebindRequest` 是不可变选项结构，通过 `With...` 方法派生：
+
+```csharp
+RebindRequest request = RebindRequest.Default
+    .WithCompositePart("Up")
+    .WithWaitDelay(0.1f)
+    .WithPrepareOnly(true);
 ```
 
 确认或丢弃：
@@ -163,15 +170,14 @@ UXInput.Rebind.DiscardPrepared();
 取消当前交互式监听：
 
 ```csharp
-UXInput.Rebind.CancelRebinding();
+UXInput.Rebind.Cancel();
 ```
 
 重置绑定：
 
 ```csharp
-UXInput.Rebind.ResetBinding("UI/Submit");
-UXInput.Rebind.ResetCompositePartBinding("Gameplay/Move", "Up");
-UXInput.Rebind.ResetActionBindings("UI/Submit");
+UXInput.Rebind.Reset("UI/Submit");                                             // 该动作全部覆盖
+UXInput.Rebind.Reset("Gameplay/Move", RebindRequest.Default.WithCompositePart("Up")); // 单条绑定
 UXInput.Rebind.ResetAllBindings();
 UXInput.Rebind.ResetToDefault();
 ```
@@ -186,9 +192,9 @@ bool imported = UXInput.Rebind.ImportBindingsJson(json);
 显示绑定文本：
 
 ```csharp
-string text = UXInput.Rebind.GetBindingDisplayString("UI/Submit");
-string gamepadText = UXInput.Rebind.GetBindingDisplayString("UI/Submit", RebindTarget.Gamepad);
-string upText = UXInput.Rebind.GetBindingDisplayString("Gameplay/Move", "Up");
+string text = UXInput.Rebind.GetDisplayString("UI/Submit");
+string gamepadText = UXInput.Rebind.GetDisplayString("UI/Submit", RebindRequest.ForTarget(RebindTarget.Gamepad));
+string upText = UXInput.Rebind.GetDisplayString("Gameplay/Move", RebindRequest.Default.WithCompositePart("Up"));
 ```
 
 `RebindTarget`：
@@ -197,8 +203,6 @@ string upText = UXInput.Rebind.GetBindingDisplayString("Gameplay/Move", "Up");
 | --- | --- |
 | `KeyboardMouse` | 键盘和鼠标。默认会排除鼠标移动、滚轮、Pointer position/delta。 |
 | `Gamepad` | 手柄。 |
-| `Joystick` | 摇杆。 |
-| `Any` | 不限制设备。 |
 
 绑定文件路径：
 
@@ -211,7 +215,7 @@ string upText = UXInput.Rebind.GetBindingDisplayString("Gameplay/Move", "Up");
 
 `UXInput.Reader` 是业务层轮询读取工具，适合在 `Update` 中读 Action。
 
-解析 Action：
+解析 Action（依赖 `InputActionProvider` 的注册表；找不到时静默返回 null）：
 
 ```csharp
 InputAction jump = UXInput.Reader.ResolveAction("Gameplay/Jump");
@@ -228,53 +232,54 @@ if (UXInput.Reader.TryReadValue<Vector2>("Gameplay/Aim", out Vector2 aim))
 }
 ```
 
-一次触发和 Toggle：
-
-```csharp
-if (UXInput.Reader.ReadPressedOnce(this, "Gameplay/Interact"))
-{
-    Interact();
-}
-
-bool inventoryOpen = UXInput.Reader.ReadPressedToggle(this, "UI/Inventory");
-SetInventoryVisible(inventoryOpen);
-```
-
-Button 专用读取：
+按住状态读取：
 
 ```csharp
 bool pressed = UXInput.Reader.ReadButton("UI/Submit");
-bool once = UXInput.Reader.ReadButtonOnce(this, "UI/Submit");
-bool toggled = UXInput.Reader.ReadButtonToggle(this, "UI/TogglePanel");
+bool held = UXInput.Reader.ReadPressed("Gameplay/Sprint");
 ```
+
+边沿与开关（状态归调用方所有）：
+
+```csharp
+private UXInput.Reader.ButtonState _interactState;
+private UXInput.Reader.ButtonState _inventoryState;
+
+private void Update()
+{
+    if (_interactState.Once(UXInput.Reader.ResolveAction("Gameplay/Interact")))
+    {
+        Interact();
+    }
+
+    bool inventoryOpen = _inventoryState.Toggle(UXInput.Reader.ResolveAction("UI/Inventory"));
+    SetInventoryVisible(inventoryOpen);
+}
+```
+
+`ButtonState` 必须声明为字段（属性/临时变量拿到的是副本）。`Once` 在按下当次返回 true，`Toggle` 每次按下翻转并返回缓存状态。`Reset()` 清零，`SetToggled(bool)` 直接设置开关。
 
 Composite Part：
 
 ```csharp
 bool up = UXInput.Reader.ReadCompositePartButton("Gameplay/Move", "Up");
 
-if (UXInput.Reader.ReadCompositePartButtonOnce(this, "Gameplay/Move", "Left"))
+if (_stepLeftState.Once(UXInput.Reader.ResolveAction("Gameplay/Move"), "Left"))
 {
     StepLeft();
 }
 ```
 
-重置 Toggle 状态：
-
-```csharp
-UXInput.Reader.ResetToggledButton("UI/Inventory");
-UXInput.Reader.ResetToggledCompositePartButton("player", "Gameplay/Move", "Up");
-UXInput.Reader.ResetToggledButtons();
-```
+`Reader` 不保存任何以对象或字符串为键的全局状态，因此不会因为 UI 对象销毁而泄漏。需要跨组件共享开关时，把 `ButtonState` 放在共享的静态字段或拥有者组件上。
 
 诊断事件：
 
 | 事件 | 说明 |
 | --- | --- |
-| `OnRead` | `Once`、`Toggle`、`ValueOnce` 等离散读取发生时触发。 |
-| `OnContinuousRead` | `ReadPressed`、`ReadButton`、`TryReadValue` 等连续读取为 true 时触发，可能高频。 |
+| `OnRead` | `Once`、`Toggle` 等离散读取发生时触发。 |
+| `OnContinuousRead` | `ReadPressed`、`ReadButton`、`TryReadValue`、`ReadCompositePartButton` 为 true 时触发，可能高频。 |
 
-`Reader` 的状态缓存是懒加载的。普通 `ReadPressed`、`ReadButton`、`TryReadValue` 不会创建 once/toggle/composite 缓存。
+Composite 部分的绑定索引按 `Rebind.BindingVersion` 缓存；稳态读取为 0 分配。
 
 ## Haptics 震动
 
@@ -313,7 +318,7 @@ UXInput.Haptics.Play(hapticPattern);
 ```csharp
 UXInput.Haptics.Stop();
 UXInput.Haptics.Reset();
-UXInput.Haptics.SetIntensity(0.5f);
+UXInput.Haptics.Intensity = 0.5f;
 ```
 
 `HapticPattern` 是 `ScriptableObject`，可以在项目中创建：
@@ -374,7 +379,7 @@ Add Component > Input > Input Visualizer
 ```csharp
 public void StartRebindSubmit()
 {
-    UXInput.Rebind.BeginRebind("UI/Submit");
+    UXInput.Rebind.Begin("UI/Submit");
 }
 
 public void SavePrepared()
@@ -405,7 +410,7 @@ private void OnDisable()
 
 private void Refresh()
 {
-    bindingLabel.text = UXInput.Rebind.GetBindingDisplayString("UI/Submit");
+    bindingLabel.text = UXInput.Rebind.GetDisplayString("UI/Submit");
 }
 ```
 
@@ -431,9 +436,11 @@ private void OnProfileChanged(UXInput.Watch.InputProfile profile)
 ### 读取输入并震动
 
 ```csharp
+private UXInput.Reader.ButtonState _interactState;
+
 private void Update()
 {
-    if (UXInput.Reader.ReadPressedOnce(this, "Gameplay/Interact"))
+    if (_interactState.Once(UXInput.Reader.ResolveAction("Gameplay/Interact")))
     {
         UXInput.Haptics.Play(HapticPreset.Selection);
         Interact();
@@ -448,5 +455,5 @@ private void Update()
 3. `UXInput.Rebind` 的结果先进入暂存区，只有 `ConfirmApply` 后才会应用和保存。
 4. `UXInput.Rebind.OnBindingsChanged` 是绑定变化的统一通知入口。
 5. `UXInput.Reader.OnContinuousRead` 可能高频触发，诊断默认不显示。
-6. `InputVisualizer` 默认过滤 Pointer position/delta 和重复设备活动，避免鼠标移动刷屏。
+6. `InputVisualizer` 只在 `UNITY_EDITOR` 或 `DEVELOPMENT_BUILD` 中编译，发布包不会包含它。
 7. 手柄震动只作用于 `Gamepad.current`，没有当前手柄时调用会直接返回。

@@ -77,7 +77,7 @@ public sealed class DeleteConfirmWindow : UIWindow<ui_DeleteConfirmWindow>
 - 指针进入 / 离开、非指针选中 / 取消选中由 `UXSelectable` 上报。
 - 左键点击、`OnSubmit`、`PlayClickFeedback` 上报 `Press`。
 
-主题 clip 配在 `UXUiAudioProfile`，启动场景用 `UXUiAudioBinder` 注入。单个按钮要换音、只要点击音或完全静音，挂 `UXUiAudioOverride`。详见 [UXUiAudio](UXUiAudio.md)。
+主题 clip 配在 `UXUiAudioProfile`，由应用加载后调用 `UXUiAudioRouter.Bind(profile)`。单个按钮要换音、只要点击音或完全静音，挂 `UXUiAudioOverride`。详见 [UXUiAudio](UXUiAudio.md)。
 
 ## Inspector 配置
 
@@ -92,8 +92,8 @@ public sealed class DeleteConfirmWindow : UIWindow<ui_DeleteConfirmWindow>
 1. 只响应左键点击，右键不会触发 `onClick`。
 2. `OnSubmit` 会触发 `onClick`，所以键盘、手柄和 `HotkeyComponent` 都可以复用同一套按钮逻辑。
 3. `onClick` 的类型仍然是 `Button.ButtonClickedEvent`，旧代码里 `baseui.BtnConfirm.onClick.AddListener(...)` 的写法可以保留。
-4. 按钮禁用或节点未激活时，`Press()` 会直接返回，不会触发业务回调。
-5. 音效走全局 Profile。没挂 `UXUiAudioBinder` 或不想出声时静默跳过，不报错。
+4. 按钮禁用或节点未激活时，点击和 Submit 不会上报音效或触发业务回调。
+5. 音效优先使用控件 Override，再使用全局 Profile；两者都没有时静默跳过。
 
 ## UXSelectable 子节点状态
 

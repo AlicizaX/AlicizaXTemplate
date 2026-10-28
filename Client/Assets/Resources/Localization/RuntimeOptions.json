@@ -1,0 +1,13 @@
+{
+  "Version": 1,
+  "Locales": [
+    "ChineseSimplified",
+    "English",
+    "Japanese"
+  ],
+  "DefaultLocale": "ChineseSimplified",
+  "Catalogs": [
+    "../../Bundles/Configs/bytes/localization/Game_{locale}.bytes",
+    "Update_{locale}.bytes"
+  ]
+}

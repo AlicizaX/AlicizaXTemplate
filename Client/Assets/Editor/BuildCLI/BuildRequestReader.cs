@@ -46,11 +46,6 @@ public static class BuildRequestReader
             throw new Exception("构建场景列表为空");
         }
 
-        if (string.IsNullOrEmpty(request.Language))
-        {
-            throw new Exception("缺少 UCL_PARAM_LANGUAGE");
-        }
-
         return request;
     }
 

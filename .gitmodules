@@ -19,3 +19,6 @@
 [submodule "Client/Packages/com.alicizax.unity.input"]
 	path = Client/Packages/com.alicizax.unity.input
 	url = https://github.com/AlicizaX/com.alicizax.unity.input.git
+[submodule "Client/Packages/com.alicizax.unity.localization"]
+	path = Client/Packages/com.alicizax.unity.localization
+	url = https://github.com/AlicizaX/com.alicizax.unity.localization.git

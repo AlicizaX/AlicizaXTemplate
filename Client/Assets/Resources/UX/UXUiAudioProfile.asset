@@ -15,21 +15,13 @@ MonoBehaviour:
   _rules:
   - Cue: 0
     Devices: 2
-    IgnoreProgrammatic: 0
+    AllowProgrammaticFocus: 0
     Clip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
   - Cue: 2
     Devices: 12
-    IgnoreProgrammatic: 1
+    AllowProgrammaticFocus: 0
     Clip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
-  - Cue: 4
+  - Cue: 1
     Devices: 15
-    IgnoreProgrammatic: 0
-    Clip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}
-  - Cue: 5
-    Devices: 15
-    IgnoreProgrammatic: 0
-    Clip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}
-  - Cue: 6
-    Devices: 15
-    IgnoreProgrammatic: 0
+    AllowProgrammaticFocus: 0
     Clip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}

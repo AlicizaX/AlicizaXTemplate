@@ -1,5 +1,6 @@
 using AlicizaX.UI;
 using AlicizaX.UI.Runtime;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,11 +23,11 @@ namespace Game.UI
         [SerializeField] private UXButton mBtnActionC;
         public UXButton BtnActionC => mBtnActionC;
 
-        [SerializeField] private UXTextMeshPro mTextTitle;
-        public UXTextMeshPro TextTitle => mTextTitle;
+        [SerializeField] private TextMeshProUGUI mTextTitle;
+        public TextMeshProUGUI TextTitle => mTextTitle;
 
-        [SerializeField] private UXTextMeshPro mTextStatus;
-        public UXTextMeshPro TextStatus => mTextStatus;
+        [SerializeField] private TextMeshProUGUI mTextStatus;
+        public TextMeshProUGUI TextStatus => mTextStatus;
 
         [SerializeField] private RecyclerView mScrollViewList;
         public RecyclerView ScrollViewList => mScrollViewList;

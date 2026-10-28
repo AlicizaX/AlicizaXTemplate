@@ -81,7 +81,7 @@ MonoBehaviour:
         CollectorGUID: afddbfe87a53e9049bf031ee18842f87
         CollectorType: 0
         AddressRuleName: AddressByFileName
-        PackRuleName: PackDirectory
+        PackRuleName: PackCollector
         FilterRuleName: CollectAll
         AssetTags: WEBGL_PRELOAD
         UserData: 

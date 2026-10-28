@@ -1,22 +1,41 @@
-#!/bin/bash
-cd "$(dirname "$0")" || exit 1
+#!/usr/bin/env bash
+set -euo pipefail
 
-if [[ -n "$1" ]]; then
-    TEMPLATE="$1"
+cd "$(dirname "$0")"
+if [[ "${1:-}" == "--check" ]]; then
+    set -- -x alicizax.check=true
+elif [[ $# -ne 0 ]]; then
+    echo 'Usage: gen-all.sh [--check]' >&2
+    exit 2
 else
-    INTERACTIVE=1
-    echo "Select generation mode:"
-    echo "  1. Normal (ClientTemplate)"
-    echo "  2. Lazy   (ClientTemplateLazy)"
-    read -rp "Enter 1 or 2: " CHOICE
-    [[ "$CHOICE" == "2" ]] && TEMPLATE=ClientTemplateLazy || TEMPLATE=ClientTemplate
+    set --
 fi
 
-dotnet ./CustomeTools/ConfigGenerate/ConfigGenerate.dll config.ini "$TEMPLATE"
-EXIT_CODE=$?
-
-if [[ -n "$INTERACTIVE" ]]; then
-    read -rp "Press Enter to continue..."
+if [[ ! -f Tools/Luban.AlicizaX.Localization.dll ]]; then
+    echo 'Luban localization extension is missing. Rebuild Config/Tools.' >&2
+    exit 1
 fi
 
-exit "$EXIT_CODE"
+dotnet Tools/Luban.dll \
+    -t all \
+    --conf luban.conf \
+    -f \
+    -p alicizax-localization \
+    --strict \
+    -x outputSaver=alicizax-stage \
+    -x alicizax.config=config.ini \
+    -x alicizax.validationOnly=true \
+    -x l10n.provider=alicizax
+
+dotnet Tools/Luban.dll \
+    -t client \
+    --conf luban.conf \
+    -c cs-bin \
+    -d bin \
+    -p alicizax-localization \
+    --customTemplateDir Defines/ClientTemplate \
+    --strict \
+    -x outputSaver=alicizax-stage \
+    -x alicizax.config=config.ini \
+    -x l10n.provider=alicizax \
+    "$@"

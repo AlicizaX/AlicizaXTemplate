@@ -52,8 +52,8 @@ namespace GameLogic.Player
             }
 
             Credit -= totalPrice;
-            AddBagItem(goodsData.ItemId, goodsData.Name, quantity);
-            var evt = new PlayerDataChangedEvent(Credit, goodsData.ItemId, goodsData.Name, quantity, totalPrice);
+            AddBagItem(goodsData.ItemId, goodsData.NameKey, quantity);
+            var evt = new PlayerDataChangedEvent(Credit, goodsData.ItemId, goodsData.NameKey, quantity, totalPrice);
             EventBus.Publish(in evt);
             return true;
         }
@@ -63,11 +63,11 @@ namespace GameLogic.Player
             ItemConfig itemConfig = _configService.TbItem.GetOrDefault(itemId);
             if (itemConfig != null)
             {
-                AddBagItem(itemConfig.Id, itemConfig.Name, quantity);
+                AddBagItem(itemConfig.Id, itemConfig.NameKey, quantity);
             }
         }
 
-        private void AddBagItem(int itemId, string itemName, int quantity)
+        private void AddBagItem(int itemId, string itemNameKey, int quantity)
         {
             for (int i = 0; i < _bagItems.Count; i++)
             {
@@ -82,20 +82,20 @@ namespace GameLogic.Player
                 return;
             }
 
-            _bagItems.Add(new FakeBagItemData(itemId, itemName, quantity));
+            _bagItems.Add(new FakeBagItemData(itemId, itemNameKey, quantity));
         }
     }
 
     public struct FakeBagItemData
     {
         public int ItemId;
-        public string ItemName;
+        public string ItemNameKey;
         public int Count;
 
-        public FakeBagItemData(int itemId, string itemName, int count)
+        public FakeBagItemData(int itemId, string itemNameKey, int count)
         {
             ItemId = itemId;
-            ItemName = itemName;
+            ItemNameKey = itemNameKey;
             Count = count;
         }
     }
@@ -105,15 +105,15 @@ namespace GameLogic.Player
     {
         public readonly int Credit;
         public readonly int ChangedItemId;
-        public readonly string ChangedItemName;
+        public readonly string ChangedItemNameKey;
         public readonly int ChangedItemCount;
         public readonly int Cost;
 
-        public PlayerDataChangedEvent(int credit, int changedItemId, string changedItemName, int changedItemCount, int cost)
+        public PlayerDataChangedEvent(int credit, int changedItemId, string changedItemNameKey, int changedItemCount, int cost)
         {
             Credit = credit;
             ChangedItemId = changedItemId;
-            ChangedItemName = changedItemName;
+            ChangedItemNameKey = changedItemNameKey;
             ChangedItemCount = changedItemCount;
             Cost = cost;
         }

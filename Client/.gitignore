@@ -31,6 +31,7 @@
 ExportedObj/
 .consulo/
 *.csproj
+!Packages/com.alicizax.unity.localization/Editor/Generation/Cli~/Localization.Cli.csproj
 *.unityproj
 *.sln
 *.suo

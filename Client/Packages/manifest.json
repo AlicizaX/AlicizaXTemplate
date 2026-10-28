@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "com.alicizax.unity.localization": "file:com.alicizax.unity.localization",
     "com.code-philosophy.hybridclr": "https://gitee.com/focus-creative-games/hybridclr_unity.git",
+    "com.code-philosophy.luban": "https://github.com/focus-creative-games/luban_unity.git",
     "com.kyrylokuzyk.primetween": "1.4.0",
     "com.tuyoogame.yooasset": "3.0.6",
     "com.unity.2d.sprite": "1.0.0",

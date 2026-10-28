@@ -1,6 +1,8 @@
 using System.Reflection;
 using System.Collections.Generic;
 using AlicizaX;
+using AlicizaX.Localization.Runtime;
+using AlicizaX.UI.UXFeedback;
 using Cysharp.Threading.Tasks;
 using Game.Config;
 using GameLogic.Player;
@@ -10,7 +12,6 @@ using UnityEngine;
 
 namespace GameLogic
 {
-
     public static class HotfixEntry
     {
         private static List<Assembly> _hotfixAssembly;
@@ -27,8 +28,12 @@ namespace GameLogic
         {
             Log.Info("HotFix Logic Entry!");
             _hotfixAssembly = (List<Assembly>)objects[0];
+
+            await LocalizationKit.AddCatalogAsync(new ResourceCatalogSource("Game_{locale}"));
+
             ConfigService = AppServices.App.Register<IConfigService>(new ConfigService());
             await ConfigService.Initialize(new ConfigBytesLoader());
+            ConfigService.SetLocalizationChange(LocalizationKit.Get, LocalizationKit.SubscribeChanged);
 
 
             if (!AppServices.App.TryGet<IFakePlayerDataService>(out _))
@@ -36,28 +41,20 @@ namespace GameLogic
                 AppServices.App.Register<IFakePlayerDataService>(new FakePlayerDataService());
             }
 
-            GameApp.UI.ShowUI<UIHomeWindow>();
+            UXUiAudioRouter.Bind(Resources.Load<UXUiAudioProfile>("UX/UXUiAudioProfile"));
+            await GameApp.UI.ShowUI<UIHomeWindow>();
         }
 
         private sealed class ConfigBytesLoader : IConfigBytesLoader
         {
-            public UniTask<ByteBuf> LoadCommonAsync(string file)
+            public async UniTask<ByteBuf> LoadCommonAsync(string file)
             {
-                return LoadBufferAsync($"{file}");
-            }
-
-            public UniTask<ByteBuf> LoadLocalizedAsync(string file)
-            {
-                return LoadBufferAsync($"{file}_{GameApp.Localization.Language}");
-            }
-
-            private static async UniTask<ByteBuf> LoadBufferAsync(string location)
-            {
-                var textAsset = await GameApp.Resource.LoadAssetAsync<TextAsset>(location);
-                byte[] bytes = textAsset.bytes;
-                GameApp.Resource.UnloadAsset(textAsset);
-                return ByteBuf.Wrap(bytes);
+                string location = $"{file}";
+                using var asset = await GameApp.Resource.LoadLeaseAsync<TextAsset>(location);
+                if (!asset.IsValid) throw new System.InvalidOperationException($"Missing config asset: {location}");
+                return ByteBuf.Wrap(asset.Asset.bytes);
             }
         }
+
     }
 }

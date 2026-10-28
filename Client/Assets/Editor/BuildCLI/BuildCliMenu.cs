@@ -1,4 +1,4 @@
-using AlicizaX.Editor.Extension;
+using AlicizaX.Editor.Toolbar;
 using UnityEditor;
 using YooAsset;
 
@@ -47,7 +47,6 @@ public static class BuildCliMenu
             PlayMode = mode == ResourceBuildMode.Online
                 ? (int)EPlayMode.HostPlayMode
                 : (int)EPlayMode.OfflinePlayMode,
-            Language = "ChineseSimplified",
         };
     }
 

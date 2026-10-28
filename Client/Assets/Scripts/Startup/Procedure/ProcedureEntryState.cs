@@ -1,7 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using AlicizaX;
-using AlicizaX.Localization;
+using AlicizaX.Localization.Runtime;
 using UnityEngine;
 using YooAsset;
 
@@ -25,7 +25,7 @@ namespace Unity.Startup.Procedure
             //检查设备是否能够访问互联网
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
-                Log.Warning("The device is not connected to the network");
+                Log.Warning(UpdateLocalizationKey.Bootstrap.UPDATE_NETWORKERROR);
                 return;
             }
 

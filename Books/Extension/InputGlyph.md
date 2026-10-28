@@ -89,10 +89,11 @@ AlicizaX/Extension/Input/Create Input Glyph Database
 
 ## 默认 Profile
 
-`Sync Profiles` 会生成固定 Profile。当前默认不包含 `Touch`，因为触摸输入不应该作为通用按键图标数据库默认配置。
+`Sync Profiles` 会补齐固定 Profile，并且只补齐缺失项：不截断、不重排、不清空已有条目。固定列表包含 `Touch`，用于触摸/触控笔图标表；不需要时可以留空。
 
 | Profile | 默认 Fallback |
 | --- | --- |
+| `Touch` | 无 |
 | `KeyboardMouse` | 无 |
 | `GenericGamepad` | 无 |
 | `GenericJoystick` | `GenericGamepad` |
@@ -102,7 +103,7 @@ AlicizaX/Extension/Input/Create Input Glyph Database
 | `SteamDeck` | `Xbox`，`GenericGamepad` |
 | `SteamController` | `SteamDeck`，`Xbox`，`GenericGamepad` |
 
-Fallback 使用广度优先队列，并会去重。以 `SteamController` 为例，查找顺序是：
+回退链在数据库构建缓存时一次性展平，运行时查询只做一次字典命中。以 `SteamController` 为例，查找顺序是：
 
 ```text
 SteamController -> SteamDeck -> Xbox -> GenericGamepad
@@ -111,8 +112,10 @@ SteamController -> SteamDeck -> Xbox -> GenericGamepad
 以 `Xbox` 找 `<Gamepad>/buttonSouth` 为例：
 
 ```text
-Xbox -> GenericGamepad -> Placeholder
+Xbox -> GenericGamepad -> 无明确条目
 ```
+
+没有明确条目时：`InputGlyphImage` 使用数据库 `Placeholder`，`InputGlyphText` 回退到控制路径的可读文本，不会用占位图冒充实测命中。
 
 不会自动去找 `PlayStation`、`Switch` 或 `KeyboardMouse`，除非你把它们写进 `fallbackProfileIds`。
 
@@ -166,7 +169,6 @@ Add Component > UI > Input Glyph Image
 | `Action Source Mode` | 图标来源。 |
 | `Action Reference` | 直接指定 `InputActionReference`。 |
 | `Hotkey Trigger` | 从同节点或指定 `HotkeyComponentBase` 读取 Hotkey Action。 |
-| `Action Name` | 通过 `InputActionProvider.ResolveAction(actionName)` 查询。 |
 | `Composite Part Name` | 组合绑定部分，例如 `Up`、`Down`、`Left`、`Right`。 |
 | `Target Image` | 要写入 Sprite 的 Image。为空时自动取同节点 `Image`。 |
 | `Profile Events` | 当前 Profile 匹配或不匹配时触发 UnityEvent。 |
@@ -189,7 +191,7 @@ Add Component > UI > Input Glyph Text
 
 字段和 `InputGlyphImage` 基本一致，输出目标为 `Target Text`。为空时自动取同节点 `TMP_Text`。
 
-启用时会缓存当前 TMP 文本作为模板，刷新时用 `{0}` 填入图标或回退文本：
+启用时会缓存当前 TMP 文本作为模板，刷新时只替换第一个 `{0}` 占位符：
 
 ```text
 Press {0} to confirm
@@ -207,22 +209,14 @@ Press <sprite name="xbox_a"> to confirm
 Press A to confirm
 ```
 
+模板没有 `{0}` 时保持原文本不变；其它占位符（例如 `{1}`）不会被解释，也不会抛异常。图标解析结果变化时才重新拼接字符串。
+
 ## Action 来源
 
 | 模式 | 说明 |
 | --- | --- |
 | `ActionReference` | 直接使用 Inspector 中的 `InputActionReference`。 |
 | `HotkeyTrigger` | 从 `HotkeyComponentBase.HotkeyAction` 读取动作，适合按钮热键提示。 |
-| `ActionName` | 使用 `InputActionProvider.ResolveAction` 按名称查找。 |
-
-`ActionName` 推荐使用完整路径：
-
-```text
-UI/Submit
-Gameplay/Jump
-```
-
-`InputActionProvider` 只注册 `MapName/ActionName` 形式的完整路径，短名称不会被解析。
 
 ## 运行时查询
 
@@ -343,9 +337,9 @@ profiles:
 
 ## 注意事项
 
-1. `Touch` 不在默认 `InputGlyphDatabase` Profile 中。触摸输入仍然可以被 `UXInput.Watch` 识别，但默认不生成触摸图标表。
+1. `Touch` 现在是固定 Profile 之一；不需要触摸图标时保持为空即可。
 2. 同一物理位置的 Gamepad 控制路径在不同平台显示不同按钮文字，差异应放在不同 Profile 的 Sprite 上。
-3. `InputGlyphText` 会把启用时的文本作为模板，模板中建议保留 `{0}`。
-4. `InputGlyphImage` 找不到图标时会清空 `Image.sprite`。
+3. `InputGlyphText` 会把启用时的文本作为模板，模板中建议保留 `{0}`；缺失或非法占位符不会抛异常。
+4. `InputGlyphImage` 找不到明确图标时会使用数据库 `Placeholder`，数据库未配置占位图时清空 `Image.sprite`。
 5. `InputGlyphText` 找不到图标时会优先回退到 Input System 的可读绑定文本。
 6. 绑定变化由 `UXInput.Rebind.OnBindingsChanged` 通知，设备变化由 `UXInput.Watch.OnContextChanged` 通知。

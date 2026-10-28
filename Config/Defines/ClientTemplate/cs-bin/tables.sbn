@@ -1,0 +1,97 @@
+using System;
+using Luban;
+using AlicizaX;
+using Cysharp.Threading.Tasks;
+
+{{namespace_with_grace_begin __namespace}}
+    public interface IConfigBytesLoader
+    {
+        UniTask<ByteBuf> LoadCommonAsync(string file);
+    }
+
+    public interface IConfigService : IService
+    {
+        {{~for table in __tables ~}}
+        {{~if table.comment != '' ~}}
+        /// <summary>{{escape_comment table.comment}}</summary>
+        {{~end~}}
+        {{table.full_name}} {{format_property_name __code_style table.name}} { get; }
+        {{~end~}}
+        UniTask Initialize(IConfigBytesLoader loader);
+        void SetLocalizationChange(Func<string, string> translate, Func<Action<string>, IDisposable> subscribeChanged);
+    }
+
+    public class {{__name}} : ServiceBase, IConfigService
+    {
+        private IConfigBytesLoader _loader;
+        private bool _isLoaded;
+        private Func<string, string> _translate;
+        private IDisposable _localizationSubscription;
+
+        {{~for table in __tables ~}}
+        public {{table.full_name}} {{format_property_name __code_style table.name}} { private set; get; }
+        {{~end~}}
+
+        public async UniTask Initialize(IConfigBytesLoader loader)
+        {
+            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
+            if (_isLoaded) return;
+            var loadTasks = new System.Collections.Generic.List<UniTask>();
+            {{~for table in __tables ~}}
+            {{format_property_name __code_style table.name}} = new {{table.full_name}}(() => _loader.LoadCommonAsync("{{table.output_data_file}}"));
+            loadTasks.Add({{format_property_name __code_style table.name}}.LoadAsync());
+            {{~end~}}
+            await UniTask.WhenAll(loadTasks);
+            {{~for table in __tables ~}}
+            {{format_property_name __code_style table.name}}.ResolveRef(this);
+            {{~end~}}
+            _isLoaded = true;
+            RefreshLocalization();
+        }
+
+        public void SetLocalizationChange(Func<string, string> translate, Func<Action<string>, IDisposable> subscribeChanged)
+        {
+            if (translate == null) throw new ArgumentNullException(nameof(translate));
+            if (subscribeChanged == null) throw new ArgumentNullException(nameof(subscribeChanged));
+            _localizationSubscription?.Dispose();
+            _translate = translate;
+            _localizationSubscription = subscribeChanged(_ => RefreshLocalization());
+            RefreshLocalization();
+        }
+
+        private void RefreshLocalization()
+        {
+            if (!_isLoaded || _translate == null) return;
+            {{~for table in __tables ~}}
+            {{~has_text = false~}}
+            {{~for field in table.value_ttype.def_bean.hierarchy_export_fields~}}
+            {{~if has_tag field.ctype "text"~}}
+            {{~has_text = true~}}
+            {{~end~}}
+            {{~end~}}
+            {{~if has_text~}}
+            {{~if table.is_map_table || table.is_list_table~}}
+            foreach (var row in {{format_property_name __code_style table.name}}.DataList)
+            {
+            {{~else~}}
+            {
+                var row = {{format_property_name __code_style table.name}}.Data;
+            {{~end~}}
+                {{~for field in table.value_ttype.def_bean.hierarchy_export_fields~}}
+                {{~if has_tag field.ctype "text"~}}
+                row.{{format_property_name __code_style field.name}} = _translate(row.{{format_property_name __code_style field.name}}Key);
+                {{~end~}}
+                {{~end~}}
+            }
+            {{~end~}}
+            {{~end~}}
+        }
+
+        protected override void OnInitialize() { }
+        protected override void OnDestroyService()
+        {
+            _localizationSubscription?.Dispose();
+            _localizationSubscription = null;
+        }
+    }
+{{namespace_with_grace_end __namespace}}

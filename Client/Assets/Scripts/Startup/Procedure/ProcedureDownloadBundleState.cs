@@ -1,5 +1,6 @@
-﻿using AlicizaX.Resource.Runtime;
+using AlicizaX.Resource.Runtime;
 using AlicizaX;
+using AlicizaX.Localization.Runtime;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using YooAsset;
@@ -26,7 +27,7 @@ namespace Unity.Startup.Procedure
             downloader = AppServices.Require<IResourceService>().CreateResourceDownloader();
             if (downloader.TotalDownloadCount == 0)
             {
-                Log.Info("没有发现需要下载的资源");
+                Log.Info(UpdateLocalizationKey.Bootstrap.UPDATE_NOASSETS);
                 SwitchProcedure<ProcedurePatchDoneState>();
             }
             else
@@ -62,7 +63,7 @@ namespace Unity.Startup.Procedure
             // 检测下载结果
             if (downloader.Status != EOperationStatus.Succeeded)
             {
-                Log.Error("资源更新失败!");
+                Log.Error(UpdateLocalizationKey.Bootstrap.UPDATE_DOWNLOADFAILED);
                 return;
             }
 

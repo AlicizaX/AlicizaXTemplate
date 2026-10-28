@@ -1,4 +1,6 @@
 using AlicizaX;
+using AlicizaX.Localization.Runtime;
+using AlicizaX.Resource.Runtime;
 using AlicizaX.UI.Runtime;
 using Game.UI;
 using GameLogic.Player;
@@ -23,6 +25,7 @@ namespace GameLogic.UI
             baseui.BtnPlus.onClick.AddListener(OnBtnPlusClick);
             baseui.InputQuantity.onValueChanged.AddListener(OnQuantityInputChanged);
             _playerDataService = AppServices.Require<IFakePlayerDataService>();
+            LocalizationKit.Changed += OnLocalizationChanged;
         }
 
         protected override void OnOpen()
@@ -30,6 +33,16 @@ namespace GameLogic.UI
             _goodsData = UserData as ShopGoodsData;
             _unitPrice = _goodsData?.Price ?? 0;
             _quantity = 1;
+            RefreshView();
+        }
+
+        protected override void OnDestroy()
+        {
+            LocalizationKit.Changed -= OnLocalizationChanged;
+        }
+
+        private void OnLocalizationChanged(string language)
+        {
             RefreshView();
         }
 
@@ -48,12 +61,12 @@ namespace GameLogic.UI
 
             if (_playerDataService.TryBuy(_goodsData, _quantity, out int totalPrice))
             {
-                Log.Info(LocalizationKey.Log.BUY_CONFIRMED(_goodsData.Name, _quantity.ToString(), totalPrice.ToString()));
+                Log.Info(LocalizationKey.Log.BUY_CONFIRMED(_goodsData.Name, _quantity, totalPrice));
                 CloseSelf();
                 return;
             }
 
-            Log.Info(LocalizationKey.Log.BUY_INSUFFICIENT(_goodsData.Name, _quantity.ToString()));
+            Log.Info(LocalizationKey.Log.BUY_INSUFFICIENT(_goodsData.Name, _quantity));
         }
 
         private void OnBtnMinusClick()
@@ -113,7 +126,7 @@ namespace GameLogic.UI
 
         private void RefreshTotalPrice()
         {
-            string totalPrice = LocalizationKey.UI.COMMON_CREDITPRICE((_unitPrice * _quantity).ToStringNonAlloc());
+            string totalPrice = LocalizationKey.UI.COMMON_CREDITPRICE(_unitPrice * _quantity);
             baseui.TextTotalPrice.text = LocalizationKey.UI.BUY_TOTALPRICE(totalPrice);
         }
     }

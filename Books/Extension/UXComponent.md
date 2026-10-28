@@ -1,6 +1,6 @@
 # UXComponent 扩展组件
 
-`UXComponent` 提供一组基于 UGUI 的增强控件。它们主要解决子节点状态切换、Toggle 分组、渐变图片、本地化文本和 UI 语义音效等问题。快捷键、导航和 InputGlyph 已拆到独立输入扩展包中。
+`UXComponent` 提供一组基于 UGUI 的增强控件。它们主要解决子节点状态切换、Toggle 分组、渐变图片和 UI 语义音效等问题。快捷键、导航和 InputGlyph 已拆到独立输入扩展包中。
 
 源码位置：
 
@@ -19,21 +19,20 @@
 | --- | --- |
 | [UXButton](UXButton.md) | `UXButton`、`UXSelectable` 子节点状态 |
 | [UXToggle](UXToggle.md) | `UXToggle`、`UXGroup` 分组、页签切换 |
-| [UXUiAudio](UXUiAudio.md) | UI Cue、`UXUiAudioProfile`、Binder、单控件 Override |
+| [UXUiAudio](UXUiAudio.md) | UI Cue、`UXUiAudioProfile`、单控件 Override |
 | [UXImage](UXImage.md) | 渐变绘制、镜像模式、进度条 |
-| [UXTextMeshPro](UXTextMeshPro.md) | 本地化 key 绑定、本地化适配器注入 |
 | [UXDraggable](UXDraggable.md) | 拖拽事件转发、可拖拽弹窗 |
 | [HotkeyComponent](HotkeyComponent.md) | 可选 input 包：Input System 快捷键绑定、优先级规则 |
 
 ## UI 音效绑定
 
-`UXButton` / `UXToggle` 不再持有 clip，也不再注入 `IUXAudioHelper`。启动场景的 `Entry/UI` 上挂 `UXUiAudioBinder`，指定 `UXUiAudioProfile`。详见 [UXUiAudio](UXUiAudio.md)。
+`UXButton` / `UXToggle` 不持有 clip，也不注入 `IUXAudioHelper`。应用加载 `UXUiAudioProfile` 后调用 `UXUiAudioRouter.Bind(profile)`；无需场景组件。详见 [UXUiAudio](UXUiAudio.md)。
 
 ## 编译条件
 
 | 宏 | 影响范围 |
 | --- | --- |
-| `TEXTMESHPRO_SUPPORT` | `UXTextMeshPro` |
+| `TEXTMESHPRO_SUPPORT` | `UXButton`、`UXInput Field` 的 TMP 创建菜单 |
 | `INPUTSYSTEM_SUPPORT` | 由 `com.alicizax.unity.input` 自动生成，用于 input 包内的 `HotkeyComponent`、`Navigation`、`InputGlyph` |
 | `UXNAVIGATION_SUPPORT` | UI extension 检测到 `com.alicizax.unity.input` 后自动生成，用于 RecyclerView.Navigation 接入 |
 

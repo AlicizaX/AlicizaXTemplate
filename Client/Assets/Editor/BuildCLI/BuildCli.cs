@@ -38,6 +38,9 @@ public static class BuildCli
 
     public static void Execute(BuildRequest request)
     {
+#if ALICIZAX_LOCALIZATION
+        LocalizationBuildLanguageOverride.ValidateLanguage(request.Language);
+#endif
         BuildTargetGroup group = Prepare(request);
 #if HYBIRDCLR_SUPPORT
         if (HasPlayerDefine(group, "ENABLE_HYBRIDCLR"))
@@ -108,6 +111,7 @@ public static class BuildCli
 
     private static void BuildResource(BuildRequest request)
     {
+        LubanConfigGenerate.CheckGeneratedFiles();
         var parameter = new ResourceBuildParameter
         {
             ResourceBuildTarget = request.BuildTarget,

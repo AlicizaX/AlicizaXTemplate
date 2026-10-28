@@ -22,6 +22,11 @@
             "name": "com.code-philosophy.hybridclr",
             "expression": "",
             "define": "HYBIRDCLR_SUPPORT"
+        },
+        {
+            "name": "com.alicizax.unity.localization",
+            "expression": "",
+            "define": "ALICIZAX_LOCALIZATION"
         }
     ],
     "noEngineReferences": false

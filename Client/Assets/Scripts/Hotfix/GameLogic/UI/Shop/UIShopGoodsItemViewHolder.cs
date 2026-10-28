@@ -1,4 +1,6 @@
+using AlicizaX.Resource.Runtime;
 using AlicizaX.UI;
+using AlicizaX.Localization.UI;
 using Cysharp.Threading.Tasks;
 using Game.Config.Tables;
 using TMPro;
@@ -17,20 +19,20 @@ namespace GameLogic.UI
         {
             _shopConfig = shopConfig;
             _itemConfig = shopConfig.ItemId_Ref;
-            Tag = tagKey;
+            TagKey = tagKey;
             AccentColor = accentColor;
-            PriceText = LocalizationKey.UI.COMMON_CREDITPRICE(_itemConfig.Price.ToStringNonAlloc());
         }
 
         public int Id => _shopConfig.Id;
         public int ItemId => _itemConfig.Id;
+        public string NameKey => _itemConfig.NameKey;
+        public string DescriptionKey => _itemConfig.DescKey;
         public string Name => _itemConfig.Name;
         public string Description => _itemConfig.Desc;
         public int Price => _itemConfig.Price;
         public string Icon => _itemConfig.Icon;
-        public string Tag { get; private set; }
+        public string TagKey { get; }
         public Color AccentColor { get; }
-        public string PriceText { get; }
     }
 
     public sealed class UIShopGoodsItemViewHolder : ViewHolder<ShopGoodsData>, IPointerClickHandler, IRecyclerViewNavigationViewHolder
@@ -47,13 +49,21 @@ namespace GameLogic.UI
         [SerializeField] private TextMeshProUGUI tagText;
 
         private string _iconLocation;
+        private LocalizedText _nameBinding;
+        private LocalizedText _descriptionBinding;
+        private LocalizedText _priceBinding;
+        private LocalizedText _tagBinding;
 
         protected override void OnBind(ShopGoodsData data, int index)
         {
-            nameText.text = data.Name;
-            descriptionText.text = data.Description;
-            priceText.text = data.PriceText;
-            tagText.text = data.Tag;
+            _nameBinding ??= EnsureBinding(nameText);
+            _descriptionBinding ??= EnsureBinding(descriptionText);
+            _priceBinding ??= EnsureBinding(priceText);
+            _tagBinding ??= EnsureBinding(tagText);
+            _nameBinding.SetKey(data.NameKey);
+            _descriptionBinding.SetKey(data.DescriptionKey);
+            _priceBinding.SetContent(LocalizationKey.UI.COMMON_CREDITPRICE_Raw, data.Price);
+            _tagBinding.SetKey(data.TagKey);
             if (_iconLocation != data.Icon)
             {
                 _iconLocation = data.Icon;
@@ -67,6 +77,15 @@ namespace GameLogic.UI
         protected override void OnClear()
         {
             _iconLocation = null;
+            _nameBinding?.SetKey(null);
+            _descriptionBinding?.SetKey(null);
+            _priceBinding?.SetKey(null);
+            _tagBinding?.SetKey(null);
+        }
+
+        private static LocalizedText EnsureBinding(TMP_Text text)
+        {
+            return text.GetComponent<LocalizedText>() ?? text.gameObject.AddComponent<LocalizedText>();
         }
 
         protected override void OnSelectionChange(bool select)

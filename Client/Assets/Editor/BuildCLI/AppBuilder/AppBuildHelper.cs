@@ -50,6 +50,7 @@ public static class AppBuildHelper
         try
         {
             ApplyLaunchContext(buildParams);
+            using var buildOverrides = BuildLaunchContext.BeginBuildOverrides();
 
             var options = new BuildPlayerOptions
             {
@@ -58,6 +59,11 @@ public static class AppBuildHelper
                 target = buildParams.BuildTarget,
                 options = buildParams.DevelopBuild ? BuildOptions.Development : BuildOptions.None
             };
+
+#if ALICIZAX_LOCALIZATION
+            if (LocalizationBuildLanguageOverride.ActiveTempPath != null)
+                options.extraScriptingDefines = new[] { LocalizationBuildLanguageOverride.Define };
+#endif
 
             var report = BuildPipeline.BuildPlayer(options);
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
@@ -152,7 +158,7 @@ public static class AppBuildHelper
 
         if (!string.IsNullOrEmpty(buildParameters.Language))
         {
-            BuildLaunchContext.Set(BuildLaunchContext.LocalizationLanguage, buildParameters.Language);
+            BuildLaunchContext.Set("localization.language", buildParameters.Language);
         }
     }
 

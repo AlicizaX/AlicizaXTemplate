@@ -1,4 +1,4 @@
-﻿using AlicizaX;
+using AlicizaX;
 using AlicizaX.UI.Runtime;
 using Game.UI;
 
@@ -42,9 +42,9 @@ namespace GameLogic.UI
             Log.Info("UITestAWidget.OnRegisterEvent");
         }
 
-        protected override void OnUpdate()
+        protected override void OnUpdate(float deltaTime)
         {
-            base.OnUpdate();
+            base.OnUpdate(deltaTime);
             Log.Info("UITestAWidget.OnUpdate()");
         }
     }

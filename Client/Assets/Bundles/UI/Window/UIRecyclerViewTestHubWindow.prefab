@@ -176,7 +176,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 467075220984702314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -256,9 +256,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 0
-  m_localizationKey: 
-  m_localizationFormatArgs: []
 --- !u!1 &1247586024127652362
 GameObject:
   m_ObjectHideFlags: 0
@@ -632,7 +629,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2432052815662717301}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -712,9 +709,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 0
-  m_localizationKey: 
-  m_localizationFormatArgs: []
 --- !u!1 &2896079008915485955
 GameObject:
   m_ObjectHideFlags: 0
@@ -769,7 +763,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2896079008915485955}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -849,9 +843,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 0
-  m_localizationKey: 
-  m_localizationFormatArgs: []
 --- !u!1 &3374677962780976520
 GameObject:
   m_ObjectHideFlags: 0
@@ -906,7 +897,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3374677962780976520}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -986,9 +977,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 0
-  m_localizationKey: 
-  m_localizationFormatArgs: []
 --- !u!1 &3410554183932074094
 GameObject:
   m_ObjectHideFlags: 0
@@ -1804,7 +1792,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5462643584319130539}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -1884,9 +1872,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 0
-  m_localizationKey: 
-  m_localizationFormatArgs: []
 --- !u!1 &5624320047666859970
 GameObject:
   m_ObjectHideFlags: 0
@@ -1941,7 +1926,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5624320047666859970}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -2021,9 +2006,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 0
-  m_localizationKey: 
-  m_localizationFormatArgs: []
 --- !u!1 &5965096475993217433
 GameObject:
   m_ObjectHideFlags: 0
@@ -2078,7 +2060,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5965096475993217433}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -2158,9 +2140,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 0
-  m_localizationKey: 
-  m_localizationFormatArgs: []
 --- !u!1 &6071155889177163410
 GameObject:
   m_ObjectHideFlags: 0
@@ -2215,7 +2194,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6071155889177163410}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -2295,9 +2274,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 0
-  m_localizationKey: 
-  m_localizationFormatArgs: []
 --- !u!1 &6885869581924380705
 GameObject:
   m_ObjectHideFlags: 0
@@ -2474,7 +2450,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7368699994477079935}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -2554,9 +2530,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 0
-  m_localizationKey: 
-  m_localizationFormatArgs: []
 --- !u!1 &8112815859567330979
 GameObject:
   m_ObjectHideFlags: 0
@@ -2611,7 +2584,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8112815859567330979}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd17b8b605f2ba540bac156b5cf5ac77, type: 3}
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -2691,6 +2664,3 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
-  m_localizationID: 0
-  m_localizationKey: 
-  m_localizationFormatArgs: []

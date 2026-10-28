@@ -3,6 +3,7 @@ using System.Text;
 using AlicizaX.UI;
 using AlicizaX.UI.Runtime;
 using Game.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -458,7 +459,7 @@ namespace GameLogic.UI
                 return;
             }
 
-            UXTextMeshPro label = button.GetComponentInChildren<UXTextMeshPro>(true);
+            TextMeshProUGUI label = button.GetComponentInChildren<TextMeshProUGUI>(true);
             if (label != null)
             {
                 label.text = text;
