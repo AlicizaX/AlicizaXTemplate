@@ -41,7 +41,7 @@ public static class LubanConfigGenerate
     {
         string root = ConfigRoot;
         bool windows = Application.platform == RuntimePlatform.WindowsEditor;
-        string script = Path.Combine(root, windows ? "gen-all.bat" : "gen-all.sh");
+        string script = Path.Combine(root, windows ? "gen-all.bat" : "gen-all.command");
         if (!File.Exists(script)) throw new FileNotFoundException("gen-all script not found.", script);
         var start = new ProcessStartInfo(windows ? "cmd.exe" : "/bin/bash",
             windows ? "/d /s /c \"\"" + script + "\"" + (check ? " --check" : "") + "\""

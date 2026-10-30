@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 if [[ "${1:-}" == "--check" ]]; then
     set -- -x alicizax.check=true
 elif [[ $# -ne 0 ]]; then
-    echo 'Usage: gen-all.sh [--check]' >&2
+    echo 'Usage: gen-all.command [--check]' >&2
     exit 2
 else
     set --

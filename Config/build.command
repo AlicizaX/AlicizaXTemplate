@@ -6,7 +6,7 @@ fail() {
     exit 1
 }
 
-[[ $# -eq 0 ]] || fail 'Usage: build.sh'
+[[ $# -eq 0 ]] || fail 'Usage: build.command'
 
 config_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
 luban_dir="$config_dir/Luban"
@@ -130,7 +130,7 @@ if ! mv "$build_dir" "$tools_dir"; then
     fail 'Could not replace Tools. Previous build was restored if possible.'
 fi
 
-if ! bash "$config_dir/gen-all.sh" --check; then
+if ! bash "$config_dir/gen-all.command" --check; then
     mv "$tools_dir" "$build_dir" || fail 'Verification failed and new Tools could not be moved aside.'
     if $had_previous_tools; then
         mv "$backup_dir" "$tools_dir" || fail 'Verification failed and previous Tools could not be restored.'
