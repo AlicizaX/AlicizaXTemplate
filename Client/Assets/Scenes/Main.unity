@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -135,6 +134,10 @@ PrefabInstance:
       propertyPath: m_Font
       value: 
       objectReference: {fileID: 12800000, guid: 75dc6fd4068d60b48a885cd7b49fedb5, type: 3}
+    - target: {fileID: 348092252413910368, guid: 9b309e866dfb8d24db2a798af37926ee, type: 3}
+      propertyPath: m_EnableFloatingToggleSnap
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3490734709751829172, guid: 9b309e866dfb8d24db2a798af37926ee, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

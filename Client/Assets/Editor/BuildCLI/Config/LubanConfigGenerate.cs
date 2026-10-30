@@ -9,35 +9,19 @@ using UnityEngine;
 
 public static class LubanConfigGenerate
 {
-    private const string ConfigPathPrefsKey = "AlicizaX.Config.Path";
-
-    private static string ConfigPath
-    {
-        get
-        {
-            string selected = EditorPrefs.GetString(ConfigPathPrefsKey, string.Empty);
-            return string.IsNullOrEmpty(selected)
-                ? Path.GetFullPath(Path.Combine(Application.dataPath, "../../Config/config.ini"))
-                : selected;
-        }
-    }
+    // Hardcoded Luban config folder: <AlicizaXTemplate>/Config, relative to the Unity project folder (<AlicizaXTemplate>/Client).
+    private const string ConfigRelativeRoot = "../../Config";
 
     private static string ConfigRoot
     {
-        get => Path.GetDirectoryName(ConfigPath);
+        get => Path.GetFullPath(Path.Combine(Application.dataPath, ConfigRelativeRoot));
     }
 
-    [MenuItem("AlicizaX/Config/Select Config")]
-    public static void SelectConfig()
+    private static string ConfigPath
     {
-        string selected = EditorUtility.OpenFilePanel("Select Config/config.ini", ConfigRoot, "ini");
-        if (string.IsNullOrEmpty(selected)) return;
-        if (!Path.GetFileName(selected).Equals("config.ini", StringComparison.OrdinalIgnoreCase))
-            throw new ArgumentException("Select the Luban config.ini file.");
-        EditorPrefs.SetString(ConfigPathPrefsKey, Path.GetFullPath(selected));
+        get => Path.Combine(ConfigRoot, "config.ini");
     }
 
-    [MenuItem("AlicizaX/Config/Generate Config")]
     [EditorToolFunction("Gen-Config")]
     public static void GenerateConfig()
     {
@@ -45,8 +29,8 @@ public static class LubanConfigGenerate
         AssetDatabase.Refresh();
         UnityEngine.Debug.Log("Luban config generation completed.");
     }
-
-    [MenuItem("AlicizaX/Config/Check Generated Files")]
+    
+    [EditorToolFunction("Gen-Check Generated Files")]
     public static void CheckGeneratedFiles()
     {
         if (!File.Exists(ConfigPath)) return;
@@ -82,11 +66,4 @@ public static class LubanConfigGenerate
         if (process.ExitCode != 0) throw new InvalidOperationException(label + " failed:\n" + output);
         if (output.Length != 0) UnityEngine.Debug.Log(output);
     }
-}
-
-internal sealed class LubanConfigBuildCheck : IPreprocessBuildWithReport
-{
-    public int callbackOrder => -1000;
-
-    public void OnPreprocessBuild(BuildReport report) => LubanConfigGenerate.CheckGeneratedFiles();
 }
