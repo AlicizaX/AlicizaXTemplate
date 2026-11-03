@@ -54,47 +54,6 @@ https://github.com/AlicizaX/FramworkInstaller.git
 
 详细的依赖关系与安装顺序见 **[安装与可选扩展包](https://b4lie.github.io/AlicizaXWiki/install/)**。
 
-## 快速开始
-
-启动场景里准备一个框架根节点（例如 `Entry`），按需挂上这些组件：
-
-| 组件 | 作用 |
-| --- | --- |
-| `RootModule` | 创建服务世界，驱动 `Tick/LateTick/FixedTick`，设置帧率、后台运行与休眠策略 |
-| `MemoryPoolSetting` | 配置内存池空闲预算并驱动回收 |
-| `TimerComponent` | 注册全局计时器服务 |
-| `ResourceComponent` | 注册资源服务并初始化 YooAsset |
-| `UIComponent` | 注册 UI 服务并实例化 UI 根节点 |
-| `AudioComponent` | 注册音频服务 |
-| `SceneComponent` | 注册场景服务并创建 Scene 作用域 |
-| `LocalizationComponent` | 注册并初始化本地化服务 |
-| `GameObjectPoolComponent` | 注册 GameObject 池服务 |
-| `DebuggerComponent` | 可选，注册运行时调试窗口 |
-
-组件执行顺序由各自的 `DefaultExecutionOrder` 保证：`RootModule` 最先，随后是内存池、计时器、资源、UI、音频。业务脚本建议在 `Start()` 之后再访问框架服务。
-
-业务代码统一通过 `GameApp` 访问各模块：
-
-```csharp
-using AlicizaX;
-using AlicizaX.UI.Runtime;
-using UnityEngine;
-
-public sealed class GameEntry : MonoBehaviour
-{
-    private void Start()
-    {
-        // 打开一个窗口（窗口类型由 UI 生成器产生）
-        GameApp.UI.ShowUISync<UILoadUpdate>();
-
-        // 延迟 1 秒做一件事
-        GameApp.Timer.AddTimer(() => Debug.Log("1s later"), 1f);
-    }
-}
-```
-
-常用入口：`GameApp.Base` / `GameApp.Resource` / `GameApp.ResourcePackage` / `GameApp.UI` / `GameApp.Audio` / `GameApp.Scene` / `GameApp.Timer` / `GameApp.GameObjectPool` / `GameApp.Localization`。
-
 ## 文档
 
 完整文档在 **[https://b4lie.github.io/AlicizaXWiki/](https://b4lie.github.io/AlicizaXWiki/)**：
