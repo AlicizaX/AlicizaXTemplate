@@ -17,26 +17,26 @@ namespace Unity.Startup.Procedure
         private async UniTask InitPackageAsync()
         {
             string hostUrl = string.Empty;
-            if (GameApp.Resource.PlayMode == EPlayMode.HostPlayMode || GameApp.Resource.PlayMode == EPlayMode.WebPlayMode)
+            if (GameApp.ResourcePackage.PlayMode == EPlayMode.HostPlayMode || GameApp.ResourcePackage.PlayMode == EPlayMode.WebPlayMode)
             {
                 hostUrl = StartupSetting.CDNUrl;
             }
 
-            await GameApp.Resource.InitPackageAsync(string.Empty, hostUrl, hostUrl);
+            await GameApp.ResourcePackage.InitPackageAsync(string.Empty, hostUrl, hostUrl);
             await UniTask.DelayFrame();
             UpdateStaticVersion().Forget();
         }
 
         private async UniTask UpdateStaticVersion()
         {
-            var buildInOperation = GameApp.Resource.RequestPackageVersionAsync();
+            var buildInOperation = GameApp.ResourcePackage.RequestPackageVersionAsync();
             await buildInOperation.ToUniTask();
 
             if (buildInOperation.Status == EOperationStatus.Succeeded)
             {
                 //更新成功
                 string packageVersion = buildInOperation.PackageVersion;
-                GameApp.Resource.PackageVersion = packageVersion;
+                GameApp.ResourcePackage.PackageVersion = packageVersion;
 
                 Log.Info($"Updated package Version : {packageVersion}");
                 maxFailedCount = 0;
@@ -62,17 +62,17 @@ namespace Unity.Startup.Procedure
         {
             LoadPackageManifestOperation buildInOperation;
             string packageVersion = "Simulate";
-            if (GameApp.Resource.PlayMode != EPlayMode.EditorSimulateMode)
+            if (GameApp.ResourcePackage.PlayMode != EPlayMode.EditorSimulateMode)
             {
-                packageVersion = GameApp.Resource.PackageVersion;
+                packageVersion = GameApp.ResourcePackage.PackageVersion;
             }
 
-            buildInOperation = GameApp.Resource.LoadPackageManifestAsync(packageVersion);
+            buildInOperation = GameApp.ResourcePackage.LoadPackageManifestAsync(packageVersion);
             await buildInOperation.ToUniTask();
 
             if (buildInOperation.Status == EOperationStatus.Succeeded)
             {
-                if (GameApp.Resource.PlayMode == EPlayMode.OfflinePlayMode)
+                if (GameApp.ResourcePackage.PlayMode == EPlayMode.OfflinePlayMode)
                 {
                     SwitchProcedure<ProcedurePatchDoneState>();
                     return;

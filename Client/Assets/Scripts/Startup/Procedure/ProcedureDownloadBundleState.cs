@@ -24,7 +24,7 @@ namespace Unity.Startup.Procedure
 
         private void CreateDownloader()
         {
-            downloader = AppServices.Require<IResourceService>().CreateResourceDownloader();
+            downloader = AppServices.Require<IResourcePackageService>().CreateResourceDownloader();
             if (downloader.TotalDownloadCount == 0)
             {
                 Log.Info(UpdateLocalizationKey.Bootstrap.UPDATE_NOASSETS);

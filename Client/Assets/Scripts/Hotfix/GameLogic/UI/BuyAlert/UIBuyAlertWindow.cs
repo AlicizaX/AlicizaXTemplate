@@ -112,7 +112,7 @@ namespace GameLogic.UI
             baseui.TextItemName.text = _goodsData != null ? _goodsData.Name : LocalizationKey.UI.BUY_UNKNOWNITEM;
             if (_goodsData != null)
             {
-                baseui.ImgItemIcon.SetSprite(_goodsData.Icon);
+                baseui.ImgItemIcon.SetSprite(Res, _goodsData.Icon);
                 baseui.ImgItemIcon.color = _goodsData.AccentColor;
             }
             else

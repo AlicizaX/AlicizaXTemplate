@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using AlicizaX;
+using AlicizaX.Resource.Runtime;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using YooAsset;
 #if ENABLE_HYBRIDCLR
@@ -38,7 +40,7 @@ namespace Unity.Startup.Procedure
             m_LoadMetadataAssetCount = 0;
             LoadMetadataForAOTAssembly();
 
-            if (GameApp.Resource.PlayMode == EPlayMode.EditorSimulateMode)
+            if (GameApp.ResourcePackage.PlayMode == EPlayMode.EditorSimulateMode)
             {
                 LoadAssembliesFromDomain();
             }
@@ -139,13 +141,19 @@ namespace Unity.Startup.Procedure
             foreach (string hotUpdateDllName in StartupSetting.HotUpdateAssemblies)
             {
                 m_LoadAssemblyAssetCount++;
-                GameApp.Resource.LoadAsset<TextAsset>(hotUpdateDllName, LoadAssemblyAssetSuccess);
+                LoadAssemblyAssetAsync(hotUpdateDllName).Forget();
             }
 
             if (m_LoadAssemblyAssetCount == 0)
             {
                 m_LoadAssemblyComplete = true;
             }
+        }
+
+        private async UniTaskVoid LoadAssemblyAssetAsync(string location)
+        {
+            using AssetLease<TextAsset> lease = await GameApp.Resource.LoadLeaseAsync<TextAsset>(location);
+            LoadAssemblyAssetSuccess(lease.Asset);
         }
 
         private void LoadAssemblyAssetSuccess(TextAsset textAsset)
@@ -183,18 +191,13 @@ namespace Unity.Startup.Procedure
             {
                 m_LoadAssemblyAssetCount--;
                 m_LoadAssemblyComplete = m_LoadAssemblyAssetCount == 0;
-
-                if (textAsset != null)
-                {
-                    GameApp.Resource.UnloadAsset(textAsset);
-                }
             }
         }
 
         // Load AOT metadata only when HybridCLR is enabled.
         private void LoadMetadataForAOTAssembly()
         {
-            if (GameApp.Resource.PlayMode == EPlayMode.EditorSimulateMode || AOTGenericReferences.PatchedAOTAssemblyList.Count == 0)
+            if (GameApp.ResourcePackage.PlayMode == EPlayMode.EditorSimulateMode || AOTGenericReferences.PatchedAOTAssemblyList.Count == 0)
             {
                 m_LoadMetadataAssemblyComplete = true;
                 return;
@@ -204,13 +207,19 @@ namespace Unity.Startup.Procedure
             foreach (string aotDllName in AOTGenericReferences.PatchedAOTAssemblyList)
             {
                 m_LoadMetadataAssetCount++;
-                GameApp.Resource.LoadAsset<TextAsset>(aotDllName, LoadMetadataAssetSuccess);
+                LoadMetadataAssetAsync(aotDllName).Forget();
             }
 
             if (m_LoadMetadataAssetCount == 0)
             {
                 m_LoadMetadataAssemblyComplete = true;
             }
+        }
+
+        private async UniTaskVoid LoadMetadataAssetAsync(string location)
+        {
+            using AssetLease<TextAsset> lease = await GameApp.Resource.LoadLeaseAsync<TextAsset>(location);
+            LoadMetadataAssetSuccess(lease.Asset);
         }
 
         private void LoadMetadataAssetSuccess(TextAsset textAsset)
@@ -237,11 +246,6 @@ namespace Unity.Startup.Procedure
             {
                 m_LoadMetadataAssetCount--;
                 m_LoadMetadataAssemblyComplete = m_LoadMetadataAssetCount == 0;
-
-                if (textAsset != null)
-                {
-                    GameApp.Resource.UnloadAsset(textAsset);
-                }
             }
         }
 #endif
