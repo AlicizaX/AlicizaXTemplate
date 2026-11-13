@@ -44,16 +44,12 @@ namespace GameLogic.UI
             baseui.TogRecommend.isOn = true;
             RefreshCurrencyText();
             SwitchCategory(EShopCategory.TEST);
+            EventProxy.AddUIEvent<PlayerDataChangedEvent>(OnPlayerDataChanged);
         }
 
         protected override void OnOpen()
         {
             RefreshCurrencyText();
-        }
-
-        protected override void OnRegisterEvent(EventListenerProxy proxy)
-        {
-            proxy.AddUIEvent<PlayerDataChangedEvent>(OnPlayerDataChanged);
         }
 
         private void OnPlayerDataChanged(in PlayerDataChangedEvent evt)
@@ -107,7 +103,7 @@ namespace GameLogic.UI
         private void SwitchCategory(EShopCategory category)
         {
             var datas = GetGoods(category);
-            _goodsList.Data = datas.Take(16).ToList();
+            _goodsList.Data = datas.Take(32).ToList();
             _goodsLinerList.Data = datas;
             _goodsLoopList.Data = datas;
         }

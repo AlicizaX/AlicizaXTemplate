@@ -85,7 +85,7 @@ namespace Game.Config
         }
 
         protected override void OnInitialize() { }
-        protected override void OnDestroyService()
+        protected override void OnDispose()
         {
             _localizationSubscription?.Dispose();
             _localizationSubscription = null;

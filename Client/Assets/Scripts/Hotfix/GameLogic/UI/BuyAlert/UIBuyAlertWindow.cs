@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace GameLogic.UI
 {
-    [Window(UILayer.Popup, 3)]
+    [Window(UILayer.Popup, -1)]
     public class UIBuyAlertWindow : UIWindow<ui_UIBuyAlertWindow>
     {
         private ShopGoodsData _goodsData;

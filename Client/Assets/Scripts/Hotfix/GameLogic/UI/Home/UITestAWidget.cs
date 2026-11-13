@@ -36,12 +36,6 @@ namespace GameLogic.UI
             Log.Info("UITestAWidget.OnRefresh");
         }
 
-        protected override void OnRegisterEvent(EventListenerProxy proxy)
-        {
-            base.OnRegisterEvent(proxy);
-            Log.Info("UITestAWidget.OnRegisterEvent");
-        }
-
         protected override void OnUpdate(float deltaTime)
         {
             base.OnUpdate(deltaTime);

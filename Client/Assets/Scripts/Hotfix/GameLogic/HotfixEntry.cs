@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using AlicizaX;
 using AlicizaX.Localization.Runtime;
-using AlicizaX.UI.UXFeedback;
+using AlicizaX.Input;
 using Cysharp.Threading.Tasks;
 using Game.Config;
 using GameLogic.Player;
@@ -31,17 +31,17 @@ namespace GameLogic
 
             await LocalizationKit.AddCatalogAsync(new ResourceCatalogSource("Game_{locale}"));
 
-            ConfigService = AppServices.App.Register<IConfigService>(new ConfigService());
+            ConfigService = AppServices.Register<IConfigService>(new ConfigService());
             await ConfigService.Initialize(new ConfigBytesLoader());
             ConfigService.SetLocalizationChange(LocalizationKit.Get, LocalizationKit.SubscribeChanged);
 
 
-            if (!AppServices.App.TryGet<IFakePlayerDataService>(out _))
+            if (!AppServices.TryGet<IFakePlayerDataService>(out _))
             {
-                AppServices.App.Register<IFakePlayerDataService>(new FakePlayerDataService());
+                AppServices.Register<IFakePlayerDataService>(new FakePlayerDataService());
             }
 
-            UXUiAudioRouter.Bind(Resources.Load<UXUiAudioProfile>("UX/UXUiAudioProfile"));
+            UXInput.Feedback.Profile = Resources.Load<InputFeedbackProfile>("UX/InputFeedbackProfile");
             await GameApp.UI.ShowUI<UIHomeWindow>();
         }
 

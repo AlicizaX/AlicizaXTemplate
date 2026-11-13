@@ -119,7 +119,6 @@ MonoBehaviour:
   m_ShadowEffectDistance: {x: 2, y: -2}
   m_ShadowSoftness: 1.5
   m_UseGraphicAlpha: 1
-  m_OriginFlipMode: 0
   m_FlipMode: 0
   m_FlipWithCopy: 1
   m_FlipEdgeHorizontal: 2
@@ -138,7 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1244e4e0978d61d4690faa552218c589, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _transitionPlayerComponent: {fileID: 1999173220494767221}
+  _defaultTransition: {fileID: 1999173220494767221}
 --- !u!114 &1999173220494767221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,7 +157,6 @@ MonoBehaviour:
   targetRect: {fileID: 610910684217411226}
   canvasGroup: {fileID: 3028760432738633948}
   useUnscaledTime: 1
-  followAnimationInteractable: 0
   openDuration: 1
   closeDuration: 1
   slideDistance: 120

@@ -31,7 +31,7 @@ namespace GameLogic.Player
             AddInitialItem(3001, 2);
         }
 
-        protected override void OnDestroyService()
+        protected override void OnDispose()
         {
             _bagItems.Clear();
         }

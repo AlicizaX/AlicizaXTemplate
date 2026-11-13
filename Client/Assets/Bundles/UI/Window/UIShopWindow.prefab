@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1684390523067905217}
   - component: {fileID: 4080589129632134963}
   - component: {fileID: 2071414018764554873}
+  - component: {fileID: 6356012789400962898}
   - component: {fileID: 8284539248617032526}
   m_Layer: 5
   m_Name: Tog@Pack
@@ -77,6 +78,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6356012789400962898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95669013388501524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8890c652e5c4375b106ed12b7355c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 0
+  _profile: {fileID: 0}
 --- !u!114 &8284539248617032526
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -396,8 +411,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _target: {fileID: 6807502940412919174}
   _key: UI.Shop.Title
   _arguments: []
@@ -546,8 +561,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _target: {fileID: 3380475061070479436}
   _key: UI.Shop.TabSkin
   _arguments: []
@@ -717,6 +732,7 @@ GameObject:
   - component: {fileID: 678326836087717844}
   - component: {fileID: 4407422507495060593}
   - component: {fileID: 7309206332327847148}
+  - component: {fileID: 4852044727906847784}
   m_Layer: 5
   m_Name: ScrollView@GoodsList
   m_TagString: Untagged
@@ -758,7 +774,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
-  alignment: 2
+  centerCrossAxis: 0
   spacing: {x: 35, y: 20}
   padding: {x: 5, y: 5}
   movementType: 0
@@ -812,12 +828,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 4
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
+    m_SelectOnRight: {fileID: 4931375287322301384}
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
@@ -841,16 +857,26 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 0}
   recyclerView: {fileID: 678326836087717844}
-  navigationScope: {fileID: 0}
+  navigationScope: {fileID: 1074027313733218944}
   wrapNavigation: 0
   keepFocusVisibleWhenSuppressed: 1
   smoothScroll: 1
   smoothScrollDuration: 0.18
   focusAlignment: 2
-  exitLeft: {fileID: 0}
-  exitRight: {fileID: 0}
-  exitUp: {fileID: 0}
-  exitDown: {fileID: 0}
+--- !u!114 &4852044727906847784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1793448674643077280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8890c652e5c4375b106ed12b7355c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 0
+  _profile: {fileID: 0}
 --- !u!1 &1849951930596189609
 GameObject:
   m_ObjectHideFlags: 0
@@ -952,6 +978,7 @@ GameObject:
   - component: {fileID: 3568099304913718340}
   - component: {fileID: 309093924178575750}
   - component: {fileID: 4794244344494896813}
+  - component: {fileID: 6064180413044091450}
   - component: {fileID: 4931375287322301384}
   - component: {fileID: 2782881452727641682}
   m_Layer: 5
@@ -1019,6 +1046,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6064180413044091450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1894572764968299891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8890c652e5c4375b106ed12b7355c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 0
+  _profile: {fileID: 0}
 --- !u!114 &4931375287322301384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1032,18 +1073,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 0
+    m_Mode: 4
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnLeft: {fileID: 7309206332327847148}
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 0.86}
     m_PressedColor: {r: 0.75, g: 0.78, b: 0.74, a: 1}
-    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_SelectedColor: {r: 1, g: 0, b: 0, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.08
@@ -1059,7 +1100,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 4794244344494896813}
+  m_TargetGraphic: {fileID: 4006178148059681915}
   m_ChildTransitions: []
   m_OnClick:
     m_PersistentCalls:
@@ -1079,8 +1120,9 @@ MonoBehaviour:
   _holder: {fileID: 6632951170448113532}
   _hotkeyAction: {fileID: 2578644123212045086, guid: 5a8ec89654ebcd642af04da22f4406f8, type: 3}
   _hotkeyPressType: 1
-  _hotkeyConsumesInput: 1
-  _component: {fileID: 4931375287322301384}
+  _submitTarget: {fileID: 4931375287322301384}
+  _listenerComponents:
+  - {fileID: 6064180413044091450}
 --- !u!1 &2979973705440797269
 GameObject:
   m_ObjectHideFlags: 0
@@ -1226,8 +1268,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _target: {fileID: 6918161624132930552}
   _key: UI.Shop.TabItem
   _arguments: []
@@ -1369,7 +1411,7 @@ MonoBehaviour:
   - {fileID: 4437988265261170900}
   - {fileID: 5768689325602518406}
   - {fileID: 8284539248617032526}
-  m_DefaultToggle: {fileID: 7442681452951954130}
+  m_DefaultToggle: {fileID: 5768689325602518406}
 --- !u!114 &8928547728108153838
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1407,6 +1449,7 @@ GameObject:
   - component: {fileID: 8914986885984948434}
   - component: {fileID: 357797460490994208}
   - component: {fileID: 4481087540622029556}
+  - component: {fileID: 8410991809536628811}
   - component: {fileID: 7442681452951954130}
   m_Layer: 5
   m_Name: Tog@Skin
@@ -1473,6 +1516,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8410991809536628811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3364151360188648400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8890c652e5c4375b106ed12b7355c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 0
+  _profile: {fileID: 0}
 --- !u!114 &7442681452951954130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1629,6 +1686,7 @@ GameObject:
   - component: {fileID: 6632951170448113532}
   - component: {fileID: -4639290678824064717}
   - component: {fileID: 5019894679281548058}
+  - component: {fileID: 1074027313733218944}
   m_Layer: 5
   m_Name: UIShopWindow
   m_TagString: Untagged
@@ -1709,7 +1767,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 698cc60c321497c4eb6859bb35ffdfb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _transitionPlayerComponent: {fileID: -4639290678824064717}
+  _defaultTransition: {fileID: -4639290678824064717}
   mBtnClose: {fileID: 4931375287322301384}
   mImgBackGround: {fileID: 607875759826900998}
   mImgHeaderPanel: {fileID: 8390873508647541044}
@@ -1761,6 +1819,25 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1074027313733218944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3448168187203640000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85e4995cea5647b46995bb92b329207d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _defaultSelectable: {fileID: 4931375287322301384}
+  _holder: {fileID: 6632951170448113532}
+  _bakedSelectables:
+  - {fileID: 7309206332327847148}
+  - {fileID: 4931375287322301384}
+  _rememberLastSelection: 1
+  _blockLowerScopes: 1
 --- !u!1 &3846200000159972780
 GameObject:
   m_ObjectHideFlags: 0
@@ -2056,8 +2133,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _target: {fileID: 4006178148059681915}
   _key: UI.Shop.ButtonClose
   _arguments: []
@@ -2206,12 +2283,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _target: {fileID: 7246463894730132326}
   _key: UI.Shop.Currency
-  _arguments:
-  -
+  _arguments: []
 --- !u!1 &4316408580505295796
 GameObject:
   m_ObjectHideFlags: 0
@@ -2313,6 +2389,7 @@ GameObject:
   - component: {fileID: 733628616223591270}
   - component: {fileID: 8250645922674543006}
   - component: {fileID: 4946823442412035327}
+  - component: {fileID: 8145152321470828874}
   - component: {fileID: 5768689325602518406}
   m_Layer: 5
   m_Name: Tog@Recommend
@@ -2379,6 +2456,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8145152321470828874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4722886727674328419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8890c652e5c4375b106ed12b7355c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 0
+  _profile: {fileID: 0}
 --- !u!114 &5768689325602518406
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2587,8 +2678,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _target: {fileID: 3169440259867709202}
   _key: UI.Shop.TabPack
   _arguments: []
@@ -2773,8 +2864,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _target: {fileID: 6443062615783685008}
   _key: UI.Shop.TabRecommend
   _arguments: []
@@ -3013,8 +3104,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36e95875e53d46d58e8e31459740d51d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _target: {fileID: 2286589044601406580}
   _key: UI.Shop.SubTitle
   _arguments: []
@@ -3069,7 +3160,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
-  alignment: 2
+  centerCrossAxis: 0
   spacing: {x: 0, y: 5}
   padding: {x: 10, y: 0}
   movementType: 1
@@ -3301,7 +3392,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
-  alignment: 2
+  centerCrossAxis: 0
   spacing: {x: 0, y: 5}
   padding: {x: 10, y: 0}
   movementType: 1
@@ -3567,6 +3658,7 @@ GameObject:
   - component: {fileID: 6429583821724645095}
   - component: {fileID: 4366175561886797846}
   - component: {fileID: 7724453420411641658}
+  - component: {fileID: 7609856867232423270}
   - component: {fileID: 4437988265261170900}
   m_Layer: 5
   m_Name: Tog@Item
@@ -3633,6 +3725,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7609856867232423270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8736078736895631703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8890c652e5c4375b106ed12b7355c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 0
+  _profile: {fileID: 0}
 --- !u!114 &4437988265261170900
 MonoBehaviour:
   m_ObjectHideFlags: 0

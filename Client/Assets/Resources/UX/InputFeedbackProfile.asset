@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5bc158ee140177a488502af54ffe40b5, type: 3}
-  m_Name: UXUiAudioProfile
+  m_Name: InputFeedbackProfile
   m_EditorClassIdentifier: 
   _rules:
   - Cue: 0
@@ -18,10 +18,10 @@ MonoBehaviour:
     AllowProgrammaticFocus: 0
     Clip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
   - Cue: 2
-    Devices: 12
+    Devices: 4
     AllowProgrammaticFocus: 0
     Clip: {fileID: 8300000, guid: 1e062a4eb2011b7459a22d947f834a9e, type: 3}
   - Cue: 1
-    Devices: 15
+    Devices: 7
     AllowProgrammaticFocus: 0
     Clip: {fileID: 8300000, guid: a4f36e7d229d54b4d86cc6d26ff0b4fd, type: 3}

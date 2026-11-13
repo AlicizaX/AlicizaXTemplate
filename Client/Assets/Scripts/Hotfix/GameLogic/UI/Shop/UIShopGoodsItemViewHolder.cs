@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using Game.Config.Tables;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace GameLogic.UI
@@ -35,7 +34,7 @@ namespace GameLogic.UI
         public Color AccentColor { get; }
     }
 
-    public sealed class UIShopGoodsItemViewHolder : ViewHolder<ShopGoodsData>, IPointerClickHandler, IRecyclerViewNavigationViewHolder
+    public sealed class UIShopGoodsItemViewHolder : InteractiveViewHolder<ShopGoodsData>
     {
         private static readonly Color BackgroundColor = new(0.035f, 0.04f, 0.04f, 0.9f);
 
@@ -53,6 +52,9 @@ namespace GameLogic.UI
         private LocalizedText _descriptionBinding;
         private LocalizedText _priceBinding;
         private LocalizedText _tagBinding;
+
+        // 保持现状：点击/提交只开购买弹窗，不改业务选中。
+        protected override bool SelectOnActivate => false;
 
         protected override void OnBind(ShopGoodsData data, int index)
         {
@@ -72,6 +74,8 @@ namespace GameLogic.UI
 
             icon.color = data.AccentColor;
             background.color = BackgroundColor;
+            // 复用的实例可能残留上一条数据的焦点/选中边框：新绑定不持有焦点，按业务选中重画。
+            ApplyFrame(IsSelected);
         }
 
         protected override void OnClear()
@@ -88,42 +92,25 @@ namespace GameLogic.UI
             return text.GetComponent<LocalizedText>() ?? text.gameObject.AddComponent<LocalizedText>();
         }
 
+        protected override void OnItemClick(ShopGoodsData data, int index)
+        {
+            GameApp.UI.ShowUI<UIBuyAlertWindow>(data).Forget();
+        }
+
+        protected override void OnNavigationFocused(bool focused)
+        {
+            ApplyFrame(focused);
+        }
+
         protected override void OnSelectionChange(bool select)
         {
-            if (CurrentData != null)
-            {
-                Color accentColor = CurrentData.AccentColor;
-                selectedFrame.color = new Color(accentColor.r, accentColor.g, accentColor.b, select ? 0.78f : 0.18f);
-            }
+            ApplyFrame(select);
         }
 
-        public void OnPointerClick(PointerEventData eventData)
+        private void ApplyFrame(bool highlighted)
         {
-            if (CurrentData != null)
-            {
-                SetSelect();
-                GameApp.UI.ShowUI<UIBuyAlertWindow>(CurrentData).Forget();
-            }
-        }
-
-        public void HandleNavigationFocused(bool focused)
-        {
-            OnSelectionChange(focused);
-        }
-
-        public bool HandleNavigationMove(AxisEventData eventData)
-        {
-            return false;
-        }
-
-        public bool HandleNavigationSubmit()
-        {
-            return false;
-        }
-
-        public bool IsNavigationFocusable(int dataIndex)
-        {
-            return true;
+            Color accentColor = CurrentData.AccentColor;
+            selectedFrame.color = new Color(accentColor.r, accentColor.g, accentColor.b, highlighted ? 0.78f : 0.18f);
         }
     }
 }

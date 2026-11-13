@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2026717582295688924}
   - component: {fileID: 5133397036920429605}
   - component: {fileID: 2474407175103589799}
+  - component: {fileID: 2403347476038927640}
   - component: {fileID: 1243206000715561276}
   m_Layer: 5
   m_Name: Btn@Close
@@ -77,6 +78,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2403347476038927640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296782646286909690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8890c652e5c4375b106ed12b7355c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 0
+  _profile: {fileID: 0}
 --- !u!114 &1243206000715561276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,7 +228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
-  alignment: 1
+  centerCrossAxis: 0
   spacing: {x: 90, y: 10}
   padding: {x: 16, y: 12}
   movementType: 0
@@ -713,7 +728,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
-  alignment: 0
+  centerCrossAxis: 0
   spacing: {x: 0, y: 10}
   padding: {x: 16, y: 12}
   movementType: 0
@@ -866,6 +881,7 @@ GameObject:
   - component: {fileID: 733440885562706408}
   - component: {fileID: 5007698056207990650}
   - component: {fileID: 4710235559197685315}
+  - component: {fileID: 6113392124719828747}
   - component: {fileID: 3530326179017150142}
   m_Layer: 5
   m_Name: Btn@ActionB
@@ -932,6 +948,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6113392124719828747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3620919735013396540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8890c652e5c4375b106ed12b7355c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 0
+  _profile: {fileID: 0}
 --- !u!114 &3530326179017150142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1103,7 +1133,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
-  alignment: 1
+  centerCrossAxis: 0
   spacing: {x: 12, y: 10}
   padding: {x: 16, y: 12}
   movementType: 0
@@ -1580,7 +1610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
-  alignment: 1
+  centerCrossAxis: 0
   spacing: {x: 12, y: 10}
   padding: {x: 16, y: 12}
   movementType: 0
@@ -2015,8 +2045,6 @@ MonoBehaviour:
   targetRect: {fileID: 6509070850791578845}
   canvasGroup: {fileID: 6659884109928516972}
   useUnscaledTime: 1
-  initializeAsClosed: 1
-  followAnimationInteractable: 0
   openDuration: 0.22
   closeDuration: 0.18
   slideDistance: 120
@@ -2034,7 +2062,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aaf33dc431d1ad4c9fd90507421d325, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _transitionPlayerComponent: {fileID: 4584752004525106786}
+  _defaultTransition: {fileID: 4584752004525106786}
   mBtnClose: {fileID: 1243206000715561276}
   mBtnActionA: {fileID: 6173990139645393825}
   mBtnActionB: {fileID: 3530326179017150142}
@@ -2241,7 +2269,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
-  alignment: 1
+  centerCrossAxis: 0
   spacing: {x: 0, y: 0}
   padding: {x: 8, y: 8}
   movementType: 0
@@ -2376,7 +2404,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
-  alignment: 1
+  centerCrossAxis: 0
   spacing: {x: 0, y: 12}
   padding: {x: 16, y: 12}
   movementType: 0
@@ -2558,7 +2586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 1
-  alignment: 1
+  centerCrossAxis: 0
   spacing: {x: 30, y: 0}
   padding: {x: 0, y: 0}
   movementType: 0
@@ -2612,6 +2640,7 @@ GameObject:
   - component: {fileID: 7960566388656594533}
   - component: {fileID: 8757164801586508991}
   - component: {fileID: 8404452152488484147}
+  - component: {fileID: 6680642515304974631}
   - component: {fileID: 8936145026721773693}
   m_Layer: 5
   m_Name: Btn@ActionC
@@ -2678,6 +2707,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6680642515304974631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8395383727203043293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8890c652e5c4375b106ed12b7355c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 0
+  _profile: {fileID: 0}
 --- !u!114 &8936145026721773693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2734,6 +2777,7 @@ GameObject:
   - component: {fileID: 5885084327421794304}
   - component: {fileID: 8160036282959831748}
   - component: {fileID: 3542991338653680676}
+  - component: {fileID: 6402453274126237092}
   - component: {fileID: 6173990139645393825}
   m_Layer: 5
   m_Name: Btn@ActionA
@@ -2800,6 +2844,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6402453274126237092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8785466746905645071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8890c652e5c4375b106ed12b7355c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mode: 0
+  _profile: {fileID: 0}
 --- !u!114 &6173990139645393825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2936,7 +2994,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 0
-  alignment: 1
+  centerCrossAxis: 0
   spacing: {x: 12, y: 10}
   padding: {x: 16, y: 12}
   movementType: 0
