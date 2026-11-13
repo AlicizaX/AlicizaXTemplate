@@ -18,6 +18,16 @@ public interface IBuildParameters
 [System.Serializable]
 public class AndroidBuildParameters : IBuildParameters
 {
+    /// <summary>
+    /// 默认最低 API 等级：Unity 6000.5 起不再支持 API 22（Android 5.1），
+    /// <see cref="AndroidSdkVersions.AndroidApiLevel22"/> 已废弃为编译错误，最低只能到 API 26（Android 8.0）。
+    /// </summary>
+#if UNITY_6000_5_OR_NEWER
+    private const AndroidSdkVersions DefaultMinSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
+#else
+    private const AndroidSdkVersions DefaultMinSdkVersion = AndroidSdkVersions.AndroidApiLevel22;
+#endif
+
     // 通用参数
     public BuildTarget BuildTarget => BuildTarget.Android;
     public string OutPutPath { get; set; }
@@ -37,7 +47,7 @@ public class AndroidBuildParameters : IBuildParameters
     /// <summary>
     /// 最低支持的 Android API 等级
     /// </summary>
-    public AndroidSdkVersions MinSdkVersion { get; set; } = AndroidSdkVersions.AndroidApiLevel22;
+    public AndroidSdkVersions MinSdkVersion { get; set; } = DefaultMinSdkVersion;
 
     /// <summary>
     /// 目标 API 等级

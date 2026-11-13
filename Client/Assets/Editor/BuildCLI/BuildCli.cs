@@ -1,5 +1,6 @@
 using System;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEngine;
 
 public static class BuildCli
@@ -80,7 +81,7 @@ public static class BuildCli
 
         if (!string.IsNullOrEmpty(request.Defines))
         {
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(group, request.Defines);
+            PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(group), request.Defines);
         }
 
         return group;
@@ -97,7 +98,7 @@ public static class BuildCli
 
     private static bool HasPlayerDefine(BuildTargetGroup group, string define)
     {
-        string[] defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group).Split(';');
+        string[] defines = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(group)).Split(';');
         for (int i = 0; i < defines.Length; i++)
         {
             if (defines[i].Trim() == define)

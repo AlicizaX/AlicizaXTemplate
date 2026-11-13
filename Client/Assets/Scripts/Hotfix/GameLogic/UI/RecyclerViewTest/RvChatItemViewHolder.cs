@@ -22,7 +22,13 @@ namespace GameLogic.UI
                 message.alignment = data.IsSelf
                     ? TextAlignmentOptions.TopRight
                     : TextAlignmentOptions.TopLeft;
+                // TMP 自 Unity 6（uGUI 2.0）起用 textWrappingMode 取代 enableWordWrapping；
+                // Unity 2022.3 只有旧的布尔属性，故按引擎版本分流。
+#if UNITY_6000_0_OR_NEWER
+                message.textWrappingMode = TextWrappingModes.Normal;
+#else
                 message.enableWordWrapping = true;
+#endif
                 message.overflowMode = TextOverflowModes.Overflow;
                 message.ForceMeshUpdate();
             }

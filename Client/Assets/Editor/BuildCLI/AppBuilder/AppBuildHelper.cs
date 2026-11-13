@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using AlicizaX.Editor;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEngine;
 
 public static class AppBuildHelper
@@ -94,7 +95,7 @@ public static class AppBuildHelper
 
         if (!string.IsNullOrEmpty(androidParams.BundleIdentifier))
         {
-            PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, androidParams.BundleIdentifier);
+            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, androidParams.BundleIdentifier);
         }
 
         PlayerSettings.Android.bundleVersionCode = androidParams.BundleVersionCode;
