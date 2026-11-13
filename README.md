@@ -68,3 +68,15 @@ https://github.com/AlicizaX/FramworkInstaller.git
 | [UI 模块](https://b4lie.github.io/AlicizaXWiki/modules/ui/)         | 窗口、元数据与生命周期、路由转场、Widget |
 | [Resources](https://b4lie.github.io/AlicizaXWiki/modules/resource/) | 租约、作用域、资源包与回收               |
 | [UI Extension](https://b4lie.github.io/AlicizaXWiki/extension/)     | UX 组件、RecyclerView、输入与导航        |
+
+## 贡献与致谢
+
+### 生态依赖
+
+- **[TEngine](https://github.com/Alex-Rachel/TEngine)**：*设计基石性能强大、易用、设计优秀，上手使用很方便，有多款已上线商业项目验证*
+- **[YooAsset](https://github.com/tuyoogame/YooAsset)**：*资源管理*
+- **[Luban](https://github.com/focus-creative-games/luban)**：*配置解决方案*
+
+### 参与贡献
+
+欢迎提交 Issue 或 PR。提交前建议说明问题背景与改动范围。
