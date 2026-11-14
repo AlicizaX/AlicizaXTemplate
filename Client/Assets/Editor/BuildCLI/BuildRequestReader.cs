@@ -33,13 +33,10 @@ public static class BuildRequestReader
             VersionName = file.versionName,
             VersionCode = file.versionCode,
             Development = file.development,
-            ResourceMode = ParseEnum<ResourceBuildMode>(Required("RES_MODE")),
-            PackageVersion = Environment.GetEnvironmentVariable("UCL_PARAM_PACKAGE_VERSION"),
+            PlayMode = PlayModeValue(ParseEnum<ResourceBuildMode>(Required("RES_MODE"))),
             Language = Environment.GetEnvironmentVariable("UCL_PARAM_LANGUAGE"),
             Decryption = Environment.GetEnvironmentVariable("UCL_PARAM_DECRYPTION"),
-            Encryption = Environment.GetEnvironmentVariable("UCL_PARAM_ENCRYPTION"),
         };
-        request.PlayMode = PlayModeValue(request.ResourceMode);
 
         if (request.Scenes == null || request.Scenes.Length == 0)
         {

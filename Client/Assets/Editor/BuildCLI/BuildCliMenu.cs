@@ -1,5 +1,6 @@
 using AlicizaX.Editor.Toolbar;
 using UnityEditor;
+using UnityEngine;
 using YooAsset;
 
 public static class BuildCliMenu
@@ -39,11 +40,10 @@ public static class BuildCliMenu
         {
             BuildTarget = BuildTarget.StandaloneWindows64,
             OutputDirectory = OutputRoot,
-            ResourceOutputDirectory = BundleRoot,
             FileName = FileName,
             Scenes = Scenes,
+            VersionName = "1.0.0",
             Development = false,
-            ResourceMode = mode,
             PlayMode = mode == ResourceBuildMode.Online
                 ? (int)EPlayMode.HostPlayMode
                 : (int)EPlayMode.OfflinePlayMode,
@@ -57,9 +57,6 @@ public static class BuildCliMenu
             BuildTarget = BuildTarget.StandaloneWindows64,
             OutputDirectory = BundleRoot,
             ResourceMode = mode,
-            PlayMode = mode == ResourceBuildMode.Online
-                ? (int)EPlayMode.HostPlayMode
-                : (int)EPlayMode.OfflinePlayMode,
         };
     }
 }

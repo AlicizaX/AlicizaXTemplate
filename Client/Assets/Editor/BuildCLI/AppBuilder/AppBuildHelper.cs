@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using AlicizaX.Editor;
+using AlicizaX.Resource.Runtime;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
 
 public static class AppBuildHelper
 {
+    private const string LaunchConfigAssetPath = "Assets/Resources/AlicizaX/launch.json";
+    private const string BuildLocaleAssetPath = "Assets/Resources/AlicizaX/Localization/build-locale.txt";
+
     /// <summary>
     /// 构建 Android 应用
     /// </summary>
@@ -50,8 +55,7 @@ public static class AppBuildHelper
 
         try
         {
-            ApplyLaunchContext(buildParams);
-            using var buildOverrides = BuildLaunchContext.BeginBuildOverrides();
+            PrepareBuildConfig(buildParams);
 
             var options = new BuildPlayerOptions
             {
@@ -60,11 +64,6 @@ public static class AppBuildHelper
                 target = buildParams.BuildTarget,
                 options = buildParams.DevelopBuild ? BuildOptions.Development : BuildOptions.None
             };
-
-#if ALICIZAX_LOCALIZATION
-            if (LocalizationBuildLanguageOverride.ActiveTempPath != null)
-                options.extraScriptingDefines = new[] { LocalizationBuildLanguageOverride.Define };
-#endif
 
             var report = BuildPipeline.BuildPlayer(options);
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
@@ -82,7 +81,7 @@ public static class AppBuildHelper
         }
         finally
         {
-            BuildLaunchContext.Clear();
+            CleanupBuildConfig();
         }
     }
 
@@ -149,17 +148,53 @@ public static class AppBuildHelper
     }
 
 
-    private static void ApplyLaunchContext(IBuildParameters buildParameters)
+    private static void PrepareBuildConfig(IBuildParameters buildParams)
     {
-        BuildLaunchContext.Set(BuildLaunchContext.ResourcePlayMode, buildParameters.ResMode.ToString());
-        if (buildParameters.DecryptionServices != null)
-        {
-            BuildLaunchContext.Set(BuildLaunchContext.ResourceDecryption, buildParameters.DecryptionServices);
-        }
+        string launchConfigPath = ToProjectPath(LaunchConfigAssetPath);
+        Directory.CreateDirectory(Path.GetDirectoryName(launchConfigPath) ?? Application.dataPath);
 
-        if (!string.IsNullOrEmpty(buildParameters.Language))
+        var config = new ResourceLaunchConfig
         {
-            BuildLaunchContext.Set("localization.language", buildParameters.Language);
+            playMode = buildParams.ResMode,
+            decryptionServices = buildParams.DecryptionServices ?? string.Empty,
+        };
+        File.WriteAllText(launchConfigPath, JsonUtility.ToJson(config), new UTF8Encoding(false));
+        AssetDatabase.ImportAsset(LaunchConfigAssetPath, ImportAssetOptions.ForceSynchronousImport);
+
+        string localeAssetPath = BuildLocaleAssetPath;
+        DeleteAssetIfExists(localeAssetPath);
+#if ALICIZAX_LOCALIZATION
+        if (!string.IsNullOrEmpty(buildParams.Language))
+        {
+            string localePath = ToProjectPath(localeAssetPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(localePath) ?? Application.dataPath);
+            File.WriteAllText(localePath, buildParams.Language, new UTF8Encoding(false));
+            AssetDatabase.ImportAsset(localeAssetPath, ImportAssetOptions.ForceSynchronousImport);
+        }
+#endif
+    }
+
+    private static void CleanupBuildConfig()
+    {
+        DeleteAssetIfExists(BuildLocaleAssetPath);
+        DeleteAssetIfExists(LaunchConfigAssetPath);
+    }
+
+    private static string ToProjectPath(string assetPath)
+    {
+        return Path.GetFullPath(Path.Combine(Application.dataPath, "..", assetPath));
+    }
+
+    private static void DeleteAssetIfExists(string assetPath)
+    {
+        try
+        {
+            if (File.Exists(ToProjectPath(assetPath)))
+                AssetDatabase.DeleteAsset(assetPath);
+        }
+        catch (Exception error)
+        {
+            Debug.LogWarning($"删除构建配置失败: {assetPath} ({error.Message})");
         }
     }
 

@@ -4,7 +4,6 @@ public sealed class BuildRequest
 {
     public BuildTarget BuildTarget;
     public string OutputDirectory;
-    public string ResourceOutputDirectory;
     public string FileName;
     public string[] Scenes;
     public string Defines;

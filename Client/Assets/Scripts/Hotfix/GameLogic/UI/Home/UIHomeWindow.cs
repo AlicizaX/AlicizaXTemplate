@@ -73,6 +73,7 @@ namespace GameLogic.UI
         private void OnBtnShopClick()
         {
             GameApp.UI.ShowUI<UIShopWindow>();
+            Log.Info("打开商店");
         }
 
         private void OnBtnBagClick()

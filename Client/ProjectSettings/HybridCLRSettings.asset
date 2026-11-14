@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e189374413a3f00468e49d51d8b27a09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enable: 0
+  enable: 1
   useGlobalIl2cpp: 0
-  hybridclrRepoURL: https://gitee.com/focus-creative-games/hybridclr
-  il2cppPlusRepoURL: https://gitee.com/focus-creative-games/il2cpp_plus
+  hybridclrRepoURL: https://github.com/focus-creative-games/hybridclr
+  il2cppPlusRepoURL: https://github.com/focus-creative-games/il2cpp_plus
   hotUpdateAssemblyDefinitions:
   - {fileID: 5897886265953266890, guid: 564df1cc38305e340a693812656f6fe7, type: 3}
   - {fileID: 5897886265953266890, guid: 5c89d8180b6e1a145b027f32840f0a58, type: 3}
@@ -23,18 +23,8 @@ MonoBehaviour:
   - {fileID: 5897886265953266890, guid: a7619eac3f12ad342939451d4b294312, type: 3}
   hotUpdateAssemblies: []
   preserveHotUpdateAssemblies: []
-  hotUpdateDllCompileOutputRootDir: HybridCLRData/HotUpdateDlls
   externalHotUpdateAssembliyDirs: []
-  strippedAOTDllOutputRootDir: HybridCLRData/AssembliesPostIl2CppStrip
-  patchAOTAssemblies:
-  - mscorlib.dll
-  - System.dll
-  - System.Core.dll
-  - UnityEngine.CoreModule.dll
-  - YooAsset.dll
-  - UniTask.Runtime.dll
-  - ZString.dll
-  - AlicizaX.Framework.Runtime.dll
+  linkPreserveLevel: 0
   outputLinkFile: HybridCLRGenerate/link.xml
   outputAOTGenericReferenceFile: HybridCLRGenerate/AOTGenericReferences.cs
   maxGenericReferenceIteration: 10

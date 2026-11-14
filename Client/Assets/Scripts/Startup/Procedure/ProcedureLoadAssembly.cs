@@ -40,6 +40,14 @@ namespace Unity.Startup.Procedure
             m_LoadMetadataAssetCount = 0;
             LoadMetadataForAOTAssembly();
 
+#if UNITY_EDITOR
+            // 编辑器下始终使用工程编译出的程序集（Library/ScriptAssemblies）。
+            // 原因：在编辑器里对热更 DLL 执行 Assembly.Load(bytes) 会再加载一份同名程序集，
+            // 而 AssetBundle 中 Prefab 的脚本引用解析到的是编辑器程序集，
+            // 于是 GetComponent(热更类型) 会因类型身份不同而失败（表现为 UI holder 丢失）。
+            // 要验证真正下载的热更 DLL，请出包测试。
+            LoadAssembliesFromDomain();
+#else
             if (GameApp.ResourcePackage.PlayMode == EPlayMode.EditorSimulateMode)
             {
                 LoadAssembliesFromDomain();
@@ -48,6 +56,7 @@ namespace Unity.Startup.Procedure
             {
                 LoadHotUpdateAssembliesFromResource();
             }
+#endif
 #else
             LoadAssembliesFromDomain();
 #endif
@@ -97,6 +106,24 @@ namespace Unity.Startup.Procedure
         {
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
+#if UNITY_EDITOR
+                // 关闭域重载时，上一次播放中 Assembly.Load(bytes) 加载的热更副本会残留在域里，
+                // 这类程序集 Location 为空，不能作为编辑器下的代码来源。
+                // 注意：动态程序集（Roslyn / HybridCLR Emit 等）访问 Location 会抛 NotSupportedException。
+                if (assembly.IsDynamic)
+                    continue;
+                string location;
+                try
+                {
+                    location = assembly.Location;
+                }
+                catch (NotSupportedException)
+                {
+                    continue;
+                }
+                if (string.IsNullOrEmpty(location))
+                    continue;
+#endif
                 string assemblyName = ToDllName(assembly);
                 if (IsEntranceAssembly(assemblyName))
                 {

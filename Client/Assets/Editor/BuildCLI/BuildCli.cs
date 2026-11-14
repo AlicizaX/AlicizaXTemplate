@@ -46,15 +46,10 @@ public static class BuildCli
 #if HYBIRDCLR_SUPPORT
         if (HasPlayerDefine(group, "ENABLE_HYBRIDCLR"))
         {
-            PrepareHybrid(request);
-            BuildResource(request);
-            BuildApp(request);
-            HybridClrBuild.CopyAot(request.BuildTarget);
-            BuildResource(request);
-            return;
+            HybridClrBuild.Install();
+            HybridClrBuild.Generate();
         }
 #endif
-        BuildResource(request);
         BuildApp(request);
     }
 
@@ -64,7 +59,8 @@ public static class BuildCli
 #if HYBIRDCLR_SUPPORT
         if (HasPlayerDefine(group, "ENABLE_HYBRIDCLR"))
         {
-            PrepareHybrid(request);
+            HybridClrBuild.CompileHotUpdate(request.BuildTarget);
+            HybridClrBuild.CopyAot(request.BuildTarget);
         }
 #endif
         BuildResource(request);
@@ -87,15 +83,6 @@ public static class BuildCli
         return group;
     }
 
-#if HYBIRDCLR_SUPPORT
-    private static void PrepareHybrid(BuildRequest request)
-    {
-        HybridClrBuild.Install();
-        HybridClrBuild.Generate();
-        HybridClrBuild.CompileHotUpdate(request.BuildTarget);
-    }
-#endif
-
     private static bool HasPlayerDefine(BuildTargetGroup group, string define)
     {
         string[] defines = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(group)).Split(';');
@@ -116,9 +103,7 @@ public static class BuildCli
         var parameter = new ResourceBuildParameter
         {
             ResourceBuildTarget = request.BuildTarget,
-            OutputPath = string.IsNullOrEmpty(request.ResourceOutputDirectory)
-                ? request.OutputDirectory
-                : request.ResourceOutputDirectory,
+            OutputPath = request.OutputDirectory,
             UseDefaultPackageVersion = string.IsNullOrEmpty(request.PackageVersion),
             PackageVersion = request.PackageVersion,
             BuildMode = request.ResourceMode,
