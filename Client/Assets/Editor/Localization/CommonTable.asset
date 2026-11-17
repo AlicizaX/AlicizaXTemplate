@@ -1,0 +1,648 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc267bc6ec31169428fca564289ef01d, type: 3}
+  m_Name: CommonTable
+  m_EditorClassIdentifier: 
+  TableId: CommonTable
+  Settings: {fileID: 11400000, guid: c7984cd79ada4a49802bafa43940db59, type: 2}
+  Keys:
+  - Log.Buy.Confirmed
+  - Log.Buy.Insufficient
+  - Log.Home.BagClick
+  - Log.Home.ExitClick
+  - Log.Home.RoleClick
+  - Log.Home.TestTipsClick
+  - Test.Test
+  - UI.Buy.ButtonConfirm
+  - UI.Buy.FooterHint
+  - UI.Buy.QuantityPlaceholder
+  - UI.Buy.Title
+  - UI.Buy.TotalPrice
+  - UI.Buy.UnknownItem
+  - UI.Common.CreditPrice
+  - UI.Home.ButtonBag
+  - UI.Home.ButtonExit
+  - UI.Home.ButtonRole
+  - UI.Home.ButtonShop
+  - UI.Home.ButtonTips
+  - UI.Home.FooterHint
+  - UI.Home.NoticeContent
+  - UI.Home.NoticeTitle
+  - UI.Shop.ButtonClose
+  - UI.Shop.Category.Item.Description
+  - UI.Shop.Category.Item.Title
+  - UI.Shop.Category.Pack.Description
+  - UI.Shop.Category.Pack.Title
+  - UI.Shop.Category.Recommend.Description
+  - UI.Shop.Category.Recommend.Title
+  - UI.Shop.Category.Skin.Description
+  - UI.Shop.Category.Skin.Title
+  - UI.Shop.Currency
+  - UI.Shop.FooterHint
+  - UI.Shop.Goods.Item.AccessKey.Description
+  - UI.Shop.Goods.Item.AccessKey.Name
+  - UI.Shop.Goods.Item.EnergyBattery.Description
+  - UI.Shop.Goods.Item.EnergyBattery.Name
+  - UI.Shop.Goods.Item.Medkit.Description
+  - UI.Shop.Goods.Item.Medkit.Name
+  - UI.Shop.Goods.Item.SignalMarker.Description
+  - UI.Shop.Goods.Item.SignalMarker.Name
+  - UI.Shop.Goods.Pack.ExplorationPack.Description
+  - UI.Shop.Goods.Pack.ExplorationPack.Name
+  - UI.Shop.Goods.Pack.OutfitPack.Description
+  - UI.Shop.Goods.Pack.OutfitPack.Name
+  - UI.Shop.Goods.Pack.StarterPack.Description
+  - UI.Shop.Goods.Pack.StarterPack.Name
+  - UI.Shop.Goods.Pack.WeeklySupply.Description
+  - UI.Shop.Goods.Pack.WeeklySupply.Name
+  - UI.Shop.Goods.Recommend.CreditCrate.Description
+  - UI.Shop.Goods.Recommend.CreditCrate.Name
+  - UI.Shop.Goods.Recommend.DailySupply.Description
+  - UI.Shop.Goods.Recommend.DailySupply.Name
+  - UI.Shop.Goods.Recommend.NightOutfit.Description
+  - UI.Shop.Goods.Recommend.NightOutfit.Name
+  - UI.Shop.Goods.Recommend.TacticalModule.Description
+  - UI.Shop.Goods.Recommend.TacticalModule.Name
+  - UI.Shop.Goods.Skin.AshHelmet.Description
+  - UI.Shop.Goods.Skin.AshHelmet.Name
+  - UI.Shop.Goods.Skin.GhostMask.Description
+  - UI.Shop.Goods.Skin.GhostMask.Name
+  - UI.Shop.Goods.Skin.NeonCoat.Description
+  - UI.Shop.Goods.Skin.NeonCoat.Name
+  - UI.Shop.Goods.Skin.WandererBadge.Description
+  - UI.Shop.Goods.Skin.WandererBadge.Name
+  - UI.Shop.Goods.Test.Description
+  - UI.Shop.Goods.Test.Name
+  - UI.Shop.SubTitle
+  - UI.Shop.TabItem
+  - UI.Shop.TabPack
+  - UI.Shop.TabRecommend
+  - UI.Shop.TabSkin
+  - UI.Shop.Tag.Discount
+  - UI.Shop.Tag.Hot
+  - UI.Shop.Tag.Item
+  - UI.Shop.Tag.New
+  - UI.Shop.Tag.Pack
+  - UI.Shop.Tag.Recommend
+  - UI.Shop.Tag.Skin
+  - UI.Shop.Title
+  Tables:
+  - {fileID: 11410001}
+  - {fileID: 11410002}
+  - {fileID: 11410003}
+  AssetDirectory: Assets/Bundles/Configs/sciptableObject
+  AddressTemplate: '{table}_{locale}'
+  CodeOutput: Assets/Scripts/Hotfix/GameLogic/LocalizationKey.cs
+--- !u!114 &11410001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82a13950012b4b940bb4bf322e8a7569, type: 3}
+  m_Name: ChineseSimplified
+  m_EditorClassIdentifier: 
+  TableId: CommonTable
+  Locale: ChineseSimplified
+  Entries:
+  - Key: Log.Buy.Confirmed
+    Value: "\u786E\u8BA4\u8D2D\u4E70\uFF1A{0} x{1}\uFF0C\u603B\u4EF7 {2}"
+  - Key: Log.Buy.Insufficient
+    Value: "\u4FE1\u7528\u70B9\u4E0D\u8DB3\uFF0C\u65E0\u6CD5\u8D2D\u4E70\uFF1A{0}x{1}"
+  - Key: Log.Home.BagClick
+    Value: "\u70B9\u51FB\u80CC\u5305\u6309\u94AE"
+  - Key: Log.Home.ExitClick
+    Value: "\u70B9\u51FB\u9000\u51FA\u6309\u94AE"
+  - Key: Log.Home.TestTipsClick
+    Value: "\u70B9\u51FB\u6D4B\u8BD5\u63D0\u793A\u6309\u94AE"
+  - Key: Test.Test
+    Value: "\u6D4B\u8BD5"
+  - Key: UI.Buy.ButtonConfirm
+    Value: "\u786E\u8BA4\u8D2D\u4E70"
+  - Key: UI.Buy.FooterHint
+    Value: "\u8F93\u5165\u6570\u91CF\u6216\u4F7F\u7528 +/- \u8C03\u6574\u8D2D\u4E70\u6570\u91CF"
+  - Key: UI.Buy.QuantityPlaceholder
+    Value: "\u6570\u91CF"
+  - Key: UI.Buy.Title
+    Value: "\u8D2D\u4E70\u786E\u8BA4"
+  - Key: UI.Buy.TotalPrice
+    Value: "\u603B\u4EF7\u683C\uFF1A{0}"
+  - Key: UI.Common.CreditPrice
+    Value: "{0} \u4FE1\u7528\u70B9"
+  - Key: UI.Home.ButtonBag
+    Value: "\u80CC\u5305"
+  - Key: UI.Home.ButtonExit
+    Value: "\u9000\u51FA"
+  - Key: UI.Home.ButtonRole
+    Value: "\u89D2\u8272"
+  - Key: UI.Home.ButtonShop
+    Value: "\u5546\u5E97"
+  - Key: UI.Home.ButtonTips
+    Value: "\u63D0\u793A"
+  - Key: UI.Home.FooterHint
+    Value: "\u70B9\u51FB\u6309\u94AE\u6D4B\u8BD5 UI \u903B\u8F91 / ESC \u8FD4\u56DE"
+  - Key: UI.Home.NoticeContent
+    Value: "\u6B22\u8FCE\u8FDB\u5165\u6D4B\u8BD5\u4E3B\u754C\u9762\u3002\u53F3\u4E0A\u89D2\u53EF\u4EE5\u6253\u5F00\u5546\u5E97\u3001\u80CC\u5305\u3001\u89D2\u8272\u5C5E\u6027\u548C\u6D4B\u8BD5\u63D0\u793A\u3002\n\n\u5F53\u524D\u754C\u9762\u7528\u4E8E\u9A8C\u8BC1UI
+      \u6846\u67B6\u3001\u6309\u94AE\u7ED1\u5B9A\u548C\u9ED8\u8BA4\u8FC7\u573A\u52A8\u753B\u3002"
+  - Key: UI.Home.NoticeTitle
+    Value: "\u4EFB\u52A1\u516C\u544A"
+  - Key: UI.Shop.ButtonClose
+    Value: "\u9000\u51FA"
+  - Key: UI.Shop.Category.Item.Description
+    Value: "\u6765\u81EA Shop \u8868 MATERIAL \u5206\u7C7B\u7684\u6750\u6599\u9053\u5177\u3002\u5217\u8868\u6570\u636E\u7531\u914D\u7F6E\u8868\u52A8\u6001\u8BFB\u53D6\u3002"
+  - Key: UI.Shop.Category.Item.Title
+    Value: "\u6750\u6599\u5546\u57CE"
+  - Key: UI.Shop.Category.Pack.Title
+    Value: "\u6D88\u8017\u54C1\u5546\u57CE"
+  - Key: UI.Shop.Category.Recommend.Description
+    Value: "\u6765\u81EA Shop \u8868 TEST \u5206\u7C7B\u7684\u6D4B\u8BD5\u9053\u5177\u3002\u5217\u8868\u6570\u636E\u7531\u914D\u7F6E\u8868\u52A8\u6001\u8BFB\u53D6\u3002"
+  - Key: UI.Shop.Category.Recommend.Title
+    Value: "\u6D4B\u8BD5\u5546\u57CE"
+  - Key: UI.Shop.Category.Skin.Description
+    Value: "\u6765\u81EA Shop \u8868 EQUIPMENT \u5206\u7C7B\u7684\u88C5\u5907\u9053\u5177\u3002\u5217\u8868\u6570\u636E\u7531\u914D\u7F6E\u8868\u52A8\u6001\u8BFB\u53D6\u3002"
+  - Key: UI.Shop.Category.Skin.Title
+    Value: "\u88C5\u5907\u5546\u57CE"
+  - Key: UI.Shop.Currency
+    Value: "\u4FE1\u7528\u70B9\uFF1A{0}"
+  - Key: UI.Shop.FooterHint
+    Value: "\u70B9\u51FB\u5546\u54C1\u8BB0\u5F55\u6D4B\u8BD5\u8D2D\u4E70\u65E5\u5FD7/
+      ESC \u8FD4\u56DE"
+  - Key: UI.Shop.Goods.Item.AccessKey.Description
+    Value: "\u7528\u4E8E\u9501\u5B9A\u533A\u57DF\u7684\u4E34\u65F6\u6388\u6743\u5361\u3002"
+  - Key: UI.Shop.Goods.Item.AccessKey.Name
+    Value: "\u901A\u884C\u5BC6\u94A5"
+  - Key: UI.Shop.Goods.Item.EnergyBattery.Name
+    Value: "\u80FD\u91CF\u7535\u6C60"
+  - Key: UI.Shop.Goods.Item.Medkit.Description
+    Value: "\u7528\u4E8E\u5B9E\u5730\u6D4B\u8BD5\u7684\u5373\u65F6\u6062\u590D\u8865\u7ED9\u3002"
+  - Key: UI.Shop.Goods.Item.Medkit.Name
+    Value: "\u6025\u6551\u5305"
+  - Key: UI.Shop.Goods.Item.SignalMarker.Description
+    Value: "\u4E3A\u5BFC\u822A\u6D4B\u8BD5\u8BB0\u5F55\u4E00\u4E2A\u4E34\u65F6\u4F4D\u7F6E\u70B9\u3002"
+  - Key: UI.Shop.Goods.Item.SignalMarker.Name
+    Value: "\u4FE1\u53F7\u6807\u8BB0"
+  - Key: UI.Shop.Goods.Pack.ExplorationPack.Description
+    Value: "\u63A2\u7D22\u5FAA\u73AF\u6240\u9700\u7684\u6D88\u8017\u54C1\u4E0E\u94A5\u5319\u3002"
+  - Key: UI.Shop.Goods.Pack.OutfitPack.Description
+    Value: "\u4E09\u4EF6\u5916\u89C2\u7EC4\u5408\u7684\u6298\u6263\u5957\u88C5\u3002"
+  - Key: UI.Shop.Goods.Pack.OutfitPack.Name
+    Value: "\u5916\u89C2\u793C\u5305"
+  - Key: UI.Shop.Goods.Pack.StarterPack.Name
+    Value: "\u65B0\u624B\u793C\u5305"
+  - Key: UI.Shop.Goods.Pack.WeeklySupply.Description
+    Value: "\u6309\u5546\u57CE\u5468\u671F\u5237\u65B0\u7684\u9650\u65F6\u793C\u5305\u3002"
+  - Key: UI.Shop.Goods.Pack.WeeklySupply.Name
+    Value: "\u6BCF\u5468\u8865\u7ED9"
+  - Key: UI.Shop.Goods.Recommend.CreditCrate.Description
+    Value: "\u7528\u4E8E\u5546\u57CE\u5217\u8868\u6D4B\u8BD5\u7684\u6A21\u62DF\u8D27\u5E01\u5305\u3002"
+  - Key: UI.Shop.Goods.Recommend.CreditCrate.Name
+    Value: "\u4FE1\u7528\u70B9\u7BB1"
+  - Key: UI.Shop.Goods.Recommend.DailySupply.Description
+    Value: "\u6838\u5FC3\u6D88\u8017\u54C1\u7684\u6BCF\u65E5\u6298\u6263\u7EC4\u5408\u3002"
+  - Key: UI.Shop.Goods.Recommend.DailySupply.Name
+    Value: "\u6BCF\u65E5\u8865\u7ED9"
+  - Key: UI.Shop.Goods.Recommend.NightOutfit.Name
+    Value: "\u591C\u884C\u5916\u89C2"
+  - Key: UI.Shop.Goods.Recommend.TacticalModule.Description
+    Value: "\u7528\u4E8E\u9A8C\u8BC1\u8D2D\u4E70\u6D41\u7A0B\u7684\u53EF\u590D\u7528\u6A21\u5757\u3002"
+  - Key: UI.Shop.Goods.Recommend.TacticalModule.Name
+    Value: "\u6218\u672F\u6A21\u5757"
+  - Key: UI.Shop.Goods.Skin.AshHelmet.Description
+    Value: "\u9002\u5408\u57CE\u5E02\u5173\u5361\u7684\u54D1\u5149\u6218\u672F\u5934\u76D4\u3002"
+  - Key: UI.Shop.Goods.Skin.AshHelmet.Name
+    Value: "\u7070\u70EC\u5934\u76D4"
+  - Key: UI.Shop.Goods.Skin.GhostMask.Description
+    Value: "\u4F4E\u5BF9\u6BD4\u5EA6\u6807\u8BB0\u7684\u6781\u7B80\u9762\u5177\u3002"
+  - Key: UI.Shop.Goods.Skin.GhostMask.Name
+    Value: "\u5E7D\u7075\u9762\u5177"
+  - Key: UI.Shop.Goods.Skin.NeonCoat.Description
+    Value: "\u5E26\u6709\u9752\u8272\u7EC6\u5149\u5E26\u7684\u6697\u8272\u5916\u5957\u3002"
+  - Key: UI.Shop.Goods.Skin.NeonCoat.Name
+    Value: "\u9713\u8679\u5916\u5957"
+  - Key: UI.Shop.Goods.Skin.WandererBadge.Description
+    Value: "\u6765\u81EA\u5730\u4E0B\u6807\u8BC6\u98CE\u683C\u7684\u5C0F\u578B\u5FBD\u7AE0\u3002"
+  - Key: UI.Shop.Goods.Skin.WandererBadge.Name
+    Value: "\u6D41\u6D6A\u5FBD\u7AE0"
+  - Key: UI.Shop.Goods.Test.Description
+    Value: "\u7528\u4E8E\u6EDA\u52A8\u6D4B\u8BD5\u7684 RecyclerView \u590D\u7528\u6761\u76EE\u3002"
+  - Key: UI.Shop.Goods.Test.Name
+    Value: "\u6D4B\u8BD5\u5546\u54C1 {0}"
+  - Key: UI.Shop.SubTitle
+    Value: "\u8865\u7ED9\u7EC8\u7AEF"
+  - Key: UI.Shop.TabPack
+    Value: "\u6D88\u8017\u54C1"
+  - Key: UI.Shop.TabRecommend
+    Value: "\u6D4B\u8BD5"
+  - Key: UI.Shop.Tag.Discount
+    Value: "\u6298\u6263"
+  - Key: UI.Shop.Tag.Hot
+    Value: "\u70ED\u95E8"
+  - Key: UI.Shop.Tag.Item
+    Value: "\u6750\u6599"
+  - Key: UI.Shop.Tag.Pack
+    Value: "\u6D88\u8017\u54C1"
+  - Key: UI.Shop.Tag.Recommend
+    Value: "\u6D4B\u8BD5"
+  - Key: UI.Shop.Tag.Skin
+    Value: "\u88C5\u5907"
+  - Key: UI.Shop.Title
+    Value: "\u5546\u5E97"
+  - Key: UI.Shop.Category.Pack.Description
+    Value: "\u6765\u81EA Shop \u8868 CONSUMABLE \u5206\u7C7B\u7684\u6D88\u8017\u54C1\u3002\u5217\u8868\u6570\u636E\u7531\u914D\u7F6E\u8868\u52A8\u6001\u8BFB\u53D6\u3002"
+  - Key: UI.Shop.Goods.Item.EnergyBattery.Description
+    Value: "\u539F\u578B\u8BBE\u5907\u53EF\u590D\u7528\u7684\u5907\u7528\u7535\u6C60\u3002"
+  - Key: UI.Shop.TabItem
+    Value: "\u6750\u6599"
+  - Key: UI.Shop.Tag.New
+    Value: "\u65B0\u54C1"
+  - Key: UI.Buy.UnknownItem
+    Value: "\u672A\u77E5\u9053\u5177"
+  - Key: UI.Shop.Goods.Recommend.NightOutfit.Description
+    Value: "\u9002\u914D\u6697\u8272\u83DC\u5355\u573A\u666F\u7684\u9AD8\u5BF9\u6BD4\u5916\u89C2\u3002"
+  - Key: Log.Home.RoleClick
+    Value: "\u70B9\u51FB\u89D2\u8272\u5C5E\u6027\u6309\u94AE"
+  - Key: UI.Shop.Goods.Pack.StarterPack.Description
+    Value: "\u7528\u4E8E\u9996\u6B21\u6D41\u7A0B\u9A8C\u8BC1\u7684\u57FA\u7840\u9053\u5177\u5305\u3002"
+  - Key: UI.Shop.Goods.Pack.ExplorationPack.Name
+    Value: "\u63A2\u7D22\u793C\u5305"
+  - Key: UI.Shop.TabSkin
+    Value: "\u88C5\u5907"
+--- !u!114 &11410002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82a13950012b4b940bb4bf322e8a7569, type: 3}
+  m_Name: English
+  m_EditorClassIdentifier: 
+  TableId: CommonTable
+  Locale: English
+  Entries:
+  - Key: Log.Buy.Confirmed
+    Value: 'Purchase confirmed: {0} x{1}, total {2}'
+  - Key: Log.Buy.Insufficient
+    Value: 'Not enough credits to buy: {0} x{1}'
+  - Key: Log.Home.BagClick
+    Value: Bag button clicked
+  - Key: Log.Home.ExitClick
+    Value: Exit button clicked
+  - Key: Log.Home.RoleClick
+    Value: Character button clicked
+  - Key: Log.Home.TestTipsClick
+    Value: Test tips button clicked
+  - Key: Test.Test
+    Value: Test
+  - Key: UI.Buy.ButtonConfirm
+    Value: Confirm
+  - Key: UI.Buy.FooterHint
+    Value: Enter a quantity or use +/- to adjust it
+  - Key: UI.Buy.QuantityPlaceholder
+    Value: Quantity
+  - Key: UI.Buy.Title
+    Value: Confirm Purchase
+  - Key: UI.Buy.TotalPrice
+    Value: 'Total Price: {0}'
+  - Key: UI.Buy.UnknownItem
+    Value: Unknown Item
+  - Key: UI.Common.CreditPrice
+    Value: '{0} Credits'
+  - Key: UI.Home.ButtonBag
+    Value: Bag
+  - Key: UI.Home.ButtonExit
+    Value: Exit
+  - Key: UI.Home.ButtonRole
+    Value: Character
+  - Key: UI.Home.ButtonShop
+    Value: Shop
+  - Key: UI.Home.ButtonTips
+    Value: Tips
+  - Key: UI.Home.FooterHint
+    Value: Click buttons to test UI logic / ESC to return
+  - Key: UI.Home.NoticeContent
+    Value: 'Welcome to the test home screen. Use the top-right buttons to open Shop,
+
+      Bag,
+      Character, and Test Tips.
+
+
+
+      This screen verifies the UI framework,
+
+      button
+      binding, and default transition animation.'
+  - Key: UI.Home.NoticeTitle
+    Value: Mission Notice
+  - Key: UI.Shop.ButtonClose
+    Value: Exit
+  - Key: UI.Shop.Category.Item.Description
+    Value: Material items from the Shop table MATERIAL category. The list is loaded
+      dynamically from configuration.
+  - Key: UI.Shop.Category.Item.Title
+    Value: Material Shop
+  - Key: UI.Shop.Category.Pack.Description
+    Value: Consumables from the Shop table CONSUMABLE category. The list is loaded
+      dynamically from configuration.
+  - Key: UI.Shop.Category.Pack.Title
+    Value: Consumable Shop
+  - Key: UI.Shop.Category.Recommend.Description
+    Value: Test items from the Shop table TEST category. The list is loaded dynamically
+      from configuration.
+  - Key: UI.Shop.Category.Recommend.Title
+    Value: Test Shop
+  - Key: UI.Shop.Category.Skin.Description
+    Value: Equipment items from the Shop table EQUIPMENT category. The list is loaded
+      dynamically from configuration.
+  - Key: UI.Shop.Category.Skin.Title
+    Value: Equipment Shop
+  - Key: UI.Shop.Currency
+    Value: 'Credits: {0}'
+  - Key: UI.Shop.FooterHint
+    Value: Click an item to test purchase logs / ESC to return
+  - Key: UI.Shop.Goods.Item.AccessKey.Description
+    Value: A temporary authorization card for locked areas.
+  - Key: UI.Shop.Goods.Item.AccessKey.Name
+    Value: Access Key
+  - Key: UI.Shop.Goods.Item.EnergyBattery.Description
+    Value: A reusable spare battery for prototype devices.
+  - Key: UI.Shop.Goods.Item.EnergyBattery.Name
+    Value: Energy Battery
+  - Key: UI.Shop.Goods.Item.Medkit.Description
+    Value: Instant recovery supplies for field testing.
+  - Key: UI.Shop.Goods.Item.Medkit.Name
+    Value: Medkit
+  - Key: UI.Shop.Goods.Item.SignalMarker.Description
+    Value: Records a temporary location point for navigation tests.
+  - Key: UI.Shop.Goods.Item.SignalMarker.Name
+    Value: Signal Marker
+  - Key: UI.Shop.Goods.Pack.ExplorationPack.Description
+    Value: Consumables and keys needed for exploration loops.
+  - Key: UI.Shop.Goods.Pack.ExplorationPack.Name
+    Value: Exploration Pack
+  - Key: UI.Shop.Goods.Pack.OutfitPack.Description
+    Value: A discounted bundle of three appearance items.
+  - Key: UI.Shop.Goods.Pack.OutfitPack.Name
+    Value: Outfit Pack
+  - Key: UI.Shop.Goods.Pack.StarterPack.Description
+    Value: A basic item pack for first-flow validation.
+  - Key: UI.Shop.Goods.Pack.StarterPack.Name
+    Value: Starter Pack
+  - Key: UI.Shop.Goods.Pack.WeeklySupply.Description
+    Value: A limited-time pack refreshed on the shop cycle.
+  - Key: UI.Shop.Goods.Pack.WeeklySupply.Name
+    Value: Weekly Supply
+  - Key: UI.Shop.Goods.Recommend.CreditCrate.Description
+    Value: A mock currency pack for shop list testing.
+  - Key: UI.Shop.Goods.Recommend.CreditCrate.Name
+    Value: Credit Crate
+  - Key: UI.Shop.Goods.Recommend.DailySupply.Description
+    Value: A daily discount bundle of core consumables.
+  - Key: UI.Shop.Goods.Recommend.DailySupply.Name
+    Value: Daily Supply
+  - Key: UI.Shop.Goods.Recommend.NightOutfit.Description
+    Value: A high-contrast outfit suited for dark menu scenes.
+  - Key: UI.Shop.Goods.Recommend.NightOutfit.Name
+    Value: Night Ops Outfit
+  - Key: UI.Shop.Goods.Recommend.TacticalModule.Description
+    Value: A reusable module for validating the purchase flow.
+  - Key: UI.Shop.Goods.Recommend.TacticalModule.Name
+    Value: Tactical Module
+  - Key: UI.Shop.Goods.Skin.AshHelmet.Description
+    Value: A matte tactical helmet for urban levels.
+  - Key: UI.Shop.Goods.Skin.AshHelmet.Name
+    Value: Ash Helmet
+  - Key: UI.Shop.Goods.Skin.GhostMask.Description
+    Value: A minimalist mask with low-contrast markings.
+  - Key: UI.Shop.Goods.Skin.GhostMask.Name
+    Value: Ghost Mask
+  - Key: UI.Shop.Goods.Skin.NeonCoat.Description
+    Value: A dark coat with thin cyan light strips.
+  - Key: UI.Shop.Goods.Skin.NeonCoat.Name
+    Value: Neon Coat
+  - Key: UI.Shop.Goods.Skin.WandererBadge.Description
+    Value: A small badge inspired by underground signage.
+  - Key: UI.Shop.Goods.Skin.WandererBadge.Name
+    Value: Wanderer Badge
+  - Key: UI.Shop.Goods.Test.Description
+    Value: Reusable RecyclerView item for scroll testing.
+  - Key: UI.Shop.Goods.Test.Name
+    Value: Test Item {0}
+  - Key: UI.Shop.SubTitle
+    Value: Supply Terminal
+  - Key: UI.Shop.TabItem
+    Value: Materials
+  - Key: UI.Shop.TabPack
+    Value: Consumables
+  - Key: UI.Shop.TabRecommend
+    Value: Test
+  - Key: UI.Shop.TabSkin
+    Value: Equipment
+  - Key: UI.Shop.Tag.Discount
+    Value: Discount
+  - Key: UI.Shop.Tag.Hot
+    Value: Hot
+  - Key: UI.Shop.Tag.Item
+    Value: Material
+  - Key: UI.Shop.Tag.New
+    Value: New
+  - Key: UI.Shop.Tag.Pack
+    Value: Consumable
+  - Key: UI.Shop.Tag.Recommend
+    Value: Test
+  - Key: UI.Shop.Tag.Skin
+    Value: Equipment
+  - Key: UI.Shop.Title
+    Value: Shop
+--- !u!114 &11410003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82a13950012b4b940bb4bf322e8a7569, type: 3}
+  m_Name: Japanese
+  m_EditorClassIdentifier: 
+  TableId: CommonTable
+  Locale: Japanese
+  Entries:
+  - Key: Log.Buy.Confirmed
+    Value: "\u8CFC\u5165\u78BA\u8A8D\uFF1A{0} x{1}\u3001\u5408\u8A08 {2}"
+  - Key: Log.Buy.Insufficient
+    Value: "\u30AF\u30EC\u30B8\u30C3\u30C8\u4E0D\u8DB3\u306E\u305F\u3081\u8CFC\u5165\u4E0D\u53EF\uFF1A{0}x{1}"
+  - Key: Log.Home.BagClick
+    Value: "\u30D0\u30C3\u30B0\u30DC\u30BF\u30F3\u3092\u30AF\u30EA\u30C3\u30AF"
+  - Key: Log.Home.ExitClick
+    Value: "\u7D42\u4E86\u30DC\u30BF\u30F3\u3092\u30AF\u30EA\u30C3\u30AF"
+  - Key: Log.Home.RoleClick
+    Value: "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u30DC\u30BF\u30F3\u3092\u30AF\u30EA\u30C3\u30AF"
+  - Key: Log.Home.TestTipsClick
+    Value: "\u30C6\u30B9\u30C8\u30D2\u30F3\u30C8\u30DC\u30BF\u30F3\u3092\u30AF\u30EA\u30C3\u30AF"
+  - Key: Test.Test
+    Value: Test
+  - Key: UI.Buy.ButtonConfirm
+    Value: "\u8CFC\u5165\u3059\u308B"
+  - Key: UI.Buy.FooterHint
+    Value: "\u6570\u91CF\u3092\u5165\u529B\u3001\u307E\u305F\u306F +/- \u3067\u8ABF\u6574"
+  - Key: UI.Buy.QuantityPlaceholder
+    Value: "\u6570\u91CF"
+  - Key: UI.Buy.Title
+    Value: "\u8CFC\u5165\u78BA\u8A8D"
+  - Key: UI.Buy.TotalPrice
+    Value: "\u5408\u8A08\u4FA1\u683C\uFF1A{0}"
+  - Key: UI.Buy.UnknownItem
+    Value: "\u4E0D\u660E\u306A\u30A2\u30A4\u30C6\u30E0"
+  - Key: UI.Common.CreditPrice
+    Value: "{0} \u30AF\u30EC\u30B8\u30C3\u30C8"
+  - Key: UI.Home.ButtonBag
+    Value: "\u30D0\u30C3\u30B0"
+  - Key: UI.Home.ButtonExit
+    Value: "\u7D42\u4E86"
+  - Key: UI.Home.ButtonRole
+    Value: "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC"
+  - Key: UI.Home.ButtonShop
+    Value: "\u30B7\u30E7\u30C3\u30D7"
+  - Key: UI.Home.ButtonTips
+    Value: "\u30D2\u30F3\u30C8"
+  - Key: UI.Home.FooterHint
+    Value: "\u30DC\u30BF\u30F3\u3067 UI \u30ED\u30B8\u30C3\u30AF\u3092\u30C6\u30B9\u30C8/
+      ESC \u3067\u623B\u308B"
+  - Key: UI.Home.NoticeContent
+    Value: "\u30C6\u30B9\u30C8\u7528\u30E1\u30A4\u30F3\u753B\u9762\u3078\u3088\u3046\u3053\u305D\u3002\u53F3\u4E0A\u306E\u30DC\u30BF\u30F3\u304B\u3089\u30B7\u30E7\u30C3\u30D7\u3001\u30D0\u30C3\u30B0\u3001\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3001\u30C6\u30B9\u30C8\u30D2\u30F3\u30C8\u3092\u958B\u3051\u307E\u3059\u3002\n\n\u3053\u306E\u753B\u9762\u306FUI
+      \u30D5\u30EC\u30FC\u30E0\u30EF\u30FC\u30AF\u3001\u30DC\u30BF\u30F3\u30D0\u30A4\u30F3\u30C9\u3001\u30C7\u30D5\u30A9\u30EB\u30C8\u9077\u79FB\u30A2\u30CB\u30E1\u30FC\u30B7\u30E7\u30F3\u306E\u78BA\u8A8D\u7528\u3067\u3059\u3002"
+  - Key: UI.Home.NoticeTitle
+    Value: "\u30DF\u30C3\u30B7\u30E7\u30F3\u544A\u77E5"
+  - Key: UI.Shop.ButtonClose
+    Value: "\u7D42\u4E86"
+  - Key: UI.Shop.Category.Item.Description
+    Value: "Shop\u8868\u306EMATERIAL\u30AB\u30C6\u30B4\u30EA\u306E\u7D20\u6750\u30A2\u30A4\u30C6\u30E0\u3067\u3059\u3002\u4E00\u89A7\u30C7\u30FC\u30BF\u306F\u8A2D\u5B9A\u8868\u304B\u3089\u52D5\u7684\u306B\u8AAD\u307F\u8FBC\u307F\u307E\u3059\u3002"
+  - Key: UI.Shop.Category.Item.Title
+    Value: "\u7D20\u6750\u30B7\u30E7\u30C3\u30D7"
+  - Key: UI.Shop.Category.Pack.Description
+    Value: "Shop\u8868\u306ECONSUMABLE\u30AB\u30C6\u30B4\u30EA\u306E\u6D88\u8017\u54C1\u3067\u3059\u3002\u4E00\u89A7\u30C7\u30FC\u30BF\u306F\u8A2D\u5B9A\u8868\u304B\u3089\u52D5\u7684\u306B\u8AAD\u307F\u8FBC\u307F\u307E\u3059\u3002"
+  - Key: UI.Shop.Category.Pack.Title
+    Value: "\u6D88\u8017\u54C1\u30B7\u30E7\u30C3\u30D7"
+  - Key: UI.Shop.Category.Recommend.Description
+    Value: "Shop\u8868\u306ETEST\u30AB\u30C6\u30B4\u30EA\u306E\u30C6\u30B9\u30C8\u30A2\u30A4\u30C6\u30E0\u3067\u3059\u3002\u4E00\u89A7\u30C7\u30FC\u30BF\u306F\u8A2D\u5B9A\u8868\u304B\u3089\u52D5\u7684\u306B\u8AAD\u307F\u8FBC\u307F\u307E\u3059\u3002"
+  - Key: UI.Shop.Category.Recommend.Title
+    Value: "\u30C6\u30B9\u30C8\u30B7\u30E7\u30C3\u30D7"
+  - Key: UI.Shop.Category.Skin.Description
+    Value: "Shop\u8868\u306EEQUIPMENT\u30AB\u30C6\u30B4\u30EA\u306E\u88C5\u5099\u30A2\u30A4\u30C6\u30E0\u3067\u3059\u3002\u4E00\u89A7\u30C7\u30FC\u30BF\u306F\u8A2D\u5B9A\u8868\u304B\u3089\u52D5\u7684\u306B\u8AAD\u307F\u8FBC\u307F\u307E\u3059\u3002"
+  - Key: UI.Shop.Category.Skin.Title
+    Value: "\u88C5\u5099\u30B7\u30E7\u30C3\u30D7"
+  - Key: UI.Shop.Currency
+    Value: "\u30AF\u30EC\u30B8\u30C3\u30C8\uFF1A{0}"
+  - Key: UI.Shop.FooterHint
+    Value: "\u5546\u54C1\u3092\u30AF\u30EA\u30C3\u30AF\u3057\u3066\u8CFC\u5165\u30ED\u30B0\u3092\u30C6\u30B9\u30C8/
+      ESC \u3067\u623B\u308B"
+  - Key: UI.Shop.Goods.Item.AccessKey.Description
+    Value: "\u30ED\u30C3\u30AF\u533A\u57DF\u7528\u306E\u4E00\u6642\u8A8D\u8A3C\u30AB\u30FC\u30C9\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Item.AccessKey.Name
+    Value: "\u901A\u884C\u30AD\u30FC"
+  - Key: UI.Shop.Goods.Item.EnergyBattery.Description
+    Value: "\u8A66\u4F5C\u88C5\u7F6E\u7528\u306E\u518D\u5229\u7528\u53EF\u80FD\u306A\u4E88\u5099\u96FB\u6C60\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Item.EnergyBattery.Name
+    Value: "\u30A8\u30CD\u30EB\u30AE\u30FC\u96FB\u6C60"
+  - Key: UI.Shop.Goods.Item.Medkit.Description
+    Value: "\u30D5\u30A3\u30FC\u30EB\u30C9\u30C6\u30B9\u30C8\u7528\u306E\u5373\u6642\u56DE\u5FA9\u88DC\u7D66\u54C1\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Item.Medkit.Name
+    Value: "\u6551\u6025\u30AD\u30C3\u30C8"
+  - Key: UI.Shop.Goods.Item.SignalMarker.Description
+    Value: "\u30CA\u30D3\u30B2\u30FC\u30B7\u30E7\u30F3\u30C6\u30B9\u30C8\u7528\u306E\u4E00\u6642\u4F4D\u7F6E\u3092\u8A18\u9332\u3057\u307E\u3059\u3002"
+  - Key: UI.Shop.Goods.Item.SignalMarker.Name
+    Value: "\u4FE1\u53F7\u30DE\u30FC\u30AB\u30FC"
+  - Key: UI.Shop.Goods.Pack.ExplorationPack.Description
+    Value: "\u63A2\u7D22\u30EB\u30FC\u30D7\u306B\u5FC5\u8981\u306A\u6D88\u8017\u54C1\u3068\u30AD\u30FC\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Pack.ExplorationPack.Name
+    Value: "\u63A2\u7D22\u30D1\u30C3\u30AF"
+  - Key: UI.Shop.Goods.Pack.OutfitPack.Description
+    Value: "3 \u7A2E\u306E\u5916\u89B3\u30A2\u30A4\u30C6\u30E0\u3092\u307E\u3068\u3081\u305F\u5272\u5F15\u30BB\u30C3\u30C8\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Pack.OutfitPack.Name
+    Value: "\u5916\u89B3\u30D1\u30C3\u30AF"
+  - Key: UI.Shop.Goods.Pack.StarterPack.Description
+    Value: "\u521D\u56DE\u30D5\u30ED\u30FC\u691C\u8A3C\u7528\u306E\u57FA\u672C\u30A2\u30A4\u30C6\u30E0\u30D1\u30C3\u30AF\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Pack.StarterPack.Name
+    Value: "\u30B9\u30BF\u30FC\u30BF\u30FC\u30D1\u30C3\u30AF"
+  - Key: UI.Shop.Goods.Pack.WeeklySupply.Description
+    Value: "\u30B7\u30E7\u30C3\u30D7\u5468\u671F\u3067\u66F4\u65B0\u3055\u308C\u308B\u671F\u9593\u9650\u5B9A\u30D1\u30C3\u30AF\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Pack.WeeklySupply.Name
+    Value: "\u30A6\u30A3\u30FC\u30AF\u30EA\u30FC\u88DC\u7D66"
+  - Key: UI.Shop.Goods.Recommend.CreditCrate.Description
+    Value: "\u30B7\u30E7\u30C3\u30D7\u30EA\u30B9\u30C8\u30C6\u30B9\u30C8\u7528\u306E\u6A21\u64EC\u901A\u8CA8\u30D1\u30C3\u30AF\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Recommend.CreditCrate.Name
+    Value: "\u30AF\u30EC\u30B8\u30C3\u30C8\u7BB1"
+  - Key: UI.Shop.Goods.Recommend.DailySupply.Description
+    Value: "\u4E3B\u8981\u6D88\u8017\u54C1\u306E\u30C7\u30A4\u30EA\u30FC\u5272\u5F15\u30BB\u30C3\u30C8\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Recommend.DailySupply.Name
+    Value: "\u30C7\u30A4\u30EA\u30FC\u88DC\u7D66"
+  - Key: UI.Shop.Goods.Recommend.NightOutfit.Description
+    Value: "\u6697\u3044\u30E1\u30CB\u30E5\u30FC\u30B7\u30FC\u30F3\u5411\u3051\u306E\u9AD8\u30B3\u30F3\u30C8\u30E9\u30B9\u30C8\u5916\u89B3\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Recommend.NightOutfit.Name
+    Value: "\u30CA\u30A4\u30C8\u4F5C\u6226\u5916\u89B3"
+  - Key: UI.Shop.Goods.Recommend.TacticalModule.Description
+    Value: "\u8CFC\u5165\u30D5\u30ED\u30FC\u691C\u8A3C\u7528\u306E\u518D\u5229\u7528\u53EF\u80FD\u306A\u30E2\u30B8\u30E5\u30FC\u30EB\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Recommend.TacticalModule.Name
+    Value: "\u6226\u8853\u30E2\u30B8\u30E5\u30FC\u30EB"
+  - Key: UI.Shop.Goods.Skin.AshHelmet.Description
+    Value: "\u90FD\u5E02\u30B9\u30C6\u30FC\u30B8\u5411\u3051\u306E\u30DE\u30C3\u30C8\u306A\u6226\u8853\u30D8\u30EB\u30E1\u30C3\u30C8\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Skin.AshHelmet.Name
+    Value: "\u30A2\u30C3\u30B7\u30E5\u30D8\u30EB\u30E1\u30C3\u30C8"
+  - Key: UI.Shop.Goods.Skin.GhostMask.Description
+    Value: "\u4F4E\u30B3\u30F3\u30C8\u30E9\u30B9\u30C8\u306E\u6A21\u69D8\u304C\u5165\u3063\u305F\u30DF\u30CB\u30DE\u30EB\u306A\u30DE\u30B9\u30AF\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Skin.GhostMask.Name
+    Value: "\u30B4\u30FC\u30B9\u30C8\u30DE\u30B9\u30AF"
+  - Key: UI.Shop.Goods.Skin.NeonCoat.Description
+    Value: "\u30B7\u30A2\u30F3\u306E\u7D30\u3044\u30E9\u30A4\u30C8\u30E9\u30A4\u30F3\u304C\u5165\u3063\u305F\u6697\u8272\u30B3\u30FC\u30C8\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Skin.NeonCoat.Name
+    Value: "\u30CD\u30AA\u30F3\u30B3\u30FC\u30C8"
+  - Key: UI.Shop.Goods.Skin.WandererBadge.Description
+    Value: "\u5730\u4E0B\u6A19\u8B58\u98A8\u306E\u5C0F\u578B\u30D0\u30C3\u30B8\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Skin.WandererBadge.Name
+    Value: "\u653E\u6D6A\u8005\u30D0\u30C3\u30B8"
+  - Key: UI.Shop.Goods.Test.Description
+    Value: "\u30B9\u30AF\u30ED\u30FC\u30EB\u30C6\u30B9\u30C8\u7528\u306E RecyclerView\u518D\u5229\u7528\u9805\u76EE\u3067\u3059\u3002"
+  - Key: UI.Shop.Goods.Test.Name
+    Value: "\u30C6\u30B9\u30C8\u5546\u54C1 {0}"
+  - Key: UI.Shop.SubTitle
+    Value: "\u88DC\u7D66\u7AEF\u672B"
+  - Key: UI.Shop.TabItem
+    Value: "\u7D20\u6750"
+  - Key: UI.Shop.TabPack
+    Value: "\u6D88\u8017\u54C1"
+  - Key: UI.Shop.TabRecommend
+    Value: "\u30C6\u30B9\u30C8"
+  - Key: UI.Shop.TabSkin
+    Value: "\u88C5\u5099"
+  - Key: UI.Shop.Tag.Discount
+    Value: "\u5272\u5F15"
+  - Key: UI.Shop.Tag.Hot
+    Value: "\u4EBA\u6C17"
+  - Key: UI.Shop.Tag.Item
+    Value: "\u7D20\u6750"
+  - Key: UI.Shop.Tag.New
+    Value: "\u65B0\u7740"
+  - Key: UI.Shop.Tag.Pack
+    Value: "\u6D88\u8017\u54C1"
+  - Key: UI.Shop.Tag.Recommend
+    Value: "\u30C6\u30B9\u30C8"
+  - Key: UI.Shop.Tag.Skin
+    Value: "\u88C5\u5099"
+  - Key: UI.Shop.Title
+    Value: "\u30B7\u30E7\u30C3\u30D7"

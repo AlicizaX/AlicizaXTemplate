@@ -17,17 +17,6 @@ if [[ ! -f Tools/Luban.AlicizaX.Localization.dll ]]; then
 fi
 
 dotnet Tools/Luban.dll \
-    -t all \
-    --conf luban.conf \
-    -f \
-    -p alicizax-localization \
-    --strict \
-    -x outputSaver=alicizax-stage \
-    -x alicizax.config=config.ini \
-    -x alicizax.validationOnly=true \
-    -x l10n.provider=alicizax
-
-dotnet Tools/Luban.dll \
     -t client \
     --conf luban.conf \
     -c cs-bin \

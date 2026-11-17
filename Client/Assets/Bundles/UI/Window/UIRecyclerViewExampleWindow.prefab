@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2474407175103589799}
   - component: {fileID: 2403347476038927640}
   - component: {fileID: 1243206000715561276}
+  - component: {fileID: 7812836726078134703}
   m_Layer: 5
   m_Name: Btn@Close
   m_TagString: Untagged
@@ -37,7 +38,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 430, y: -40}
+  m_AnchoredPosition: {x: 848, y: 499}
   m_SizeDelta: {x: 160, y: 56}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5133397036920429605
@@ -137,6 +138,24 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7812836726078134703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296782646286909690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad0e473486c04dc19b468f2b20675091, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _holder: {fileID: 1001302577063599646}
+  _hotkeyAction: {fileID: 2578644123212045086, guid: 5a8ec89654ebcd642af04da22f4406f8, type: 3}
+  _hotkeyPressType: 1
+  _submitTarget: {fileID: 1243206000715561276}
+  _listenerComponents:
+  - {fileID: 2403347476038927640}
 --- !u!1 &1011017261146330598
 GameObject:
   m_ObjectHideFlags: 0

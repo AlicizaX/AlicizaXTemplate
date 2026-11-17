@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using AlicizaX.Editor;
-using AlicizaX.Resource.Runtime;
+using AlicizaX.Resource.Editor;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
+using YooAsset;
 
 public static class AppBuildHelper
 {
-    private const string LaunchConfigAssetPath = "Assets/Resources/AlicizaX/launch.json";
-    private const string BuildLocaleAssetPath = "Assets/Resources/AlicizaX/Localization/build-locale.txt";
-
     /// <summary>
     /// 构建 Android 应用
     /// </summary>
@@ -55,8 +52,6 @@ public static class AppBuildHelper
 
         try
         {
-            PrepareBuildConfig(buildParams);
-
             var options = new BuildPlayerOptions
             {
                 scenes = buildParams.Scenes,
@@ -65,11 +60,7 @@ public static class AppBuildHelper
                 options = buildParams.DevelopBuild ? BuildOptions.Development : BuildOptions.None
             };
 
-            var report = BuildPipeline.BuildPlayer(options);
-            if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
-            {
-                throw new Exception(CollectBuildErrors(report));
-            }
+            var report = BuildPlayerWithResourceConfig(options, buildParams);
 
             Debug.Log($"构建完成: {report.summary.outputPath}");
             if (showExplorer)
@@ -81,8 +72,41 @@ public static class AppBuildHelper
         }
         finally
         {
-            CleanupBuildConfig();
+            ResourcePlayerBuildConfig.Clear();
         }
+    }
+
+    /// <summary>
+    /// 资源模式由 ResourceComponentBuildProcessor 在构建时写进场景里的 ResourceComponent。
+    /// Set 会清掉 Player 场景数据缓存；万一仍命中缓存（处理器没执行），用 CleanBuildCache 重打一次，还不行就失败，绝不出沿用旧值的包。
+    /// </summary>
+    private static UnityEditor.Build.Reporting.BuildReport BuildPlayerWithResourceConfig(BuildPlayerOptions options, IBuildParameters buildParams)
+    {
+        var playMode = (EPlayMode)buildParams.ResMode;
+
+        ResourcePlayerBuildConfig.Set(playMode, buildParams.DecryptionServices);
+        var report = BuildPipeline.BuildPlayer(options);
+        ThrowIfFailed(report);
+
+        if (ResourcePlayerBuildConfig.InjectedCount > 0)
+            return report;
+
+        Debug.LogWarning("构建没有处理到 ResourceComponent（可能命中了增量构建缓存），使用 CleanBuildCache 重新构建");
+        ResourcePlayerBuildConfig.Set(playMode, buildParams.DecryptionServices);
+        options.options |= BuildOptions.CleanBuildCache;
+        report = BuildPipeline.BuildPlayer(options);
+        ThrowIfFailed(report);
+
+        if (ResourcePlayerBuildConfig.InjectedCount == 0)
+            throw new Exception("构建场景中没有找到 ResourceComponent，资源模式没有写进包体");
+
+        return report;
+    }
+
+    private static void ThrowIfFailed(UnityEditor.Build.Reporting.BuildReport report)
+    {
+        if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            throw new Exception(CollectBuildErrors(report));
     }
 
     private static void ApplyAndroidSpecificSettings(AndroidBuildParameters androidParams)
@@ -144,57 +168,6 @@ public static class AppBuildHelper
         if (string.IsNullOrEmpty(buildParams.FileName))
         {
             throw new Exception("文件名为空");
-        }
-    }
-
-
-    private static void PrepareBuildConfig(IBuildParameters buildParams)
-    {
-        string launchConfigPath = ToProjectPath(LaunchConfigAssetPath);
-        Directory.CreateDirectory(Path.GetDirectoryName(launchConfigPath) ?? Application.dataPath);
-
-        var config = new ResourceLaunchConfig
-        {
-            playMode = buildParams.ResMode,
-            decryptionServices = buildParams.DecryptionServices ?? string.Empty,
-        };
-        File.WriteAllText(launchConfigPath, JsonUtility.ToJson(config), new UTF8Encoding(false));
-        AssetDatabase.ImportAsset(LaunchConfigAssetPath, ImportAssetOptions.ForceSynchronousImport);
-
-        string localeAssetPath = BuildLocaleAssetPath;
-        DeleteAssetIfExists(localeAssetPath);
-#if ALICIZAX_LOCALIZATION
-        if (!string.IsNullOrEmpty(buildParams.Language))
-        {
-            string localePath = ToProjectPath(localeAssetPath);
-            Directory.CreateDirectory(Path.GetDirectoryName(localePath) ?? Application.dataPath);
-            File.WriteAllText(localePath, buildParams.Language, new UTF8Encoding(false));
-            AssetDatabase.ImportAsset(localeAssetPath, ImportAssetOptions.ForceSynchronousImport);
-        }
-#endif
-    }
-
-    private static void CleanupBuildConfig()
-    {
-        DeleteAssetIfExists(BuildLocaleAssetPath);
-        DeleteAssetIfExists(LaunchConfigAssetPath);
-    }
-
-    private static string ToProjectPath(string assetPath)
-    {
-        return Path.GetFullPath(Path.Combine(Application.dataPath, "..", assetPath));
-    }
-
-    private static void DeleteAssetIfExists(string assetPath)
-    {
-        try
-        {
-            if (File.Exists(ToProjectPath(assetPath)))
-                AssetDatabase.DeleteAsset(assetPath);
-        }
-        catch (Exception error)
-        {
-            Debug.LogWarning($"删除构建配置失败: {assetPath} ({error.Message})");
         }
     }
 

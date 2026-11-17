@@ -3,7 +3,6 @@
   <assembly fullname="AlicizaX.Framework.Runtime">
     <type fullname="AlicizaX.AppServices" preserve="all" />
     <type fullname="AlicizaX.EventBus" preserve="all" />
-    <type fullname="AlicizaX.EventInitialSize`1" preserve="all" />
     <type fullname="AlicizaX.EventListenerProxy" preserve="all" />
     <type fullname="AlicizaX.IPayloadEventArgs" preserve="all" />
     <type fullname="AlicizaX.IService" preserve="all" />

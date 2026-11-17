@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
     public interface IConfigBytesLoader
     {
         UniTask<ByteBuf> LoadCommonAsync(string file);
+        UniTask<ByteBuf> LoadLocalizationAsync(string locale);
     }
 
     public interface IConfigService : IService
@@ -18,14 +19,15 @@ using Cysharp.Threading.Tasks;
         {{table.full_name}} {{format_property_name __code_style table.name}} { get; }
         {{~end~}}
         UniTask Initialize(IConfigBytesLoader loader);
-        void SetLocalizationChange(Func<string, string> translate, Func<Action<string>, IDisposable> subscribeChanged);
+        UniTask SetLanguageAsync(string locale);
+        void SetLanguageBinding(IDisposable binding);
     }
 
     public class {{__name}} : ServiceBase, IConfigService
     {
         private IConfigBytesLoader _loader;
         private bool _isLoaded;
-        private Func<string, string> _translate;
+        private bool _disposed;
         private IDisposable _localizationSubscription;
 
         {{~for table in __tables ~}}
@@ -46,22 +48,19 @@ using Cysharp.Threading.Tasks;
             {{format_property_name __code_style table.name}}.ResolveRef(this);
             {{~end~}}
             _isLoaded = true;
-            RefreshLocalization();
         }
 
-        public void SetLocalizationChange(Func<string, string> translate, Func<Action<string>, IDisposable> subscribeChanged)
+        public void SetLanguageBinding(IDisposable binding)
         {
-            if (translate == null) throw new ArgumentNullException(nameof(translate));
-            if (subscribeChanged == null) throw new ArgumentNullException(nameof(subscribeChanged));
             _localizationSubscription?.Dispose();
-            _translate = translate;
-            _localizationSubscription = subscribeChanged(_ => RefreshLocalization());
-            RefreshLocalization();
+            _localizationSubscription = binding;
         }
 
-        private void RefreshLocalization()
+        public async UniTask SetLanguageAsync(string locale)
         {
-            if (!_isLoaded || _translate == null) return;
+            if (!_isLoaded || _disposed) throw new InvalidOperationException("Config service is not loaded.");
+            var values = ConfigLocalization.Read(await _loader.LoadLocalizationAsync(locale));
+            if (_disposed) throw new ObjectDisposedException(nameof({{__name}}));
             {{~for table in __tables ~}}
             {{~has_text = false~}}
             {{~for field in table.value_ttype.def_bean.hierarchy_export_fields~}}
@@ -79,7 +78,7 @@ using Cysharp.Threading.Tasks;
             {{~end~}}
                 {{~for field in table.value_ttype.def_bean.hierarchy_export_fields~}}
                 {{~if has_tag field.ctype "text"~}}
-                row.{{format_property_name __code_style field.name}} = _translate(row.{{format_property_name __code_style field.name}}Key);
+                row.{{format_property_name __code_style field.name}} = ConfigLocalization.Get(values, row.{{format_property_name __code_style field.name}}Key);
                 {{~end~}}
                 {{~end~}}
             }
@@ -90,6 +89,7 @@ using Cysharp.Threading.Tasks;
         protected override void OnInitialize() { }
         protected override void OnDispose()
         {
+            _disposed = true;
             _localizationSubscription?.Dispose();
             _localizationSubscription = null;
         }

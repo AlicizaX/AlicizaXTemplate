@@ -17,6 +17,7 @@ namespace Game.Config
     public interface IConfigBytesLoader
     {
         UniTask<ByteBuf> LoadCommonAsync(string file);
+        UniTask<ByteBuf> LoadLocalizationAsync(string locale);
     }
 
     public interface IConfigService : IService
@@ -27,14 +28,15 @@ namespace Game.Config
         Tables.TbItem TbItem { get; }
         Tables.Shop Shop { get; }
         UniTask Initialize(IConfigBytesLoader loader);
-        void SetLocalizationChange(Func<string, string> translate, Func<Action<string>, IDisposable> subscribeChanged);
+        UniTask SetLanguageAsync(string locale);
+        void SetLanguageBinding(IDisposable binding);
     }
 
     public class ConfigService : ServiceBase, IConfigService
     {
         private IConfigBytesLoader _loader;
         private bool _isLoaded;
-        private Func<string, string> _translate;
+        private bool _disposed;
         private IDisposable _localizationSubscription;
 
         public Tables.TbAudio TbAudio { private set; get; }
@@ -61,32 +63,30 @@ namespace Game.Config
             TbItem.ResolveRef(this);
             Shop.ResolveRef(this);
             _isLoaded = true;
-            RefreshLocalization();
         }
 
-        public void SetLocalizationChange(Func<string, string> translate, Func<Action<string>, IDisposable> subscribeChanged)
+        public void SetLanguageBinding(IDisposable binding)
         {
-            if (translate == null) throw new ArgumentNullException(nameof(translate));
-            if (subscribeChanged == null) throw new ArgumentNullException(nameof(subscribeChanged));
             _localizationSubscription?.Dispose();
-            _translate = translate;
-            _localizationSubscription = subscribeChanged(_ => RefreshLocalization());
-            RefreshLocalization();
+            _localizationSubscription = binding;
         }
 
-        private void RefreshLocalization()
+        public async UniTask SetLanguageAsync(string locale)
         {
-            if (!_isLoaded || _translate == null) return;
+            if (!_isLoaded || _disposed) throw new InvalidOperationException("Config service is not loaded.");
+            var values = ConfigLocalization.Read(await _loader.LoadLocalizationAsync(locale));
+            if (_disposed) throw new ObjectDisposedException(nameof(ConfigService));
             foreach (var row in TbItem.DataList)
             {
-                row.Name = _translate(row.NameKey);
-                row.Desc = _translate(row.DescKey);
+                row.Name = ConfigLocalization.Get(values, row.NameKey);
+                row.Desc = ConfigLocalization.Get(values, row.DescKey);
             }
         }
 
         protected override void OnInitialize() { }
         protected override void OnDispose()
         {
+            _disposed = true;
             _localizationSubscription?.Dispose();
             _localizationSubscription = null;
         }

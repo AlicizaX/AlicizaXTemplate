@@ -34,7 +34,6 @@ public static class BuildRequestReader
             VersionCode = file.versionCode,
             Development = file.development,
             PlayMode = PlayModeValue(ParseEnum<ResourceBuildMode>(Required("RES_MODE"))),
-            Language = Environment.GetEnvironmentVariable("UCL_PARAM_LANGUAGE"),
             Decryption = Environment.GetEnvironmentVariable("UCL_PARAM_DECRYPTION"),
         };
 

@@ -49,7 +49,7 @@ https://github.com/AlicizaX/FramworkInstaller.git
 | `com.alicizax.unity.editor.extension` | 编辑器扩展工具                                                     |
 | `com.alicizax.unity.input`            | 输入扩展：设备监听、快捷键、UI 导航、按键图标（依赖 Input System） |
 | `com.alicizax.unity.debugger`         | 运行时调试面板                                                     |
-| `com.alicizax.unity.localization`     | 基于 Luban 的多语言支持                                            |
+| `com.alicizax.unity.localization`     | 基于 ScriptableObject 的多语言词库、增量覆盖与 CSV 编辑                                            |
 | `com.alicizax.unity.installer`        | 安装器：装核心包、导入模板                                         |
 
 详细的依赖关系与安装顺序见 **[快速开始](https://b4lie.github.io/AlicizaXWiki/quickstart/)**。

@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc267bc6ec31169428fca564289ef01d, type: 3}
+  m_Name: StartupTable
+  m_EditorClassIdentifier: 
+  TableId: StartupTable
+  Settings: {fileID: 11400000, guid: c7984cd79ada4a49802bafa43940db59, type: 2}
+  Keys:
+  - Bootstrap.Update.Checking
+  - Bootstrap.Update.DownloadFailed
+  - Bootstrap.Update.Downloading
+  - Bootstrap.Update.NetworkError
+  - Bootstrap.Update.NoAssets
+  - Bootstrap.Update.Ready
+  - Bootstrap.Update.Retry
+  - Bootstrap.Update.Size
+  - Bootstrap.Update.Speed
+  Tables:
+  - {fileID: 11410001}
+  - {fileID: 11410002}
+  - {fileID: 11410003}
+  AssetDirectory: Assets/Resources/Localization
+  AddressTemplate: '{table}_{locale}'
+  CodeOutput: Assets/Scripts/Startup/UpdateLocalizationKey.cs
+--- !u!114 &11410001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82a13950012b4b940bb4bf322e8a7569, type: 3}
+  m_Name: ChineseSimplified
+  m_EditorClassIdentifier: 
+  TableId: StartupTable
+  Locale: ChineseSimplified
+  Entries:
+  - Key: Bootstrap.Update.Checking
+    Value: "\u6B63\u5728\u68C0\u67E5\u66F4\u65B0\u2026"
+  - Key: Bootstrap.Update.DownloadFailed
+    Value: "\u8D44\u6E90\u66F4\u65B0\u5931\u8D25\u3002"
+  - Key: Bootstrap.Update.Downloading
+    Value: "\u6B63\u5728\u4E0B\u8F7D {0}/{1}\uFF08{2:F2}%\uFF09"
+  - Key: Bootstrap.Update.NetworkError
+    Value: "\u7F51\u7EDC\u8FDE\u63A5\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5\u3002"
+  - Key: Bootstrap.Update.NoAssets
+    Value: "\u6CA1\u6709\u9700\u8981\u4E0B\u8F7D\u7684\u8D44\u6E90\u3002"
+  - Key: Bootstrap.Update.Ready
+    Value: "\u66F4\u65B0\u5B8C\u6210"
+  - Key: Bootstrap.Update.Retry
+    Value: "\u91CD\u8BD5"
+  - Key: Bootstrap.Update.Size
+    Value: "\u5DF2\u4E0B\u8F7D {0}MB/{1}MB"
+  - Key: Bootstrap.Update.Speed
+    Value: "\u5F53\u524D\u901F\u5EA6 {0}/s\uFF0C\u5269\u4F59\u65F6\u95F4 {1}"
+--- !u!114 &11410002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82a13950012b4b940bb4bf322e8a7569, type: 3}
+  m_Name: English
+  m_EditorClassIdentifier: 
+  TableId: StartupTable
+  Locale: English
+  Entries:
+  - Key: Bootstrap.Update.Checking
+    Value: "Checking for updates\u2026"
+  - Key: Bootstrap.Update.Downloading
+    Value: Downloading {0}/{1} ({2:F2}%)
+  - Key: Bootstrap.Update.NetworkError
+    Value: Network connection failed. Please retry.
+  - Key: Bootstrap.Update.NoAssets
+    Value: No assets need downloading.
+  - Key: Bootstrap.Update.Ready
+    Value: Update complete
+  - Key: Bootstrap.Update.Retry
+    Value: Retry
+  - Key: Bootstrap.Update.Size
+    Value: Downloaded {0}MB/{1}MB
+  - Key: Bootstrap.Update.Speed
+    Value: Speed {0}/s, time remaining {1}
+--- !u!114 &11410003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82a13950012b4b940bb4bf322e8a7569, type: 3}
+  m_Name: Japanese
+  m_EditorClassIdentifier: 
+  TableId: StartupTable
+  Locale: Japanese
+  Entries:
+  - Key: Bootstrap.Update.Checking
+    Value: "\u66F4\u65B0\u3092\u78BA\u8A8D\u3057\u3066\u3044\u307E\u3059\u2026"
+  - Key: Bootstrap.Update.DownloadFailed
+    Value: "\u30A2\u30BB\u30C3\u30C8\u306E\u66F4\u65B0\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002"
+  - Key: Bootstrap.Update.Downloading
+    Value: "\u30C0\u30A6\u30F3\u30ED\u30FC\u30C9\u4E2D {0}/{1}\uFF08{2:F2}%\uFF09"
+  - Key: Bootstrap.Update.NetworkError
+    Value: "\u30CD\u30C3\u30C8\u30EF\u30FC\u30AF\u63A5\u7D9A\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002\u518D\u8A66\u884C\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+  - Key: Bootstrap.Update.NoAssets
+    Value: "\u30C0\u30A6\u30F3\u30ED\u30FC\u30C9\u304C\u5FC5\u8981\u306A\u30A2\u30BB\u30C3\u30C8\u306F\u3042\u308A\u307E\u305B\u3093\u3002"
+  - Key: Bootstrap.Update.Ready
+    Value: "\u66F4\u65B0\u304C\u5B8C\u4E86\u3057\u307E\u3057\u305F"
+  - Key: Bootstrap.Update.Retry
+    Value: "\u518D\u8A66\u884C"
+  - Key: Bootstrap.Update.Size
+    Value: "\u30C0\u30A6\u30F3\u30ED\u30FC\u30C9\u6E08\u307F {0}MB/{1}MB"
+  - Key: Bootstrap.Update.Speed
+    Value: "\u901F\u5EA6 {0}/s\u3001\u6B8B\u308A\u6642\u9593 {1}"

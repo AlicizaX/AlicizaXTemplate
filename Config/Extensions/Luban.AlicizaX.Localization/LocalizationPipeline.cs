@@ -2,7 +2,6 @@ using Luban;
 using Luban.L10N;
 using Luban.OutputSaver;
 using Luban.Pipeline;
-using System.Text.RegularExpressions;
 
 namespace AlicizaX.LubanLocalization;
 
@@ -95,20 +94,9 @@ public sealed class LocalizationPipeline : IPipeline
     private static void FindObsoleteLocalization(HashSet<string> obsolete, LocalizationProject project,
         Dictionary<string, byte[]> expected)
     {
-        foreach (string template in project.DataTemplates)
-        {
-            string prefix = template[..template.IndexOf("{locale}", StringComparison.Ordinal)];
-            string directory = Directory.Exists(prefix) ? prefix : Path.GetDirectoryName(prefix)!;
-            if (!Directory.Exists(directory)) continue;
-            string relativeTemplate = Path.GetRelativePath(directory, template).Replace('\\', '/');
-            var pattern = new Regex("^" + Regex.Escape(relativeTemplate).Replace(Regex.Escape("{locale}"), "[^/]+") + "$",
-                OperatingSystem.IsWindows() ? RegexOptions.IgnoreCase : RegexOptions.None);
-            foreach (string file in Directory.GetFiles(directory, "*.bytes", SearchOption.AllDirectories))
-                if (pattern.IsMatch(Path.GetRelativePath(directory, file).Replace('\\', '/')) && !expected.ContainsKey(file))
-                    obsolete.Add(file);
-        }
-        foreach (string code in project.Rows.Where(row => row.CodeOut.Length > 0).Select(row => row.CodeOut).Distinct())
-            if (File.Exists(code) && !expected.ContainsKey(code)) obsolete.Add(code);
+        if (!Directory.Exists(project.OutputDirectory)) return;
+        foreach (string file in Directory.GetFiles(project.OutputDirectory, "Game_*.bytes"))
+            if (!expected.ContainsKey(file)) obsolete.Add(file);
     }
 }
 

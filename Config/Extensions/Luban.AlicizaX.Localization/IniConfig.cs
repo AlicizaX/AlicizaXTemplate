@@ -5,7 +5,6 @@ internal sealed class IniConfig
     private readonly Dictionary<string, Dictionary<string, string>> _sections = new(StringComparer.OrdinalIgnoreCase);
 
     internal string DirectoryPath { get; }
-    internal IEnumerable<KeyValuePair<string, Dictionary<string, string>>> Sections => _sections;
 
     internal IniConfig(string path)
     {

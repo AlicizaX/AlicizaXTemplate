@@ -31,16 +31,16 @@ namespace GameLogic.UI
 
             foreach (var language in LocalizationKit.SupportedLanguages)
             {
-                optionDatas.Add(new TMP_Dropdown.OptionData(language));
+                optionDatas.Add(new TMP_Dropdown.OptionData(LocalizationKit.Settings.DisplayName(language)));
             }
 
             baseui.DropdownLanguages.options = optionDatas;
-            baseui.DropdownLanguages.SetValueWithoutNotify(Mathf.Max(0, optionDatas.FindIndex(option => option.text == currentLanguage)));
+            baseui.DropdownLanguages.SetValueWithoutNotify(Mathf.Max(0, LanguageTypes.StringToIndex(currentLanguage)));
         }
 
         private void OnDropdownLanguageChange(int arg0)
         {
-            var selectedLanguage = baseui.DropdownLanguages.options[arg0].text;
+            var selectedLanguage = LocalizationKit.SupportedLanguages[arg0];
             if (currentLanguage == selectedLanguage) return;
             SwitchLanguageAsync(selectedLanguage).Forget();
         }
@@ -50,10 +50,7 @@ namespace GameLogic.UI
             baseui.DropdownLanguages.interactable = false;
             try
             {
-                if (await LocalizationKit.SetLanguageAsync(selectedLanguage))
-                {
-                    currentLanguage = selectedLanguage;
-                }
+                await LocalizationKit.SetLanguageAsync(selectedLanguage);
             }
             catch (System.Exception error)
             {
@@ -64,7 +61,7 @@ namespace GameLogic.UI
                 currentLanguage = LocalizationKit.CurrentLanguage;
                 if (baseui.DropdownLanguages != null)
                 {
-                    baseui.DropdownLanguages.SetValueWithoutNotify(Mathf.Max(0, baseui.DropdownLanguages.options.FindIndex(option => option.text == currentLanguage)));
+                    baseui.DropdownLanguages.SetValueWithoutNotify(Mathf.Max(0, LanguageTypes.StringToIndex(currentLanguage)));
                     baseui.DropdownLanguages.interactable = true;
                 }
             }

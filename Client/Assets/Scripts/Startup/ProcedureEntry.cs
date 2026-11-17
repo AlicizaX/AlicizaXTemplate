@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using AlicizaX;
 using AlicizaX.Localization.Runtime;
@@ -12,10 +11,8 @@ namespace Unity.Startup.Procedure
     {
         private async UniTaskVoid Start()
         {
-            TextAsset options = Resources.Load<TextAsset>("Localization/RuntimeOptions");
-            string json = options.text;
-            Resources.UnloadAsset(options);
-            await LocalizationKit.InitializeAsync(json, new ResourcesCatalogSource("Localization/Update_{locale}"));
+            LocalizationKit.Initialize(Resources.Load<LocalizationSettings>("Localization/Settings"));
+            await LocalizationKit.AddTableAsync("StartupTable", new ResourcesTableSource("Localization/StartupTable_{locale}"));
 
             await UniTask.WaitUntil(() => YooAsset.YooAssets.IsInitialized);
             ProcedureBuilder.InitializeProcedure(

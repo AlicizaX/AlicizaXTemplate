@@ -12,7 +12,6 @@ public sealed class BuildRequest
     public bool Development;
     public ResourceBuildMode ResourceMode;
     public int PlayMode;
-    public string Language;
     public string PackageVersion;
     public string Decryption;
     public string Encryption;

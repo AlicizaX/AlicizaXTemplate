@@ -8,7 +8,6 @@ public interface IBuildParameters
     bool DevelopBuild { get; set; }
     int ResMode { get; set; }
     string FileName { get; set; }
-    string Language { get; set; }
     string[] Scenes { get; set; }
     string Version { get; set; }
 
@@ -34,7 +33,6 @@ public class AndroidBuildParameters : IBuildParameters
     public bool DevelopBuild { get; set; }
     public int ResMode { get; set; }
     public string FileName { get; set; }
-    public string Language { get; set; }
     public string[] Scenes { get; set; }
     public string Version { get; set; }
     public string DecryptionServices { get; set; }
@@ -80,7 +78,6 @@ public class StandaloneBuildParameters : IBuildParameters
     public bool DevelopBuild { get; set; }
     public int ResMode { get; set; }
     public string FileName { get; set; }
-    public string Language { get; set; }
     public string[] Scenes { get; set; }
     public string Version { get; set; }
     public string DecryptionServices { get; set; }

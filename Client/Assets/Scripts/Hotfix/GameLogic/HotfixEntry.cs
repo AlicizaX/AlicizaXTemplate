@@ -29,11 +29,12 @@ namespace GameLogic
             Log.Info("HotFix Logic Entry!");
             _hotfixAssembly = (List<Assembly>)objects[0];
 
-            await LocalizationKit.AddCatalogAsync(new ResourceCatalogSource("Game_{locale}"));
+            await LocalizationKit.AddTableAsync("CommonTable", new AssetBundleTableSource("CommonTable_{locale}"));
 
             ConfigService = AppServices.Register<IConfigService>(new ConfigService());
             await ConfigService.Initialize(new ConfigBytesLoader());
-            ConfigService.SetLocalizationChange(LocalizationKit.Get, LocalizationKit.SubscribeChanged);
+            await ConfigService.SetLanguageAsync(LocalizationKit.CurrentLanguage);
+            ConfigService.SetLanguageBinding(LocalizationKit.RegisterLanguageLoader(ConfigService.SetLanguageAsync));
 
 
             if (!AppServices.TryGet<IFakePlayerDataService>(out _))
@@ -47,6 +48,8 @@ namespace GameLogic
 
         private sealed class ConfigBytesLoader : IConfigBytesLoader
         {
+            public UniTask<ByteBuf> LoadLocalizationAsync(string locale) => LoadCommonAsync("Game_" + locale);
+
             public async UniTask<ByteBuf> LoadCommonAsync(string file)
             {
                 string location = $"{file}";

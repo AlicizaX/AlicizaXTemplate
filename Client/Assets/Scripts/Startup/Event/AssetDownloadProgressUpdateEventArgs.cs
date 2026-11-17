@@ -1,6 +1,5 @@
 ﻿using AlicizaX;
 
-[Prewarm(4)]
 public readonly struct AssetDownloadProgressUpdateEventArgs : IPayloadEventArgs
 {
     /// <summary>

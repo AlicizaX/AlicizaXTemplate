@@ -17,18 +17,6 @@ if not exist "Tools\Luban.AlicizaX.Localization.dll" (
 )
 
 dotnet "Tools\Luban.dll" ^
-    -t all ^
-    --conf "luban.conf" ^
-    -f ^
-    -p alicizax-localization ^
-    --strict ^
-    -x "outputSaver=alicizax-stage" ^
-    -x "alicizax.config=config.ini" ^
-    -x "alicizax.validationOnly=true" ^
-    -x "l10n.provider=alicizax"
-if errorlevel 1 exit /b %errorlevel%
-
-dotnet "Tools\Luban.dll" ^
     -t client ^
     --conf "luban.conf" ^
     -c cs-bin ^
