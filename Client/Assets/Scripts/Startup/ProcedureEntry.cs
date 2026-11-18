@@ -11,7 +11,7 @@ namespace Unity.Startup.Procedure
     {
         private async UniTaskVoid Start()
         {
-            LocalizationKit.Initialize(Resources.Load<LocalizationSettings>("Localization/Settings"));
+            LocalizationKit.Initialize();
             await LocalizationKit.AddTableAsync("StartupTable", new ResourcesTableSource("Localization/StartupTable_{locale}"));
 
             await UniTask.WaitUntil(() => YooAsset.YooAssets.IsInitialized);

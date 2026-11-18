@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: StartupTable
   m_EditorClassIdentifier: 
   TableId: StartupTable
-  Settings: {fileID: 11400000, guid: c7984cd79ada4a49802bafa43940db59, type: 2}
   Keys:
   - Bootstrap.Update.Checking
   - Bootstrap.Update.DownloadFailed

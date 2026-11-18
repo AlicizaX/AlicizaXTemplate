@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: CommonTable
   m_EditorClassIdentifier: 
   TableId: CommonTable
-  Settings: {fileID: 11400000, guid: c7984cd79ada4a49802bafa43940db59, type: 2}
   Keys:
   - Log.Buy.Confirmed
   - Log.Buy.Insufficient
