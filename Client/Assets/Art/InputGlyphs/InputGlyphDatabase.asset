@@ -1,0 +1,756 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53ed017cef844d11842ba16553c6391d, type: 3}
+  m_Name: InputGlyphDatabase
+  m_EditorClassIdentifier:
+  placeholderSprite: {fileID: 0}
+  profiles:
+  - id: KeyboardMouse
+    fallbackProfileIds: []
+    bindingGroupHints:
+    - keyboard
+    - mouse
+    - keyboard&mouse
+    - keyboardmouse
+    - kbm
+    entries:
+    - controlPaths:
+      - <Keyboard>/escape
+      sprite: {fileID: 21300000, guid: d27787280d1a74548a94203a2e3829ff, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/space
+      sprite: {fileID: 21300000, guid: d6fe9ef5d5f5ad14daf63c17ba5e5ce0, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/enter
+      sprite: {fileID: 21300000, guid: 9e4680a6f7306b540b21b76c3266b9f9, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/tab
+      sprite: {fileID: 21300000, guid: dfb36ddaa8fe6114898a1bfcdef42265, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/backquote
+      sprite: {fileID: 21300000, guid: 62bf1859b79164640b197f3bc6567a6f, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/quote
+      sprite: {fileID: 21300000, guid: e506ae1ece7d2f2499c348f0239085b7, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/semicolon
+      sprite: {fileID: 21300000, guid: 71bf8623b3e83374984385f69799b466, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/comma
+      sprite: {fileID: 21300000, guid: 7d8f694783654c641b61cd0e122aeb3f, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/period
+      sprite: {fileID: 21300000, guid: e9c959283599bbc428038aabc7b003d5, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/slash
+      sprite: {fileID: 21300000, guid: e9dfc32a1c6831c4aa1fb34d7194c025, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/backslash
+      sprite: {fileID: 21300000, guid: 2c33c9b557e07f1488ab82933151c49a, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/leftBracket
+      sprite: {fileID: 21300000, guid: 76b6fb4300ab24f4181994e237a0125d, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/rightBracket
+      sprite: {fileID: 21300000, guid: 61297fa4b8d66eb4fa0646ce049db49d, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/minus
+      sprite: {fileID: 21300000, guid: b251cd334912a334c878720ddbeb7843, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/equals
+      sprite: {fileID: 21300000, guid: 173bf4490b25106499c9a08ffa8ec46f, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/upArrow
+      sprite: {fileID: 21300000, guid: abe2b27a8ebbde8429f2ec286de0b4dd, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/downArrow
+      sprite: {fileID: 21300000, guid: d4e36e97894b0b24a84dd6806b9c2d9a, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/leftArrow
+      sprite: {fileID: 21300000, guid: d46671abec3b0ed4f9e421ae40ab3325, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/rightArrow
+      sprite: {fileID: 21300000, guid: b93b24adccb527f47ba744b78e7f28c8, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/a
+      sprite: {fileID: 21300000, guid: 7ca8b2786570a6f4183920c7b9201156, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/b
+      sprite: {fileID: 21300000, guid: 5c907d264a94b9e42906bf096fe404ac, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/c
+      sprite: {fileID: 21300000, guid: c14d42ceb70a5bb459dead7076699475, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/d
+      sprite: {fileID: 21300000, guid: b51fdfe1a3afccf4f9d036ef134d1182, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/e
+      sprite: {fileID: 21300000, guid: 04d7e6e532eb5bd4ab29e6dbcb4e0bb4, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f
+      sprite: {fileID: 21300000, guid: c7722f3387e025644afc8fb6142a2828, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/g
+      sprite: {fileID: 21300000, guid: cb4655976631d154db1e7a44b588a830, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/h
+      sprite: {fileID: 21300000, guid: 22da653b02d068d46bfe5d7908f2279a, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/i
+      sprite: {fileID: 21300000, guid: 72af17eb2ecd50440ac1756e9f88edbe, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/j
+      sprite: {fileID: 21300000, guid: 627ea75265e253040a4205873ba769f2, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/k
+      sprite: {fileID: 21300000, guid: 4b6e1adc22693b942b3a8f262d18bf5a, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/l
+      sprite: {fileID: 21300000, guid: bea4283338a920a42aa818eef5ca02d1, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/m
+      sprite: {fileID: 21300000, guid: f09473e86c4a37f40bb294dcf7ba0317, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/n
+      sprite: {fileID: 21300000, guid: 2cd5545fe0ad6bb469188770a01cf285, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/o
+      sprite: {fileID: 21300000, guid: 9c9ea2c9bcde712409ad9433d430fd4d, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/p
+      sprite: {fileID: 21300000, guid: e48f1b25213b44042ba62cadf0de1a78, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/q
+      sprite: {fileID: 21300000, guid: 4cb20dbd38b55984d9eb6f6abbfc68dd, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/r
+      sprite: {fileID: 21300000, guid: c361644bbbd234d489c7cc193723b69b, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/s
+      sprite: {fileID: 21300000, guid: 1e15ffa7395fe40429205d8a3022569e, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/t
+      sprite: {fileID: 21300000, guid: b52ce62d1e586a84fb1c990de1829bc5, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/u
+      sprite: {fileID: 21300000, guid: cea85218662f6454f91a188a6c4fb6cd, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/v
+      sprite: {fileID: 21300000, guid: 711a881b85f5ca74eb21b31ce6c0634f, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/w
+      sprite: {fileID: 21300000, guid: 776c53ab6d8f49d4b9872185def288df, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/x
+      sprite: {fileID: 21300000, guid: 72dcc2abe1890a542a9a5734d49c7693, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/y
+      sprite: {fileID: 21300000, guid: be3ad17f3c0666b4facab349ec57e115, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/z
+      sprite: {fileID: 21300000, guid: 4c83b83123026c140b4acfeb3fa3003e, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/1
+      sprite: {fileID: 21300000, guid: 77b2419d3aa864b4e85bc07df2b51c9d, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/2
+      sprite: {fileID: 21300000, guid: ca3583b6f6b6892418fc15f027257cb5, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/3
+      sprite: {fileID: 21300000, guid: 4835fd6d8eddcae42ae022cba10c44df, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/4
+      sprite: {fileID: 21300000, guid: b6391b044a858b046923179947b9b0f3, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/5
+      sprite: {fileID: 21300000, guid: f3974cbb64dc9924a8d21967cd65b2c0, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/6
+      sprite: {fileID: 21300000, guid: ff78452adcb780e45951a993971e1d62, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/7
+      sprite: {fileID: 21300000, guid: ced6f435b4c49a8498b028fa181966b1, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/8
+      sprite: {fileID: 21300000, guid: 14522b2c5bbfe3b4eaea134e0a266a5e, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/9
+      sprite: {fileID: 21300000, guid: b5d7f094abe5f7b4ba0dc45eb9a8ff25, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/0
+      sprite: {fileID: 21300000, guid: 3f1569c1abd2e92409d01825e89a6c2b, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/leftShift
+      sprite: {fileID: 21300000, guid: 061b2493741e8db48b2ef5af1c3112fa, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/rightShift
+      sprite: {fileID: 21300000, guid: be6d10e8171f8be418eb27a2392453bd, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/leftAlt
+      sprite: {fileID: 21300000, guid: 822a29f01912756448816262311d7d29, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/rightAlt
+      sprite: {fileID: 21300000, guid: d3ceed53b0662fd47b0706986ed7134b, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/leftCtrl
+      sprite: {fileID: 21300000, guid: e3bc368a51c33a04089582ca0ab42897, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/rightCtrl
+      sprite: {fileID: 21300000, guid: 21ac45ddf00542840b495b346f555abb, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/leftMeta
+      sprite: {fileID: 21300000, guid: 22e466634c1bf2f4facb2b06011c3ba4, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/rightMeta
+      sprite: {fileID: 21300000, guid: 96765504991edaa4ca9e0a04fee0ba83, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/contextMenu
+      sprite: {fileID: 21300000, guid: 82e1f32c3e091af4a8ff4f1543e4eff9, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/backspace
+      sprite: {fileID: 21300000, guid: 7ec09bcbbc94adb4b8f344506940ee16, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/pageDown
+      sprite: {fileID: 21300000, guid: 9ee0549d11113124699c5e85b77a7c5a, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/pageUp
+      sprite: {fileID: 21300000, guid: be216c0ca2356ec489ffc1eee330074c, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/home
+      sprite: {fileID: 21300000, guid: f312c61711bfcc54d94a08f3046bf120, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/end
+      sprite: {fileID: 21300000, guid: 430d5474b6f1fad49af005d15445aca7, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/insert
+      sprite: {fileID: 21300000, guid: a4c65d1f4d1988b46acb581e9e51a779, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/delete
+      sprite: {fileID: 21300000, guid: 40afd1fb499dcde4c89393c104ab2685, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/capsLock
+      sprite: {fileID: 21300000, guid: 0a1956711e3c385498557e23561a3864, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numLock
+      sprite: {fileID: 21300000, guid: 6af1c416bed367c4e826e091de567bfd, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/printScreen
+      sprite: {fileID: 21300000, guid: 77b515e888bb8ea4dbb6743f87b849b6, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/scrollLock
+      sprite: {fileID: 21300000, guid: 55ae55e12da5dd94bab82424461abfc0, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/pause
+      sprite: {fileID: 21300000, guid: f7cf6135f1f57a34481265496ae5562f, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpadEnter
+      sprite: {fileID: 21300000, guid: 1de959c920b44f14b8a353941afc92d8, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpadDivide
+      sprite: {fileID: 21300000, guid: b24eb7066ff40da429e93810c8d5b124, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpadMultiply
+      sprite: {fileID: 21300000, guid: 8cd2706dae951f449933808a03734cda, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpadPlus
+      sprite: {fileID: 21300000, guid: fe31d3c27a0b0ea43aad8c105cc5093a, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpadMinus
+      sprite: {fileID: 21300000, guid: ffe247a8a1631a1459031d1c73bc3559, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpadPeriod
+      sprite: {fileID: 21300000, guid: 314b72d4f08f11f49b55de51672e152d, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpadEquals
+      sprite: {fileID: 21300000, guid: 0c7d9a8194824554ca53d11cc2069fc9, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpad1
+      sprite: {fileID: 21300000, guid: aa51a8f8d9166874bb054bd0107b131d, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpad2
+      sprite: {fileID: 21300000, guid: a72fadff554544d4da044751e0afde62, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpad3
+      sprite: {fileID: 21300000, guid: bc32da2680ad891458079f710f668eb6, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpad4
+      sprite: {fileID: 21300000, guid: ca75ece80a600ea40b4431a579189783, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpad5
+      sprite: {fileID: 21300000, guid: 9d8f8cb975e444c44a5f25e98bd5804a, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpad6
+      sprite: {fileID: 21300000, guid: 6d604fd8d8d8f1e4cb8b921527021a4c, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpad7
+      sprite: {fileID: 21300000, guid: 442de821d3feba642ade2097ceb5581d, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpad8
+      sprite: {fileID: 21300000, guid: c6ba44ec4ecdcaf4eba4cbead944e6f8, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpad9
+      sprite: {fileID: 21300000, guid: d359a52b695de404b9879cd4ee905dcf, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/numpad0
+      sprite: {fileID: 21300000, guid: 8a2b79d9860d6214989141ad884add8b, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f1
+      sprite: {fileID: 21300000, guid: f7ac128d8818d8b4594649a3e82b1c9c, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f2
+      sprite: {fileID: 21300000, guid: ae66588ca8eeb3241bdf9dce7a4721d8, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f3
+      sprite: {fileID: 21300000, guid: 75b5acfc3aa4ff540ba0bb0d2ffc7757, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f4
+      sprite: {fileID: 21300000, guid: 75ad4fdbf3818534499c73d1bb47be2d, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f5
+      sprite: {fileID: 21300000, guid: 9cfaa408dab7d3a45a7dc23422eb4287, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f6
+      sprite: {fileID: 21300000, guid: 5176e50c677d3344cac26b6160a73c21, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f7
+      sprite: {fileID: 21300000, guid: 7ec66e3f7d2532e4bb62a2b34d2ac486, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f8
+      sprite: {fileID: 21300000, guid: 7df56900047b6f34196cb4bcb06c5fbb, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f9
+      sprite: {fileID: 21300000, guid: 7b524788932918940b47d73c4327eff2, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f10
+      sprite: {fileID: 21300000, guid: fd2f0111e219b1540bd4c06e2fe88605, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f11
+      sprite: {fileID: 21300000, guid: f918230f9b511db4c80625326efb7d95, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f12
+      sprite: {fileID: 21300000, guid: 4e2b09b52cb44544cbc1563140d2bdc8, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/OEM1
+      sprite: {fileID: 21300000, guid: 29641a5ec3697ea4bbc63c90db7b2f0b, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/OEM2
+      sprite: {fileID: 21300000, guid: 85d518ca4830af54dac63904135ea6ae, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/OEM3
+      sprite: {fileID: 21300000, guid: 8b5ce71123eb2204aaf4927255cbab78, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/OEM4
+      sprite: {fileID: 21300000, guid: 8cf8cbad95318cd4faca7355af923fbe, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/OEM5
+      sprite: {fileID: 21300000, guid: c2f8bc550cc416743ab0b1b68c83edec, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f13
+      sprite: {fileID: 21300000, guid: 0f17116802ede524e94ca521ec28053f, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f14
+      sprite: {fileID: 21300000, guid: d84e4c306c76290488a5228c18329c7e, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f15
+      sprite: {fileID: 21300000, guid: 4298c28d4d269014aa0185ca80098a2e, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f16
+      sprite: {fileID: 21300000, guid: 67f863b6dae3a6e4a83962b75b796c5d, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f17
+      sprite: {fileID: 21300000, guid: 35eb75eb25645134eb20d3ce53456384, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f18
+      sprite: {fileID: 21300000, guid: 1f9e2dfb8a1050e498b567f6df730eb1, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f19
+      sprite: {fileID: 21300000, guid: 44a98b2c3a20d5a43aeb622ecd150e2b, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f20
+      sprite: {fileID: 21300000, guid: 846837c62c44f3a409dcac9566a1c76e, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f21
+      sprite: {fileID: 21300000, guid: 224b34398613c464eab7373cd55b77ee, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f22
+      sprite: {fileID: 21300000, guid: cea5f2251008af3468c01ef2ef315bb5, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f23
+      sprite: {fileID: 21300000, guid: 96a64dadfee11f5418054f94db836982, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/f24
+      sprite: {fileID: 21300000, guid: 2d6fd40f86717304facb22881f968199, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/shift
+      sprite: {fileID: 21300000, guid: 85f4b04d852387e4a8a6e2e82bfa1af3, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/ctrl
+      sprite: {fileID: 21300000, guid: 98b317656e632bc479411db032a59671, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/alt
+      sprite: {fileID: 21300000, guid: 7313f1987a1d0ee499874763c0cad2c6, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Keyboard>/anyKey
+      sprite: {fileID: 21300000, guid: 0de991da9be981e4186264fa86a4f382, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/leftButton
+      sprite: {fileID: 21300000, guid: 0db1d655d37c4e145a4b619849ec8d8c, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/rightButton
+      sprite: {fileID: 21300000, guid: 99cd4dcb01c18e54a86a2d4e62f93fc4, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/middleButton
+      sprite: {fileID: 21300000, guid: baf7ad3c225be29408ac770ab2051ce1, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/backButton
+      sprite: {fileID: 21300000, guid: b6705a8d504b4fd47b4bdde53d5bb612, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/forwardButton
+      sprite: {fileID: 21300000, guid: c7cc5edf77882a7458369f1e8d6d4359, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/delta
+      - <Mouse>/delta/x
+      - <Mouse>/delta/y
+      - <Mouse>/position
+      - <Mouse>/position/x
+      - <Mouse>/position/y
+      sprite: {fileID: 21300000, guid: e2998a00d1bafaa49906476dbd27a21c, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/scroll
+      sprite: {fileID: 21300000, guid: 4631bb0f0e8f54c4fbbf0942474f24cf, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/scroll/y
+      sprite: {fileID: 21300000, guid: 0ca730fcdcbbd2e49bdf27ef341783d5, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/scroll/x
+      sprite: {fileID: 21300000, guid: a98ddb1c93b19ba44989cfb3c6fde36b, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/scroll/up
+      sprite: {fileID: 21300000, guid: 53b0681ffc06fcc4e82ffe0e0bfa2030, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/scroll/down
+      sprite: {fileID: 21300000, guid: e7edd15167d016d4c8db2a0a6b58745e, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/scroll/left
+      sprite: {fileID: 21300000, guid: f3451e68ce19f4945ac2ba42d04b0e6c, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Mouse>/scroll/right
+      sprite: {fileID: 21300000, guid: 974e7c821d3504f4c9f6f029ff406051, type: 3}
+      tmpSpriteName:
+  - id: GenericGamepad
+    fallbackProfileIds: []
+    bindingGroupHints:
+    - gamepad
+    - controller
+    entries: []
+  - id: Xbox
+    fallbackProfileIds:
+    - GenericGamepad
+    bindingGroupHints:
+    - xbox
+    - xinput
+    - gamepad
+    - controller
+    entries:
+    - controlPaths:
+      - <Gamepad>/buttonSouth
+      sprite: {fileID: 21300000, guid: c4bde729f29dcad4ba7754457d6823ed, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/buttonEast
+      sprite: {fileID: 21300000, guid: 2f5990015635e26439cd387bc5f01210, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/buttonWest
+      sprite: {fileID: 21300000, guid: b151f34c2e485044894b28bed3727a66, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/buttonNorth
+      sprite: {fileID: 21300000, guid: 9aedcb08166676242b8f4561d38ffbdd, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/leftShoulder
+      sprite: {fileID: 21300000, guid: a4ef283aa79211d438d4650def004044, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/rightShoulder
+      sprite: {fileID: 21300000, guid: 0ae12be54da367640ac13469331c18d6, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/leftTrigger
+      sprite: {fileID: 21300000, guid: 444bfd110c1069148848370e23d1d887, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/rightTrigger
+      sprite: {fileID: 21300000, guid: 0dafd881db7ee3c4982fba7cc2e26758, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/start
+      sprite: {fileID: 21300000, guid: 33b8c0f67bd04774faf4731657cacb8b, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/select
+      sprite: {fileID: 21300000, guid: a081c3bd0b28bd7458ab29d66f822ae8, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/dpad
+      sprite: {fileID: 21300000, guid: 911706727b293ab41a7092b08f5b2593, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/dpad/up
+      sprite: {fileID: 21300000, guid: 11a67c2a406ecf74dbb3b61dfed310fb, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/dpad/down
+      sprite: {fileID: 21300000, guid: 1af6f78ece03ab94095056649dc551bc, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/dpad/left
+      sprite: {fileID: 21300000, guid: cdecfbf15d0ce904983c50215590bea4, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/dpad/right
+      sprite: {fileID: 21300000, guid: 8a6b875feb53f0845b08fa91cbabe3c7, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/leftStick
+      sprite: {fileID: 21300000, guid: 36c0ddd9dcdf3b34abba065200f3263e, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/leftStickPress
+      sprite: {fileID: 21300000, guid: 0350f12d0cc54b641a5bc709edb858e6, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/leftStick/up
+      sprite: {fileID: 21300000, guid: f911d5454f708624b9a76de9f20d1eeb, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/leftStick/down
+      sprite: {fileID: 21300000, guid: aa2d1605b7c86ff42879b85aec566bd3, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/leftStick/left
+      sprite: {fileID: 21300000, guid: 1c8c779345870284498dfbba949891b8, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/leftStick/right
+      sprite: {fileID: 21300000, guid: 2014ddd367d168a4fac9cc1399fb8538, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/rightStick
+      sprite: {fileID: 21300000, guid: f90c1d38f0a192345a4de87746681bfb, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/rightStickPress
+      sprite: {fileID: 21300000, guid: 59b5ecf85ce17f441a45558998f2f253, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/rightStick/up
+      sprite: {fileID: 21300000, guid: 0e605705dd14c4c42819d712f022a453, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/rightStick/down
+      sprite: {fileID: 21300000, guid: 8c102af156752304996ceaa927623c18, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/rightStick/left
+      sprite: {fileID: 21300000, guid: c12f2300ee043e041a5aae544b3c0655, type: 3}
+      tmpSpriteName:
+    - controlPaths:
+      - <Gamepad>/rightStick/right
+      sprite: {fileID: 21300000, guid: 779419ebfd7d99741ae2ad2372384ec6, type: 3}
+      tmpSpriteName:
+  - id: PlayStation
+    fallbackProfileIds:
+    - GenericGamepad
+    bindingGroupHints:
+    - playstation
+    - dualshock
+    - dualsense
+    - gamepad
+    - controller
+    entries: []
+  - id: Switch
+    fallbackProfileIds:
+    - GenericGamepad
+    - Xbox
+    bindingGroupHints:
+    - switch
+    - nintendo
+    - joy-con
+    - joycon
+    - gamepad
+    - controller
+    entries: []
+  - id: SteamDeck
+    fallbackProfileIds:
+    - Xbox
+    - GenericGamepad
+    bindingGroupHints:
+    - steamdeck
+    - steam
+    - xbox
+    - xinput
+    - gamepad
+    - controller
+    entries: []
+  - id: SteamController
+    fallbackProfileIds:
+    - SteamDeck
+    - Xbox
+    - GenericGamepad
+    bindingGroupHints:
+    - steam
+    - steamcontroller
+    - xbox
+    - xinput
+    - gamepad
+    - controller
+    entries: []
