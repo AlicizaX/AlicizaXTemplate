@@ -25,6 +25,7 @@ namespace Unity.Startup.Procedure
             //检查设备是否能够访问互联网
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
+                EventBus.Publish(new LaunchStateChangedEvent(LaunchState.NetworkUnavailable));
                 Log.Warning(UpdateLocalizationKey.Bootstrap.UPDATE_NETWORKERROR);
                 return;
             }

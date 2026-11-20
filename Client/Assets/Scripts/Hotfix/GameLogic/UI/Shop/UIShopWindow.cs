@@ -1,163 +1,136 @@
 using System.Collections.Generic;
 using System.Linq;
 using AlicizaX;
-using AlicizaX.Localization;
-using AlicizaX.Localization.UI;
+using AlicizaX.Input;
+using AlicizaX.Localization.Runtime;
+using AlicizaX.Resource.Runtime;
 using AlicizaX.UI;
 using AlicizaX.UI.Runtime;
 using Cysharp.Threading.Tasks;
 using Game.Config;
 using Game.UI;
 using GameLogic.Player;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace GameLogic.UI
 {
     [Window(UILayer.UI, 3)]
-    public class UIShopWindow : UIWindow<ui_UIShopWindow>
+    public sealed class UIShopWindow : UIWindow<ui_UIShopWindow>
     {
-        private readonly Dictionary<EShopCategory, List<ShopGoodsData>> _goodsByCategory = new();
-        private UGList<ShopGoodsData> _goodsList;
-        private UGList<ShopGoodsData> _goodsLinerList;
-        private UGLoopList<ShopGoodsData> _goodsLoopList;
-        private IFakePlayerDataService _playerDataService;
-        private IConfigService _configService;
-        private LocalizedText _currencyBinding;
+        private List<ShopGoodsData> _catalog;
+        private UGList<ShopGoodsData> _list;
+        private RecyclerViewNavigationController _navigation;
+        private IFakePlayerDataService _player;
+        private bool _oldKeyboardSelection;
+
+        private ShopGoodsData Selected => _list.HasChoice ? _list.GetItem(_list.ChoiceIndex) : null;
 
         protected override void OnInitialize()
         {
-            _goodsList = UGListCreateHelper.Create<ShopGoodsData>(baseui.ScrollViewGoodsList);
-            _goodsLinerList = UGListCreateHelper.Create<ShopGoodsData>(baseui.ScrollViewGoodsLinerList);
-            _goodsLoopList = UGListCreateHelper.CreateLoop<ShopGoodsData>(baseui.ScrollViewGoodsLoopList);
-            _playerDataService = AppServices.Require<IFakePlayerDataService>();
-            _configService = AppServices.Require<IConfigService>();
-            _currencyBinding = baseui.TextCurrency.GetComponent<LocalizedText>();
-
-            baseui.TogRecommend.onValueChanged.AddListener(OnTogRecommendChanged);
-            baseui.TogItem.onValueChanged.AddListener(OnTogItemChanged);
-            baseui.TogSkin.onValueChanged.AddListener(OnTogSkinChanged);
-            baseui.TogPack.onValueChanged.AddListener(OnTogPackChanged);
-            baseui.BtnClose.onClick.AddListener(OnBtnCloseClick);
-
-            baseui.TogRecommend.isOn = true;
-            RefreshCurrencyText();
-            SwitchCategory(EShopCategory.TEST);
+            _player = AppServices.Require<IFakePlayerDataService>();
+            _catalog = BuildCatalog(AppServices.Require<IConfigService>());
+            _list = UGListCreateHelper.Create<ShopGoodsData>(baseui.ScrollViewGoodsList);
+            _navigation = baseui.ScrollViewGoodsList.GetComponent<RecyclerViewNavigationController>();
+            _list.OnChoiceIndexChanged += ShowItem;
+            baseui.TogAll.onValueChanged.AddListener(on => { if (on) ShowCategory(null); });
+            baseui.TogEquipment.onValueChanged.AddListener(on => { if (on) ShowCategory(EShopCategory.EQUIPMENT); });
+            baseui.TogMaterials.onValueChanged.AddListener(on => { if (on) ShowCategory(EShopCategory.MATERIAL); });
+            baseui.TogConsumables.onValueChanged.AddListener(on => { if (on) ShowCategory(EShopCategory.CONSUMABLE); });
+            baseui.BtnPreviousTab.onClick.AddListener(baseui.TogAll.group.Previous);
+            baseui.BtnNextTab.onClick.AddListener(baseui.TogAll.group.Next);
+            baseui.BtnPurchase.onClick.AddListener(() => GameApp.UI.ShowUI<UIBuyAlertWindow>(Selected).Forget());
+            baseui.BtnClose.onClick.AddListener(() => CloseSelf());
             EventProxy.AddUIEvent<PlayerDataChangedEvent>(OnPlayerDataChanged);
         }
 
         protected override void OnOpen()
         {
-            RefreshCurrencyText();
+            LocalizationKit.Changed += OnLanguageChanged;
+            _oldKeyboardSelection = UXInput.Navigation.KeyboardRequireSelection;
+            UXInput.Navigation.KeyboardRequireSelection = true;
+            baseui.TogAll.SetIsOnWithoutNotify(true);
+            ShowCategory(null);
+            RefreshBalance();
         }
+
+        protected override void OnClose()
+        {
+            LocalizationKit.Changed -= OnLanguageChanged;
+            UXInput.Navigation.KeyboardRequireSelection = _oldKeyboardSelection;
+        }
+
+        private static List<ShopGoodsData> BuildCatalog(IConfigService config)
+        {
+            var seen = new HashSet<(EShopCategory, int)>();
+            var goods = new List<ShopGoodsData>();
+            foreach (var offer in config.Shop.DataList)
+            {
+                if (offer.Type != EShopCategory.TEST && offer.ItemId_Ref != null && seen.Add((offer.Type, offer.ItemId)))
+                    goods.Add(new ShopGoodsData(offer));
+            }
+            return goods.OrderByDescending(item => item.Price).ThenBy(item => item.ItemId).ToList();
+        }
+
+        private void ShowCategory(EShopCategory? category)
+        {
+            var goods = category.HasValue ? _catalog.FindAll(item => item.Category == category.Value) : _catalog;
+            _list.SetData(goods, ListScrollPolicy.ResetScroll);
+            baseui.TextCount.SetText(LocalizationKey.UI.SHOP_COUNT(goods.Count));
+            bool hasItems = goods.Count > 0;
+            baseui.RectDetails.gameObject.SetActive(hasItems);
+            baseui.TextEmpty.gameObject.SetActive(!hasItems);
+            if (!hasItems) return;
+
+            if (_list.ChoiceIndex == 0) ShowItem(0);
+            else _list.ChoiceIndex = 0;
+            _navigation.RestoreFocus(0);
+        }
+
+        private void ShowItem(int index)
+        {
+            if (index < 0 || index >= _list.DataCount) return;
+            var item = _list.GetItem(index);
+            baseui.ImgPreview.SetSprite(Res, item.Icon);
+            baseui.TextItemName.SetText(item.Name);
+            baseui.TextDescription.SetText(item.Description);
+            baseui.TextPrice.SetText(LocalizationKey.UI.COMMON_CREDITPRICE(item.Price));
+            baseui.TextCategory.SetText(item.Category switch
+            {
+                EShopCategory.EQUIPMENT => LocalizationKey.UI.SHOP_TABSKIN,
+                EShopCategory.MATERIAL => LocalizationKey.UI.SHOP_TABITEM,
+                _ => LocalizationKey.UI.SHOP_TABPACK
+            });
+            RefreshOwned(item.ItemId);
+        }
+
+        private void RefreshOwned(int itemId)
+        {
+            var bag = _player.BagItems;
+            int count = 0;
+            for (int i = 0; i < bag.Count; i++)
+            {
+                if (bag[i].ItemId != itemId) continue;
+                count = bag[i].Count;
+                break;
+            }
+            baseui.TextOwned.SetText(LocalizationKey.UI.SHOP_OWNED(count));
+        }
+
+        private void RefreshBalance() => baseui.TextCurrency.SetText(_player.Credit.ToString("N0"));
 
         private void OnPlayerDataChanged(in PlayerDataChangedEvent evt)
         {
-            RefreshCurrencyText();
+            RefreshBalance();
+            if (Selected?.ItemId == evt.ChangedItemId) RefreshOwned(evt.ChangedItemId);
         }
 
-        private void RefreshCurrencyText()
+        private void OnLanguageChanged(string language)
         {
-            _currencyBinding.SetArguments(_playerDataService.Credit);
-        }
-
-
-        private void OnTogRecommendChanged(bool isOn)
-        {
-            if (isOn)
+            baseui.TextCount.SetText(LocalizationKey.UI.SHOP_COUNT(_list.DataCount));
+            if (_list.TryGetVisibleRange(out int first, out int last))
             {
-                SwitchCategory(EShopCategory.TEST);
+                for (int i = first; i <= last; i++) _list.RefreshItem(i);
             }
-        }
-
-        private void OnTogItemChanged(bool isOn)
-        {
-            if (isOn)
-            {
-                SwitchCategory(EShopCategory.MATERIAL);
-            }
-        }
-
-        private void OnTogSkinChanged(bool isOn)
-        {
-            if (isOn)
-            {
-                SwitchCategory(EShopCategory.EQUIPMENT);
-            }
-        }
-
-        private void OnTogPackChanged(bool isOn)
-        {
-            if (isOn)
-            {
-                SwitchCategory(EShopCategory.CONSUMABLE);
-            }
-        }
-
-        private void OnBtnCloseClick()
-        {
-           CloseSelf();
-        }
-
-        private void SwitchCategory(EShopCategory category)
-        {
-            var datas = GetGoods(category);
-            _goodsList.Data = datas.Take(32).ToList();
-            _goodsLinerList.Data = datas;
-            _goodsLoopList.Data = datas;
-        }
-
-        private List<ShopGoodsData> GetGoods(EShopCategory category)
-        {
-            if (_goodsByCategory.TryGetValue(category, out List<ShopGoodsData> goods))
-            {
-                return goods;
-            }
-
-            goods = BuildGoods(category);
-            _goodsByCategory[category] = goods;
-            return goods;
-        }
-
-        private List<ShopGoodsData> BuildGoods(EShopCategory category)
-        {
-            var configs = _configService.Shop.DataList;
-            List<ShopGoodsData> goods = new(configs.Count);
-            string tag = GetCategoryTag(category);
-            for (int i = 0; i < configs.Count; i++)
-            {
-                var config = configs[i];
-                if (config.Type != category || config.ItemId_Ref == null)
-                {
-                    continue;
-                }
-
-                goods.Add(new ShopGoodsData(config, tag, GetAccentColor(i)));
-            }
-
-            return goods;
-        }
-
-        private static readonly Color[] AccentColors =
-        {
-            new(0.18f, 0.92f, 0.88f, 1f),
-            new(0.58f, 0.8f, 0.55f, 1f),
-            new(0.95f, 0.78f, 0.32f, 1f),
-            new(0.7f, 0.55f, 1f, 1f)
-        };
-
-        private static Color GetAccentColor(int index) => AccentColors[index % AccentColors.Length];
-
-        private static string GetCategoryTag(EShopCategory category)
-        {
-            return category switch
-            {
-                EShopCategory.MATERIAL => LocalizationKey.UI.SHOP_TAG_ITEM_Raw,
-                EShopCategory.EQUIPMENT => LocalizationKey.UI.SHOP_TAG_SKIN_Raw,
-                EShopCategory.CONSUMABLE => LocalizationKey.UI.SHOP_TAG_PACK_Raw,
-                _ => LocalizationKey.UI.SHOP_TAG_RECOMMEND_Raw
-            };
+            ShowItem(_list.ChoiceIndex);
         }
     }
 }

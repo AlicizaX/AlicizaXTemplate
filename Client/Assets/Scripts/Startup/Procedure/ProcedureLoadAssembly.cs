@@ -22,7 +22,6 @@ namespace Unity.Startup.Procedure
 #endif
         private bool m_LoadAssemblyComplete;
         private bool m_LoadMetadataAssemblyComplete;
-        private bool m_EntryInvoked;
         private Assembly m_MainLogicAssembly;
 
         protected override void OnEnter()
@@ -31,7 +30,6 @@ namespace Unity.Startup.Procedure
 
             m_LoadAssemblyComplete = false;
             m_LoadMetadataAssemblyComplete = true;
-            m_EntryInvoked = false;
             m_MainLogicAssembly = null;
             m_HotfixAssemblies.Clear();
 
@@ -64,19 +62,14 @@ namespace Unity.Startup.Procedure
 
         protected override void OnUpdate()
         {
-            if (m_EntryInvoked || !m_LoadAssemblyComplete || !m_LoadMetadataAssemblyComplete)
+            if (m_LoadAssemblyComplete && m_LoadMetadataAssemblyComplete)
             {
-                return;
+                SwitchProcedure<ProcedureUpdateFinishState>();
             }
-
-            m_EntryInvoked = true;
-            InvokeMainLogicEntry();
         }
 
-        private void InvokeMainLogicEntry()
+        internal void InvokeMainLogicEntry()
         {
-            SwitchProcedure<ProcedureUpdateFinishState>();
-
             if (m_MainLogicAssembly == null)
             {
                 Log.Warning($"Main logic assembly '{StartupSetting.EntranceDll}' missing.");

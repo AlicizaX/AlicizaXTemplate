@@ -1,9 +1,8 @@
 ﻿using AlicizaX.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using AlicizaX.UI.Runtime;
-using TMPro;
-
 namespace Game.UI
 {
 	[UIRes(ui_UIShopWindow.ResTag, EUIResLoadType.AssetBundle)]
@@ -17,63 +16,77 @@ namespace Game.UI
 		public UXButton BtnClose => mBtnClose;
 
 		[SerializeField]
-		private Image mImgBackGround;
-		public Image ImgBackGround => mImgBackGround;
+		private UXButton mBtnNextTab;
+		public UXButton BtnNextTab => mBtnNextTab;
 
 		[SerializeField]
-		private Image mImgHeaderPanel;
-		public Image ImgHeaderPanel => mImgHeaderPanel;
+		private UXButton mBtnPreviousTab;
+		public UXButton BtnPreviousTab => mBtnPreviousTab;
 
 		[SerializeField]
-		private Image mImgListPanel;
-		public Image ImgListPanel => mImgListPanel;
+		private UXButton mBtnPurchase;
+		public UXButton BtnPurchase => mBtnPurchase;
 
 		[SerializeField]
-		private Image mImgTabPanel;
-		public Image ImgTabPanel => mImgTabPanel;
+		private Image mImgPreview;
+		public Image ImgPreview => mImgPreview;
 
 		[SerializeField]
-		private RecyclerView mScrollViewGoodsLinerList;
-		public RecyclerView ScrollViewGoodsLinerList => mScrollViewGoodsLinerList;
+		private RectTransform mRectDetails;
+		public RectTransform RectDetails => mRectDetails;
 
 		[SerializeField]
 		private RecyclerView mScrollViewGoodsList;
 		public RecyclerView ScrollViewGoodsList => mScrollViewGoodsList;
 
 		[SerializeField]
-		private RecyclerView mScrollViewGoodsLoopList;
-		public RecyclerView ScrollViewGoodsLoopList => mScrollViewGoodsLoopList;
+		private TextMeshProUGUI mTextCategory;
+		public TextMeshProUGUI TextCategory => mTextCategory;
+
+		[SerializeField]
+		private TextMeshProUGUI mTextCount;
+		public TextMeshProUGUI TextCount => mTextCount;
 
 		[SerializeField]
 		private TextMeshProUGUI mTextCurrency;
 		public TextMeshProUGUI TextCurrency => mTextCurrency;
 
 		[SerializeField]
-		private TextMeshProUGUI mTextSubTitle;
-		public TextMeshProUGUI TextSubTitle => mTextSubTitle;
+		private TextMeshProUGUI mTextDescription;
+		public TextMeshProUGUI TextDescription => mTextDescription;
 
 		[SerializeField]
-		private TextMeshProUGUI mTextTitle;
-		public TextMeshProUGUI TextTitle => mTextTitle;
+		private TextMeshProUGUI mTextEmpty;
+		public TextMeshProUGUI TextEmpty => mTextEmpty;
 
 		[SerializeField]
-		private UXToggle mTogItem;
-		public UXToggle TogItem => mTogItem;
+		private TextMeshProUGUI mTextItemName;
+		public TextMeshProUGUI TextItemName => mTextItemName;
 
 		[SerializeField]
-		private UXToggle mTogPack;
-		public UXToggle TogPack => mTogPack;
+		private TextMeshProUGUI mTextOwned;
+		public TextMeshProUGUI TextOwned => mTextOwned;
 
 		[SerializeField]
-		private UXToggle mTogRecommend;
-		public UXToggle TogRecommend => mTogRecommend;
+		private TextMeshProUGUI mTextPrice;
+		public TextMeshProUGUI TextPrice => mTextPrice;
 
 		[SerializeField]
-		private UXToggle mTogSkin;
-		public UXToggle TogSkin => mTogSkin;
+		private UXToggle mTogAll;
+		public UXToggle TogAll => mTogAll;
+
+		[SerializeField]
+		private UXToggle mTogConsumables;
+		public UXToggle TogConsumables => mTogConsumables;
+
+		[SerializeField]
+		private UXToggle mTogEquipment;
+		public UXToggle TogEquipment => mTogEquipment;
+
+		[SerializeField]
+		private UXToggle mTogMaterials;
+		public UXToggle TogMaterials => mTogMaterials;
 
 		#endregion
-
-
 	}
 }

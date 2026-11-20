@@ -8,8 +8,9 @@ namespace GameLogic.UI
 {
     public sealed class RvTextItemViewHolder : ViewHolder<RvTextData>, IPointerClickHandler
     {
-        [SerializeField] private Image background;
         [SerializeField] private TextMeshProUGUI title;
+        [SerializeField] private Image artwork;
+        [SerializeField] private Sprite[] illustrations;
 
         protected override void OnBind(RvTextData data, int index)
         {
@@ -18,9 +19,9 @@ namespace GameLogic.UI
                 title.text = data.Title;
             }
 
-            if (background != null)
+            if (artwork != null && illustrations.Length > 0)
             {
-                background.color = data.Color;
+                artwork.sprite = illustrations[index % illustrations.Length];
             }
         }
 

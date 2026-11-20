@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TableId: StartupTable
   Keys:
+  - Bootstrap.Launch.PressAnyButton
   - Bootstrap.Update.Checking
   - Bootstrap.Update.DownloadFailed
   - Bootstrap.Update.Downloading
@@ -45,6 +46,8 @@ MonoBehaviour:
   TableId: StartupTable
   Locale: ChineseSimplified
   Entries:
+  - Key: Bootstrap.Launch.PressAnyButton
+    Value: "\u6309\u4EFB\u610F\u952E\u5F00\u59CB\u6E38\u620F"
   - Key: Bootstrap.Update.Checking
     Value: "\u6B63\u5728\u68C0\u67E5\u66F4\u65B0\u2026"
   - Key: Bootstrap.Update.DownloadFailed
@@ -78,6 +81,8 @@ MonoBehaviour:
   TableId: StartupTable
   Locale: English
   Entries:
+  - Key: Bootstrap.Launch.PressAnyButton
+    Value: Press any button to start
   - Key: Bootstrap.Update.Checking
     Value: "Checking for updates\u2026"
   - Key: Bootstrap.Update.Downloading
@@ -109,6 +114,8 @@ MonoBehaviour:
   TableId: StartupTable
   Locale: Japanese
   Entries:
+  - Key: Bootstrap.Launch.PressAnyButton
+    Value: "\u3044\u305A\u308C\u304B\u306E\u30DC\u30BF\u30F3\u3092\u62BC\u3057\u3066\u30B2\u30FC\u30E0\u3092\u958B\u59CB"
   - Key: Bootstrap.Update.Checking
     Value: "\u66F4\u65B0\u3092\u78BA\u8A8D\u3057\u3066\u3044\u307E\u3059\u2026"
   - Key: Bootstrap.Update.DownloadFailed

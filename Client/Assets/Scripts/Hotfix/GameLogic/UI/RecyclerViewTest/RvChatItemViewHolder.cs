@@ -53,8 +53,8 @@ namespace GameLogic.UI
                 bubble.sizeDelta = new Vector2(bubbleWidth, bubbleHeight);
                 bubble.anchoredPosition = data.IsSelf ? new Vector2(-16f, 0f) : new Vector2(16f, 0f);
                 background.color = data.IsSelf
-                    ? new Color(0.18f, 0.42f, 0.32f, 0.95f)
-                    : new Color(0.16f, 0.22f, 0.32f, 0.95f);
+                    ? new Color32(53, 83, 90, 255)
+                    : new Color32(37, 56, 69, 255);
             }
 
             if (message != null)

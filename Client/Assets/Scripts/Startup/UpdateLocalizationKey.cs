@@ -4,6 +4,8 @@ public static class UpdateLocalizationKey
 {
     public static class Bootstrap
     {
+        public const string LAUNCH_PRESSANYBUTTON_Raw = "Bootstrap.Launch.PressAnyButton";
+        public static string LAUNCH_PRESSANYBUTTON => LocalizationKit.Get(LAUNCH_PRESSANYBUTTON_Raw);
         public const string UPDATE_CHECKING_Raw = "Bootstrap.Update.Checking";
         public static string UPDATE_CHECKING => LocalizationKit.Get(UPDATE_CHECKING_Raw);
         public const string UPDATE_DOWNLOADFAILED_Raw = "Bootstrap.Update.DownloadFailed";

@@ -11,10 +11,13 @@ namespace Unity.Startup.Procedure
     {
         private async UniTaskVoid Start()
         {
+            GameApp.UI.ShowUISync<UILaunchWindow>();
             LocalizationKit.Initialize();
             await LocalizationKit.AddTableAsync("StartupTable", new ResourcesTableSource("Localization/StartupTable_{locale}"));
+            EventBus.Publish(new LaunchStateChangedEvent(LaunchState.Checking));
 
             await UniTask.WaitUntil(() => YooAsset.YooAssets.IsInitialized);
+            var loadAssembly = new ProcedureLoadAssembly();
             ProcedureBuilder.InitializeProcedure(
                 new List<ProcedureBase>
                 {
@@ -23,8 +26,8 @@ namespace Unity.Startup.Procedure
                     new ProcedureInitPackageState(),
                     new ProcedureDownloadBundleState(),
                     new ProcedurePatchDoneState(),
-                    new ProcedureLoadAssembly(),
-                    new ProcedureUpdateFinishState(),
+                    loadAssembly,
+                    new ProcedureUpdateFinishState(loadAssembly.InvokeMainLogicEntry),
                 },
                 typeof(ProcedureEntryState)
             );

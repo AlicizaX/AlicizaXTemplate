@@ -1,12 +1,10 @@
 using AlicizaX.UI;
-using UnityEngine;
 
 namespace GameLogic.UI
 {
     public sealed class RvTextData : ISimpleViewData
     {
         public string Title;
-        public Color Color;
     }
 
     public sealed class RvChatData : IMeasuredViewData

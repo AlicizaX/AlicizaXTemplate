@@ -7,6 +7,7 @@
         "YooAsset",
         "UniTask.YooAsset",
         "HybridCLRGenerate",
+        "Unity.InputSystem",
         "Unity.TextMeshPro",
         "ZString",
         "AlicizaX.Framework.Runtime",

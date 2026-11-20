@@ -1,4 +1,5 @@
 using AlicizaX.UI.Runtime;
+using Cysharp.Threading.Tasks;
 using Game.UI;
 
 namespace GameLogic.UI
@@ -21,7 +22,7 @@ namespace GameLogic.UI
 
         private static void OpenExample(RecyclerViewExampleKind kind)
         {
-            GameApp.UI.ShowUI<UIRecyclerViewExampleWindow>(kind);
+            GameApp.UI.ShowUI<UIRecyclerViewExampleWindow>(kind).Forget();
         }
     }
 }

@@ -43,6 +43,7 @@ namespace GameLogic
             }
 
             UXInput.Feedback.Profile = Resources.Load<InputFeedbackProfile>("UX/InputFeedbackProfile");
+            GameAudioSettings.ApplyMasterVolume(GameAudioSettings.MasterVolume);
             await GameApp.UI.ShowUI<UIHomeWindow>();
         }
 

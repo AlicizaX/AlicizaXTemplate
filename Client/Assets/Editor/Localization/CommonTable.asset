@@ -34,8 +34,15 @@ MonoBehaviour:
   - UI.Home.ButtonShop
   - UI.Home.ButtonTips
   - UI.Home.FooterHint
+  - UI.Home.Menu.Credits
+  - UI.Home.Menu.Options
+  - UI.Home.Menu.Quit
+  - UI.Home.Menu.Shop
+  - UI.Home.Menu.StartNewGame
   - UI.Home.NoticeContent
   - UI.Home.NoticeTitle
+  - UI.Home.Status.ActiveUser
+  - UI.Home.Status.Version
   - UI.Shop.ButtonClose
   - UI.Shop.Category.Item.Description
   - UI.Shop.Category.Item.Title
@@ -94,6 +101,151 @@ MonoBehaviour:
   - UI.Shop.Tag.Recommend
   - UI.Shop.Tag.Skin
   - UI.Shop.Title
+  - UI.Common.Back
+  - UI.Credits.Roll
+  - UI.Settings.General
+  - UI.Settings.Accessibility
+  - UI.Settings.Display
+  - UI.Settings.Audio
+  - UI.Settings.Controls
+  - UI.Settings.Reset
+  - UI.Settings.Applied
+  - UI.Settings.Preview
+  - UI.Settings.PreviewHint
+  - UI.Settings.ChangingLanguage
+  - UI.Settings.On
+  - UI.Settings.Off
+  - UI.Settings.Relaxed
+  - UI.Settings.Standard
+  - UI.Settings.Hard
+  - UI.Settings.Small
+  - UI.Settings.Medium
+  - UI.Settings.Large
+  - UI.Settings.Low
+  - UI.Settings.High
+  - UI.Settings.Windowed
+  - UI.Settings.Borderless
+  - UI.Settings.Fullscreen
+  - UI.Settings.Unlimited
+  - UI.Settings.Night
+  - UI.Settings.Wide
+  - UI.Settings.Language
+  - UI.Settings.LanguageHelp
+  - UI.Settings.PauseFocus
+  - UI.Settings.PauseFocusHelp
+  - UI.Settings.Hints
+  - UI.Settings.HintsHelp
+  - UI.Settings.Difficulty
+  - UI.Settings.DifficultyHelp
+  - UI.Settings.Markers
+  - UI.Settings.MarkersHelp
+  - UI.Settings.Prompts
+  - UI.Settings.PromptsHelp
+  - UI.Settings.SaveNotice
+  - UI.Settings.SaveNoticeHelp
+  - UI.Settings.SkipIntro
+  - UI.Settings.SkipIntroHelp
+  - UI.Settings.Subtitles
+  - UI.Settings.SubtitlesHelp
+  - UI.Settings.TextSize
+  - UI.Settings.TextSizeHelp
+  - UI.Settings.SubtitleBackdrop
+  - UI.Settings.SubtitleBackdropHelp
+  - UI.Settings.ReducedMotion
+  - UI.Settings.ReducedMotionHelp
+  - UI.Settings.Brightness
+  - UI.Settings.BrightnessHelp
+  - UI.Settings.Quality
+  - UI.Settings.QualityHelp
+  - UI.Settings.ScreenMode
+  - UI.Settings.ScreenModeHelp
+  - UI.Settings.FrameLimit
+  - UI.Settings.FrameLimitHelp
+  - UI.Settings.MasterVolume
+  - UI.Settings.MasterVolumeHelp
+  - UI.Settings.DynamicRange
+  - UI.Settings.DynamicRangeHelp
+  - UI.Settings.Sensitivity
+  - UI.Settings.SensitivityHelp
+  - UI.Settings.InvertY
+  - UI.Settings.InvertYHelp
+  - UI.Settings.Vibration
+  - UI.Settings.VibrationHelp
+  - UI.Alert.Confirm
+  - UI.Alert.Cancel
+  - UI.Settings.ResetQuestion
+  - UI.Settings.ResetDescription
+  - UI.Shop.All
+  - UI.Shop.Balance
+  - UI.Shop.Purchase
+  - UI.Shop.Owned
+  - UI.Shop.Count
+  - UI.Shop.UnitPrice
+  - UI.Buy.ShortFunds
+  - UI.Shop.Empty
+  - UI.Recycler.Hub
+  - UI.Recycler.Catalogue
+  - UI.Recycler.Controls
+  - UI.Recycler.Count
+  - UI.Recycler.Linear.Title
+  - UI.Recycler.Linear.Description
+  - UI.Recycler.Grid.Title
+  - UI.Recycler.Grid.Description
+  - UI.Recycler.Chat.Title
+  - UI.Recycler.Chat.Description
+  - UI.Recycler.Mixed.Title
+  - UI.Recycler.Mixed.Description
+  - UI.Recycler.Group.Title
+  - UI.Recycler.Group.Description
+  - UI.Recycler.Loop.Title
+  - UI.Recycler.Loop.Description
+  - UI.Recycler.Page.Title
+  - UI.Recycler.Page.Description
+  - UI.Recycler.Circle.Title
+  - UI.Recycler.Circle.Description
+  - UI.Recycler.Action.Append
+  - UI.Recycler.Action.Prepend
+  - UI.Recycler.Action.Top
+  - UI.Recycler.Action.AppendFour
+  - UI.Recycler.Action.Remove
+  - UI.Recycler.Action.Middle
+  - UI.Recycler.Action.Send
+  - UI.Recycler.Action.History
+  - UI.Recycler.Action.Resize
+  - UI.Recycler.Action.Short
+  - UI.Recycler.Action.Tall
+  - UI.Recycler.Action.Refresh
+  - UI.Recycler.Action.Expand
+  - UI.Recycler.Action.Collapse
+  - UI.Recycler.Action.AddTask
+  - UI.Recycler.Action.First
+  - UI.Recycler.Action.Center
+  - UI.Recycler.Action.Next
+  - UI.Recycler.Action.Previous
+  - UI.Recycler.Action.FirstPage
+  - UI.Recycler.Action.Fourth
+  - UI.Recycler.Action.Stop
+  - UI.Recycler.Data.Record
+  - UI.Recycler.Data.Slot
+  - UI.Recycler.Data.Cover
+  - UI.Recycler.Data.Short
+  - UI.Recycler.Data.Medium
+  - UI.Recycler.Data.Tall
+  - UI.Recycler.Data.Message
+  - UI.Recycler.Data.Note
+  - UI.Recycler.Data.Update
+  - UI.Recycler.Data.Daily
+  - UI.Recycler.Data.World
+  - UI.Recycler.Data.Story
+  - UI.Recycler.Data.Task0
+  - UI.Recycler.Data.Task1
+  - UI.Recycler.Data.Task2
+  - UI.Recycler.Data.Task3
+  - UI.Recycler.Data.Task4
+  - UI.Recycler.Data.Task5
+  - UI.Recycler.Data.Task6
+  - UI.Recycler.Data.Task7
+  - UI.Recycler.Data.NewTask
   Tables:
   - {fileID: 11410001}
   - {fileID: 11410002}
@@ -124,6 +276,8 @@ MonoBehaviour:
     Value: "\u70B9\u51FB\u80CC\u5305\u6309\u94AE"
   - Key: Log.Home.ExitClick
     Value: "\u70B9\u51FB\u9000\u51FA\u6309\u94AE"
+  - Key: Log.Home.RoleClick
+    Value: "\u70B9\u51FB\u89D2\u8272\u5C5E\u6027\u6309\u94AE"
   - Key: Log.Home.TestTipsClick
     Value: "\u70B9\u51FB\u6D4B\u8BD5\u63D0\u793A\u6309\u94AE"
   - Key: Test.Test
@@ -138,6 +292,8 @@ MonoBehaviour:
     Value: "\u8D2D\u4E70\u786E\u8BA4"
   - Key: UI.Buy.TotalPrice
     Value: "\u603B\u4EF7\u683C\uFF1A{0}"
+  - Key: UI.Buy.UnknownItem
+    Value: "\u672A\u77E5\u9053\u5177"
   - Key: UI.Common.CreditPrice
     Value: "{0} \u4FE1\u7528\u70B9"
   - Key: UI.Home.ButtonBag
@@ -152,17 +308,33 @@ MonoBehaviour:
     Value: "\u63D0\u793A"
   - Key: UI.Home.FooterHint
     Value: "\u70B9\u51FB\u6309\u94AE\u6D4B\u8BD5 UI \u903B\u8F91 / ESC \u8FD4\u56DE"
+  - Key: UI.Home.Menu.Credits
+    Value: "\u5236\u4F5C\u4EBA\u5458"
+  - Key: UI.Home.Menu.Options
+    Value: "\u8BBE\u7F6E"
+  - Key: UI.Home.Menu.Quit
+    Value: "\u9000\u51FA\u6E38\u620F"
+  - Key: UI.Home.Menu.Shop
+    Value: "\u5546\u5E97"
+  - Key: UI.Home.Menu.StartNewGame
+    Value: "\u5F00\u59CB\u65B0\u6E38\u620F"
   - Key: UI.Home.NoticeContent
     Value: "\u6B22\u8FCE\u8FDB\u5165\u6D4B\u8BD5\u4E3B\u754C\u9762\u3002\u53F3\u4E0A\u89D2\u53EF\u4EE5\u6253\u5F00\u5546\u5E97\u3001\u80CC\u5305\u3001\u89D2\u8272\u5C5E\u6027\u548C\u6D4B\u8BD5\u63D0\u793A\u3002\n\n\u5F53\u524D\u754C\u9762\u7528\u4E8E\u9A8C\u8BC1UI
       \u6846\u67B6\u3001\u6309\u94AE\u7ED1\u5B9A\u548C\u9ED8\u8BA4\u8FC7\u573A\u52A8\u753B\u3002"
   - Key: UI.Home.NoticeTitle
     Value: "\u4EFB\u52A1\u516C\u544A"
+  - Key: UI.Home.Status.ActiveUser
+    Value: "\u5F53\u524D\u7528\u6237\uFF1A{0}"
+  - Key: UI.Home.Status.Version
+    Value: '{0}({1})'
   - Key: UI.Shop.ButtonClose
     Value: "\u9000\u51FA"
   - Key: UI.Shop.Category.Item.Description
     Value: "\u6765\u81EA Shop \u8868 MATERIAL \u5206\u7C7B\u7684\u6750\u6599\u9053\u5177\u3002\u5217\u8868\u6570\u636E\u7531\u914D\u7F6E\u8868\u52A8\u6001\u8BFB\u53D6\u3002"
   - Key: UI.Shop.Category.Item.Title
     Value: "\u6750\u6599\u5546\u57CE"
+  - Key: UI.Shop.Category.Pack.Description
+    Value: "\u6765\u81EA Shop \u8868 CONSUMABLE \u5206\u7C7B\u7684\u6D88\u8017\u54C1\u3002\u5217\u8868\u6570\u636E\u7531\u914D\u7F6E\u8868\u52A8\u6001\u8BFB\u53D6\u3002"
   - Key: UI.Shop.Category.Pack.Title
     Value: "\u6D88\u8017\u54C1\u5546\u57CE"
   - Key: UI.Shop.Category.Recommend.Description
@@ -182,6 +354,8 @@ MonoBehaviour:
     Value: "\u7528\u4E8E\u9501\u5B9A\u533A\u57DF\u7684\u4E34\u65F6\u6388\u6743\u5361\u3002"
   - Key: UI.Shop.Goods.Item.AccessKey.Name
     Value: "\u901A\u884C\u5BC6\u94A5"
+  - Key: UI.Shop.Goods.Item.EnergyBattery.Description
+    Value: "\u539F\u578B\u8BBE\u5907\u53EF\u590D\u7528\u7684\u5907\u7528\u7535\u6C60\u3002"
   - Key: UI.Shop.Goods.Item.EnergyBattery.Name
     Value: "\u80FD\u91CF\u7535\u6C60"
   - Key: UI.Shop.Goods.Item.Medkit.Description
@@ -194,10 +368,14 @@ MonoBehaviour:
     Value: "\u4FE1\u53F7\u6807\u8BB0"
   - Key: UI.Shop.Goods.Pack.ExplorationPack.Description
     Value: "\u63A2\u7D22\u5FAA\u73AF\u6240\u9700\u7684\u6D88\u8017\u54C1\u4E0E\u94A5\u5319\u3002"
+  - Key: UI.Shop.Goods.Pack.ExplorationPack.Name
+    Value: "\u63A2\u7D22\u793C\u5305"
   - Key: UI.Shop.Goods.Pack.OutfitPack.Description
     Value: "\u4E09\u4EF6\u5916\u89C2\u7EC4\u5408\u7684\u6298\u6263\u5957\u88C5\u3002"
   - Key: UI.Shop.Goods.Pack.OutfitPack.Name
     Value: "\u5916\u89C2\u793C\u5305"
+  - Key: UI.Shop.Goods.Pack.StarterPack.Description
+    Value: "\u7528\u4E8E\u9996\u6B21\u6D41\u7A0B\u9A8C\u8BC1\u7684\u57FA\u7840\u9053\u5177\u5305\u3002"
   - Key: UI.Shop.Goods.Pack.StarterPack.Name
     Value: "\u65B0\u624B\u793C\u5305"
   - Key: UI.Shop.Goods.Pack.WeeklySupply.Description
@@ -212,6 +390,8 @@ MonoBehaviour:
     Value: "\u6838\u5FC3\u6D88\u8017\u54C1\u7684\u6BCF\u65E5\u6298\u6263\u7EC4\u5408\u3002"
   - Key: UI.Shop.Goods.Recommend.DailySupply.Name
     Value: "\u6BCF\u65E5\u8865\u7ED9"
+  - Key: UI.Shop.Goods.Recommend.NightOutfit.Description
+    Value: "\u9002\u914D\u6697\u8272\u83DC\u5355\u573A\u666F\u7684\u9AD8\u5BF9\u6BD4\u5916\u89C2\u3002"
   - Key: UI.Shop.Goods.Recommend.NightOutfit.Name
     Value: "\u591C\u884C\u5916\u89C2"
   - Key: UI.Shop.Goods.Recommend.TacticalModule.Description
@@ -240,16 +420,22 @@ MonoBehaviour:
     Value: "\u6D4B\u8BD5\u5546\u54C1 {0}"
   - Key: UI.Shop.SubTitle
     Value: "\u8865\u7ED9\u7EC8\u7AEF"
+  - Key: UI.Shop.TabItem
+    Value: "\u6750\u6599"
   - Key: UI.Shop.TabPack
     Value: "\u6D88\u8017\u54C1"
   - Key: UI.Shop.TabRecommend
     Value: "\u6D4B\u8BD5"
+  - Key: UI.Shop.TabSkin
+    Value: "\u88C5\u5907"
   - Key: UI.Shop.Tag.Discount
     Value: "\u6298\u6263"
   - Key: UI.Shop.Tag.Hot
     Value: "\u70ED\u95E8"
   - Key: UI.Shop.Tag.Item
     Value: "\u6750\u6599"
+  - Key: UI.Shop.Tag.New
+    Value: "\u65B0\u54C1"
   - Key: UI.Shop.Tag.Pack
     Value: "\u6D88\u8017\u54C1"
   - Key: UI.Shop.Tag.Recommend
@@ -258,26 +444,296 @@ MonoBehaviour:
     Value: "\u88C5\u5907"
   - Key: UI.Shop.Title
     Value: "\u5546\u5E97"
-  - Key: UI.Shop.Category.Pack.Description
-    Value: "\u6765\u81EA Shop \u8868 CONSUMABLE \u5206\u7C7B\u7684\u6D88\u8017\u54C1\u3002\u5217\u8868\u6570\u636E\u7531\u914D\u7F6E\u8868\u52A8\u6001\u8BFB\u53D6\u3002"
-  - Key: UI.Shop.Goods.Item.EnergyBattery.Description
-    Value: "\u539F\u578B\u8BBE\u5907\u53EF\u590D\u7528\u7684\u5907\u7528\u7535\u6C60\u3002"
-  - Key: UI.Shop.TabItem
-    Value: "\u6750\u6599"
-  - Key: UI.Shop.Tag.New
-    Value: "\u65B0\u54C1"
-  - Key: UI.Buy.UnknownItem
-    Value: "\u672A\u77E5\u9053\u5177"
-  - Key: UI.Shop.Goods.Recommend.NightOutfit.Description
-    Value: "\u9002\u914D\u6697\u8272\u83DC\u5355\u573A\u666F\u7684\u9AD8\u5BF9\u6BD4\u5916\u89C2\u3002"
-  - Key: Log.Home.RoleClick
-    Value: "\u70B9\u51FB\u89D2\u8272\u5C5E\u6027\u6309\u94AE"
-  - Key: UI.Shop.Goods.Pack.StarterPack.Description
-    Value: "\u7528\u4E8E\u9996\u6B21\u6D41\u7A0B\u9A8C\u8BC1\u7684\u57FA\u7840\u9053\u5177\u5305\u3002"
-  - Key: UI.Shop.Goods.Pack.ExplorationPack.Name
-    Value: "\u63A2\u7D22\u793C\u5305"
-  - Key: UI.Shop.TabSkin
-    Value: "\u88C5\u5907"
+  - Key: UI.Common.Back
+    Value: "\u8FD4\u56DE"
+  - Key: UI.Credits.Roll
+    Value: "<size=78><b>AlicizaX</b></size>\n\u9762\u5411 Unity \u9879\u76EE\u7684\u6A21\u5757\u5316\u6E38\u620F\u5F00\u53D1\u6846\u67B6\u3002\n\n\n<size=40><color=#E8B86B><b>\u754C\u9762\u4E0E\u4EA4\u4E92</b></color></size>\n\u8BA9\u7A97\u53E3\u548C\u7EC4\u4EF6\u5171\u4EAB\u7EDF\u4E00\u7684\u751F\u547D\u5468\u671F\uFF0C\n\u5E76\u652F\u6301\u952E\u76D8\u4E0E\u624B\u67C4\u5BFC\u822A\u3002\n\n\n<size=40><color=#E8B86B><b>\u8D44\u6E90\u4E0E\u672C\u5730\u5316</b></color></size>\n\u901A\u8FC7\u8D44\u6E90\u70ED\u66F4\u65B0\u548C\u591A\u8BED\u8A00\u652F\u6301\uFF0C\n\u6301\u7EED\u4EA4\u4ED8\u6E38\u620F\u5185\u5BB9\u3002"
+  - Key: UI.Settings.General
+    Value: "\u901A\u7528"
+  - Key: UI.Settings.Accessibility
+    Value: "\u8F85\u52A9\u529F\u80FD"
+  - Key: UI.Settings.Display
+    Value: "\u753B\u9762"
+  - Key: UI.Settings.Audio
+    Value: "\u97F3\u9891"
+  - Key: UI.Settings.Controls
+    Value: "\u64CD\u4F5C"
+  - Key: UI.Settings.Reset
+    Value: "\u6062\u590D\u9ED8\u8BA4"
+  - Key: UI.Settings.Applied
+    Value: "\u5373\u65F6\u751F\u6548"
+  - Key: UI.Settings.Preview
+    Value: "\u793A\u4F8B\u8BBE\u7F6E"
+  - Key: UI.Settings.PreviewHint
+    Value: "\u6B64\u9009\u9879\u7528\u4E8E\u6F14\u793A\uFF0C\u8C03\u6574\u53EA\u4F1A\u6539\u53D8\u8BBE\u7F6E\u9875\u4E2D\u7684\u503C\u3002"
+  - Key: UI.Settings.ChangingLanguage
+    Value: "\u6B63\u5728\u5207\u6362\u8BED\u8A00\u2026"
+  - Key: UI.Settings.On
+    Value: "\u5F00\u542F"
+  - Key: UI.Settings.Off
+    Value: "\u5173\u95ED"
+  - Key: UI.Settings.Relaxed
+    Value: "\u8F7B\u677E"
+  - Key: UI.Settings.Standard
+    Value: "\u6807\u51C6"
+  - Key: UI.Settings.Hard
+    Value: "\u6311\u6218"
+  - Key: UI.Settings.Small
+    Value: "\u5C0F"
+  - Key: UI.Settings.Medium
+    Value: "\u4E2D"
+  - Key: UI.Settings.Large
+    Value: "\u5927"
+  - Key: UI.Settings.Low
+    Value: "\u4F4E"
+  - Key: UI.Settings.High
+    Value: "\u9AD8"
+  - Key: UI.Settings.Windowed
+    Value: "\u7A97\u53E3"
+  - Key: UI.Settings.Borderless
+    Value: "\u65E0\u8FB9\u6846"
+  - Key: UI.Settings.Fullscreen
+    Value: "\u5168\u5C4F"
+  - Key: UI.Settings.Unlimited
+    Value: "\u4E0D\u9650"
+  - Key: UI.Settings.Night
+    Value: "\u591C\u95F4"
+  - Key: UI.Settings.Wide
+    Value: "\u5BBD\u5E7F"
+  - Key: UI.Settings.Language
+    Value: "\u8BED\u8A00"
+  - Key: UI.Settings.LanguageHelp
+    Value: "\u5207\u6362\u6E38\u620F\u754C\u9762\u548C\u5DF2\u672C\u5730\u5316\u7684\u6E38\u620F\u5185\u5BB9\u3002"
+  - Key: UI.Settings.PauseFocus
+    Value: "\u5931\u7126\u65F6\u6682\u505C"
+  - Key: UI.Settings.PauseFocusHelp
+    Value: "\u5207\u6362\u5230\u5176\u4ED6\u7A97\u53E3\u65F6\u6682\u505C\u6E38\u620F\u3002"
+  - Key: UI.Settings.Hints
+    Value: "\u6E38\u620F\u63D0\u793A"
+  - Key: UI.Settings.HintsHelp
+    Value: "\u5728\u63A2\u7D22\u65F6\u663E\u793A\u64CD\u4F5C\u63D0\u793A\u3002"
+  - Key: UI.Settings.Difficulty
+    Value: "\u6E38\u620F\u96BE\u5EA6"
+  - Key: UI.Settings.DifficultyHelp
+    Value: "\u9009\u62E9\u9002\u5408\u4F60\u7684\u6311\u6218\u5F3A\u5EA6\u3002"
+  - Key: UI.Settings.Markers
+    Value: "\u76EE\u6807\u6807\u8BB0"
+  - Key: UI.Settings.MarkersHelp
+    Value: "\u5728\u754C\u9762\u4E0A\u663E\u793A\u5F53\u524D\u76EE\u6807\u7684\u4F4D\u7F6E\u3002"
+  - Key: UI.Settings.Prompts
+    Value: "\u4E92\u52A8\u63D0\u793A"
+  - Key: UI.Settings.PromptsHelp
+    Value: "\u9760\u8FD1\u53EF\u4E92\u52A8\u7684\u5BF9\u8C61\u65F6\u663E\u793A\u63D0\u793A\u3002"
+  - Key: UI.Settings.SaveNotice
+    Value: "\u81EA\u52A8\u4FDD\u5B58\u63D0\u793A"
+  - Key: UI.Settings.SaveNoticeHelp
+    Value: "\u81EA\u52A8\u4FDD\u5B58\u671F\u95F4\u663E\u793A\u5B58\u6863\u63D0\u793A\u3002"
+  - Key: UI.Settings.SkipIntro
+    Value: "\u8DF3\u8FC7\u5F00\u573A\u4ECB\u7ECD"
+  - Key: UI.Settings.SkipIntroHelp
+    Value: "\u5728\u5F00\u59CB\u65B0\u6E38\u620F\u65F6\u8DF3\u8FC7\u5F00\u573A\u4ECB\u7ECD\u3002"
+  - Key: UI.Settings.Subtitles
+    Value: "\u5B57\u5E55"
+  - Key: UI.Settings.SubtitlesHelp
+    Value: "\u4E3A\u89D2\u8272\u5BF9\u8BDD\u663E\u793A\u5B57\u5E55\u3002"
+  - Key: UI.Settings.TextSize
+    Value: "\u5B57\u5E55\u5927\u5C0F"
+  - Key: UI.Settings.TextSizeHelp
+    Value: "\u8C03\u6574\u5BF9\u8BDD\u5B57\u5E55\u7684\u5B57\u53F7\u3002"
+  - Key: UI.Settings.SubtitleBackdrop
+    Value: "\u5B57\u5E55\u5E95\u677F"
+  - Key: UI.Settings.SubtitleBackdropHelp
+    Value: "\u5728\u5B57\u5E55\u540E\u65B9\u663E\u793A\u6DF1\u8272\u5E95\u677F\uFF0C\u63D0\u9AD8\u53EF\u8BFB\u6027\u3002"
+  - Key: UI.Settings.ReducedMotion
+    Value: "\u51CF\u5C11\u52A8\u6001\u6548\u679C"
+  - Key: UI.Settings.ReducedMotionHelp
+    Value: "\u51CF\u5F31\u955C\u5934\u79FB\u52A8\u548C\u754C\u9762\u52A8\u753B\u3002"
+  - Key: UI.Settings.Brightness
+    Value: "\u4EAE\u5EA6"
+  - Key: UI.Settings.BrightnessHelp
+    Value: "\u8C03\u6574\u573A\u666F\u4E2D\u7684\u6574\u4F53\u4EAE\u5EA6\u3002"
+  - Key: UI.Settings.Quality
+    Value: "\u753B\u8D28"
+  - Key: UI.Settings.QualityHelp
+    Value: "\u5728\u753B\u9762\u7EC6\u8282\u4E0E\u6D41\u7545\u5EA6\u4E4B\u95F4\u9009\u62E9\u3002"
+  - Key: UI.Settings.ScreenMode
+    Value: "\u663E\u793A\u6A21\u5F0F"
+  - Key: UI.Settings.ScreenModeHelp
+    Value: "\u9009\u62E9\u7A97\u53E3\u6216\u5168\u5C4F\u663E\u793A\u65B9\u5F0F\u3002"
+  - Key: UI.Settings.FrameLimit
+    Value: "\u5E27\u7387\u4E0A\u9650"
+  - Key: UI.Settings.FrameLimitHelp
+    Value: "\u9650\u5236\u6BCF\u79D2\u6E32\u67D3\u7684\u6700\u5927\u5E27\u6570\u3002"
+  - Key: UI.Settings.MasterVolume
+    Value: "\u603B\u97F3\u91CF"
+  - Key: UI.Settings.MasterVolumeHelp
+    Value: "\u8C03\u6574\u6E38\u620F\u6574\u4F53\u97F3\u91CF\uFF0C0% \u4E3A\u9759\u97F3\u3002"
+  - Key: UI.Settings.DynamicRange
+    Value: "\u52A8\u6001\u8303\u56F4"
+  - Key: UI.Settings.DynamicRangeHelp
+    Value: "\u9009\u62E9\u5B89\u9759\u4E0E\u54CD\u4EAE\u58F0\u97F3\u4E4B\u95F4\u7684\u97F3\u91CF\u5DEE\u3002"
+  - Key: UI.Settings.Sensitivity
+    Value: "\u89C6\u89D2\u7075\u654F\u5EA6"
+  - Key: UI.Settings.SensitivityHelp
+    Value: "\u8C03\u6574\u8F6C\u52A8\u89C6\u89D2\u65F6\u7684\u54CD\u5E94\u901F\u5EA6\u3002"
+  - Key: UI.Settings.InvertY
+    Value: "\u53CD\u8F6C\u7EB5\u8F74"
+  - Key: UI.Settings.InvertYHelp
+    Value: "\u53CD\u8F6C\u4E0A\u4E0B\u65B9\u5411\u7684\u89C6\u89D2\u64CD\u4F5C\u3002"
+  - Key: UI.Settings.Vibration
+    Value: "\u624B\u67C4\u632F\u52A8"
+  - Key: UI.Settings.VibrationHelp
+    Value: "\u4F7F\u7528\u624B\u67C4\u65F6\u542F\u7528\u632F\u52A8\u53CD\u9988\u3002"
+  - Key: UI.Alert.Confirm
+    Value: "\u786E\u8BA4"
+  - Key: UI.Alert.Cancel
+    Value: "\u53D6\u6D88"
+  - Key: UI.Settings.ResetQuestion
+    Value: "\u6062\u590D\u9ED8\u8BA4\u8BBE\u7F6E\uFF1F"
+  - Key: UI.Settings.ResetDescription
+    Value: "\u5305\u62EC\u8BED\u8A00\u548C\u603B\u97F3\u91CF\u5728\u5185\u7684\u6240\u6709\u8BBE\u7F6E\u90FD\u5C06\u6062\u590D\u4E3A\u9ED8\u8BA4\u503C\u3002"
+  - Key: UI.Shop.All
+    Value: "\u5168\u90E8"
+  - Key: UI.Shop.Balance
+    Value: "\u4FE1\u7528\u70B9"
+  - Key: UI.Shop.Purchase
+    Value: "\u8D2D\u4E70"
+  - Key: UI.Shop.Owned
+    Value: "\u5DF2\u6301\u6709 {0}"
+  - Key: UI.Shop.Count
+    Value: "{0} \u4EF6\u5546\u54C1"
+  - Key: UI.Shop.UnitPrice
+    Value: "\u5355\u4EF7"
+  - Key: UI.Buy.ShortFunds
+    Value: "\u4FE1\u7528\u70B9\u4E0D\u8DB3"
+  - Key: UI.Shop.Empty
+    Value: "\u6682\u65E0\u5728\u552E\u5546\u54C1"
+  - Key: UI.Recycler.Hub
+    Value: "\u5217\u8868\u6D4B\u8BD5\u4E2D\u5FC3"
+  - Key: UI.Recycler.Catalogue
+    Value: "8 \u4E2A\u793A\u4F8B"
+  - Key: UI.Recycler.Controls
+    Value: "\u793A\u4F8B\u64CD\u4F5C"
+  - Key: UI.Recycler.Count
+    Value: "{0} \u6761\u6570\u636E"
+  - Key: UI.Recycler.Linear.Title
+    Value: "\u7EBF\u6027\u5217\u8868"
+  - Key: UI.Recycler.Linear.Description
+    Value: "\u7B49\u9AD8\u884C\u7684\u7EB5\u5411\u6EDA\u52A8"
+  - Key: UI.Recycler.Grid.Title
+    Value: "\u53CC\u5217\u7F51\u683C"
+  - Key: UI.Recycler.Grid.Description
+    Value: "\u6309\u884C\u6392\u5217\u7684\u53CC\u5217\u683C\u4F4D"
+  - Key: UI.Recycler.Chat.Title
+    Value: "\u804A\u5929\u8BB0\u5F55"
+  - Key: UI.Recycler.Chat.Description
+    Value: "\u968F\u6D88\u606F\u957F\u5EA6\u6269\u5C55\u7684\u6C14\u6CE1"
+  - Key: UI.Recycler.Mixed.Title
+    Value: "\u6DF7\u5408\u5217\u8868"
+  - Key: UI.Recycler.Mixed.Description
+    Value: "\u4E09\u79CD\u9AD8\u5EA6\u7684\u6761\u76EE\u4EA4\u9519\u6392\u5217"
+  - Key: UI.Recycler.Group.Title
+    Value: "\u5206\u7EC4\u5217\u8868"
+  - Key: UI.Recycler.Group.Description
+    Value: "\u70B9\u51FB\u7EC4\u5934\u5C55\u5F00\u6216\u6298\u53E0\u4EFB\u52A1"
+  - Key: UI.Recycler.Loop.Title
+    Value: "\u5FAA\u73AF\u5217\u8868"
+  - Key: UI.Recycler.Loop.Description
+    Value: "\u9996\u5C3E\u76F8\u8FDE\u7684\u8FDE\u7EED\u6EDA\u52A8"
+  - Key: UI.Recycler.Page.Title
+    Value: "\u5206\u9875\u753B\u5ECA"
+  - Key: UI.Recycler.Page.Description
+    Value: "\u6A2A\u5411\u7FFB\u9875\uFF0C\u5F53\u524D\u5C01\u9762\u5C45\u4E2D"
+  - Key: UI.Recycler.Circle.Title
+    Value: "\u73AF\u5F62\u5217\u8868"
+  - Key: UI.Recycler.Circle.Description
+    Value: "\u6CBF\u5706\u5468\u65CB\u8F6C\u7684\u8282\u70B9"
+  - Key: UI.Recycler.Action.Append
+    Value: "\u8FFD\u52A0\u6761\u76EE"
+  - Key: UI.Recycler.Action.Prepend
+    Value: "\u63D2\u5165\u5230\u9876\u90E8"
+  - Key: UI.Recycler.Action.Top
+    Value: "\u56DE\u5230\u9876\u90E8"
+  - Key: UI.Recycler.Action.AppendFour
+    Value: "\u8FFD\u52A0\u56DB\u683C"
+  - Key: UI.Recycler.Action.Remove
+    Value: "\u79FB\u9664\u672B\u683C"
+  - Key: UI.Recycler.Action.Middle
+    Value: "\u6EDA\u5230\u4E2D\u95F4"
+  - Key: UI.Recycler.Action.Send
+    Value: "\u53D1\u9001\u6D88\u606F"
+  - Key: UI.Recycler.Action.History
+    Value: "\u52A0\u8F7D\u5386\u53F2\u6D88\u606F"
+  - Key: UI.Recycler.Action.Resize
+    Value: "\u52A0\u957F\u9996\u6761\u6D88\u606F"
+  - Key: UI.Recycler.Action.Short
+    Value: "\u8FFD\u52A0\u77ED\u6761\u76EE"
+  - Key: UI.Recycler.Action.Tall
+    Value: "\u8FFD\u52A0\u957F\u6761\u76EE"
+  - Key: UI.Recycler.Action.Refresh
+    Value: "\u5237\u65B0\u9996\u9879"
+  - Key: UI.Recycler.Action.Expand
+    Value: "\u5C55\u5F00\u7B2C\u4E00\u7EC4"
+  - Key: UI.Recycler.Action.Collapse
+    Value: "\u6298\u53E0\u7B2C\u4E00\u7EC4"
+  - Key: UI.Recycler.Action.AddTask
+    Value: "\u8FFD\u52A0\u5B50\u4EFB\u52A1"
+  - Key: UI.Recycler.Action.First
+    Value: "\u5B9A\u4F4D\u9996\u9879"
+  - Key: UI.Recycler.Action.Center
+    Value: "\u9996\u9879\u5C45\u4E2D"
+  - Key: UI.Recycler.Action.Next
+    Value: "\u4E0B\u4E00\u9875"
+  - Key: UI.Recycler.Action.Previous
+    Value: "\u4E0A\u4E00\u9875"
+  - Key: UI.Recycler.Action.FirstPage
+    Value: "\u56DE\u5230\u9996\u9875"
+  - Key: UI.Recycler.Action.Fourth
+    Value: "\u5B9A\u4F4D\u7B2C\u56DB\u9879"
+  - Key: UI.Recycler.Action.Stop
+    Value: "\u505C\u6B62\u65CB\u8F6C"
+  - Key: UI.Recycler.Data.Record
+    Value: "\u8BB0\u5F55"
+  - Key: UI.Recycler.Data.Slot
+    Value: "\u683C\u4F4D"
+  - Key: UI.Recycler.Data.Cover
+    Value: "\u5C01\u9762"
+  - Key: UI.Recycler.Data.Short
+    Value: "\u77ED\u6761\u76EE"
+  - Key: UI.Recycler.Data.Medium
+    Value: "\u4E2D\u6761\u76EE"
+  - Key: UI.Recycler.Data.Tall
+    Value: "\u957F\u6761\u76EE"
+  - Key: UI.Recycler.Data.Message
+    Value: "\u6D88\u606F"
+  - Key: UI.Recycler.Data.Note
+    Value: "\u5DF2\u6536\u5230\u89C2\u6D4B\u8BB0\u5F55\u3002"
+  - Key: UI.Recycler.Data.Update
+    Value: "\u7B49\u5F85\u4E0B\u4E00\u6B21\u66F4\u65B0\u3002"
+  - Key: UI.Recycler.Data.Daily
+    Value: "\u6BCF\u65E5\u4EFB\u52A1"
+  - Key: UI.Recycler.Data.World
+    Value: "\u4E16\u754C\u4EFB\u52A1"
+  - Key: UI.Recycler.Data.Story
+    Value: "\u4F20\u8BF4\u4EFB\u52A1"
+  - Key: UI.Recycler.Data.Task0
+    Value: "\u5BFB\u627E\u523B\u6674"
+  - Key: UI.Recycler.Data.Task1
+    Value: "\u62DC\u8BBF\u5E08\u7236"
+  - Key: UI.Recycler.Data.Task2
+    Value: "\u4E3A\u7518\u96E8\u91C7\u6458\u5341\u6735\u6E05\u5FC3"
+  - Key: UI.Recycler.Data.Task3
+    Value: "\u6536\u96C6\u4E09\u4EFD\u6155\u98CE\u8611\u83C7"
+  - Key: UI.Recycler.Data.Task4
+    Value: "\u51FB\u8D25\u4E18\u4E18\u4EBA\u5C04\u624B"
+  - Key: UI.Recycler.Data.Task5
+    Value: "\u53C2\u6F14\u8299\u5B81\u5A1C\u7684\u821E\u53F0\u5267"
+  - Key: UI.Recycler.Data.Task6
+    Value: "\u8C03\u67E5\u65E7\u65E5\u7684\u795E\u9AB8"
+  - Key: UI.Recycler.Data.Task7
+    Value: "\u5BFB\u627E\u6563\u5931\u7684\u4E50\u8C31"
+  - Key: UI.Recycler.Data.NewTask
+    Value: "\u8C03\u67E5\u9644\u8FD1\u7684\u5730\u8109\u5F02\u5E38"
 --- !u!114 &11410002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -333,6 +789,16 @@ MonoBehaviour:
     Value: Tips
   - Key: UI.Home.FooterHint
     Value: Click buttons to test UI logic / ESC to return
+  - Key: UI.Home.Menu.Credits
+    Value: Credits
+  - Key: UI.Home.Menu.Options
+    Value: Options
+  - Key: UI.Home.Menu.Quit
+    Value: Quit
+  - Key: UI.Home.Menu.Shop
+    Value: Shop
+  - Key: UI.Home.Menu.StartNewGame
+    Value: Start New Game
   - Key: UI.Home.NoticeContent
     Value: 'Welcome to the test home screen. Use the top-right buttons to open Shop,
 
@@ -347,6 +813,10 @@ MonoBehaviour:
       binding, and default transition animation.'
   - Key: UI.Home.NoticeTitle
     Value: Mission Notice
+  - Key: UI.Home.Status.ActiveUser
+    Value: 'Active User: {0}'
+  - Key: UI.Home.Status.Version
+    Value: '{0}({1})'
   - Key: UI.Shop.ButtonClose
     Value: Exit
   - Key: UI.Shop.Category.Item.Description
@@ -467,6 +937,319 @@ MonoBehaviour:
     Value: Equipment
   - Key: UI.Shop.Title
     Value: Shop
+  - Key: UI.Common.Back
+    Value: Back
+  - Key: UI.Credits.Roll
+    Value: '<size=78><b>AlicizaX</b></size>
+
+      A modular game development framework
+      for Unity.
+
+
+
+      <size=40><color=#E8B86B><b>UI & Interaction</b></color></size>
+
+      Give
+      windows and widgets a consistent lifecycle,
+
+      with keyboard and controller
+      navigation.
+
+
+
+      <size=40><color=#E8B86B><b>Assets & Localization</b></color></size>
+
+      Deliver
+      game content through asset updates
+
+      and built-in localization.'
+  - Key: UI.Settings.General
+    Value: General
+  - Key: UI.Settings.Accessibility
+    Value: Accessibility
+  - Key: UI.Settings.Display
+    Value: Display
+  - Key: UI.Settings.Audio
+    Value: Audio
+  - Key: UI.Settings.Controls
+    Value: Controls
+  - Key: UI.Settings.Reset
+    Value: Restore defaults
+  - Key: UI.Settings.Applied
+    Value: Applies immediately
+  - Key: UI.Settings.Preview
+    Value: Preview setting
+  - Key: UI.Settings.PreviewHint
+    Value: This preview changes the value shown in this menu.
+  - Key: UI.Settings.ChangingLanguage
+    Value: "Changing language\u2026"
+  - Key: UI.Settings.On
+    Value: On
+  - Key: UI.Settings.Off
+    Value: Off
+  - Key: UI.Settings.Relaxed
+    Value: Relaxed
+  - Key: UI.Settings.Standard
+    Value: Standard
+  - Key: UI.Settings.Hard
+    Value: Challenging
+  - Key: UI.Settings.Small
+    Value: Small
+  - Key: UI.Settings.Medium
+    Value: Medium
+  - Key: UI.Settings.Large
+    Value: Large
+  - Key: UI.Settings.Low
+    Value: Low
+  - Key: UI.Settings.High
+    Value: High
+  - Key: UI.Settings.Windowed
+    Value: Windowed
+  - Key: UI.Settings.Borderless
+    Value: Borderless
+  - Key: UI.Settings.Fullscreen
+    Value: Fullscreen
+  - Key: UI.Settings.Unlimited
+    Value: Unlimited
+  - Key: UI.Settings.Night
+    Value: Night
+  - Key: UI.Settings.Wide
+    Value: Wide
+  - Key: UI.Settings.Language
+    Value: Language
+  - Key: UI.Settings.LanguageHelp
+    Value: Change the language of menus and localized game content.
+  - Key: UI.Settings.PauseFocus
+    Value: Pause on focus loss
+  - Key: UI.Settings.PauseFocusHelp
+    Value: Pause gameplay when you switch to another window.
+  - Key: UI.Settings.Hints
+    Value: Gameplay hints
+  - Key: UI.Settings.HintsHelp
+    Value: Show guidance while exploring.
+  - Key: UI.Settings.Difficulty
+    Value: Difficulty
+  - Key: UI.Settings.DifficultyHelp
+    Value: Choose the level of challenge that suits you.
+  - Key: UI.Settings.Markers
+    Value: Objective markers
+  - Key: UI.Settings.MarkersHelp
+    Value: Show the location of your current objective on screen.
+  - Key: UI.Settings.Prompts
+    Value: Interaction prompts
+  - Key: UI.Settings.PromptsHelp
+    Value: Show a prompt near objects you can interact with.
+  - Key: UI.Settings.SaveNotice
+    Value: Autosave indicator
+  - Key: UI.Settings.SaveNoticeHelp
+    Value: Show an indicator while saving progress automatically.
+  - Key: UI.Settings.SkipIntro
+    Value: Skip opening sequence
+  - Key: UI.Settings.SkipIntroHelp
+    Value: Skip the opening sequence when starting a new game.
+  - Key: UI.Settings.Subtitles
+    Value: Subtitles
+  - Key: UI.Settings.SubtitlesHelp
+    Value: Show captions for spoken dialogue.
+  - Key: UI.Settings.TextSize
+    Value: Subtitle size
+  - Key: UI.Settings.TextSizeHelp
+    Value: Adjust the size of dialogue subtitles.
+  - Key: UI.Settings.SubtitleBackdrop
+    Value: Subtitle background
+  - Key: UI.Settings.SubtitleBackdropHelp
+    Value: Place a dark background behind subtitles for readability.
+  - Key: UI.Settings.ReducedMotion
+    Value: Reduced motion
+  - Key: UI.Settings.ReducedMotionHelp
+    Value: Reduce camera motion and interface animations.
+  - Key: UI.Settings.Brightness
+    Value: Brightness
+  - Key: UI.Settings.BrightnessHelp
+    Value: Adjust the overall brightness of the scene.
+  - Key: UI.Settings.Quality
+    Value: Graphics quality
+  - Key: UI.Settings.QualityHelp
+    Value: Choose a balance between visual detail and performance.
+  - Key: UI.Settings.ScreenMode
+    Value: Screen mode
+  - Key: UI.Settings.ScreenModeHelp
+    Value: Choose a windowed or fullscreen presentation.
+  - Key: UI.Settings.FrameLimit
+    Value: Frame rate limit
+  - Key: UI.Settings.FrameLimitHelp
+    Value: Limit the number of frames rendered per second.
+  - Key: UI.Settings.MasterVolume
+    Value: Master volume
+  - Key: UI.Settings.MasterVolumeHelp
+    Value: Adjust the overall game volume. Set it to 0% to mute.
+  - Key: UI.Settings.DynamicRange
+    Value: Dynamic range
+  - Key: UI.Settings.DynamicRangeHelp
+    Value: Choose how much volume differs between quiet and loud sounds.
+  - Key: UI.Settings.Sensitivity
+    Value: Look sensitivity
+  - Key: UI.Settings.SensitivityHelp
+    Value: Adjust how quickly the camera responds to your input.
+  - Key: UI.Settings.InvertY
+    Value: Invert vertical axis
+  - Key: UI.Settings.InvertYHelp
+    Value: Reverse the direction of vertical camera input.
+  - Key: UI.Settings.Vibration
+    Value: Controller vibration
+  - Key: UI.Settings.VibrationHelp
+    Value: Enable vibration feedback when using a controller.
+  - Key: UI.Alert.Confirm
+    Value: Confirm
+  - Key: UI.Alert.Cancel
+    Value: Cancel
+  - Key: UI.Settings.ResetQuestion
+    Value: Restore default settings?
+  - Key: UI.Settings.ResetDescription
+    Value: All settings, including language and master volume, will return to their
+      defaults.
+  - Key: UI.Shop.All
+    Value: All
+  - Key: UI.Shop.Balance
+    Value: Credits
+  - Key: UI.Shop.Purchase
+    Value: Purchase
+  - Key: UI.Shop.Owned
+    Value: Owned  {0}
+  - Key: UI.Shop.Count
+    Value: '{0} items'
+  - Key: UI.Shop.UnitPrice
+    Value: Unit price
+  - Key: UI.Buy.ShortFunds
+    Value: Insufficient credits
+  - Key: UI.Shop.Empty
+    Value: No items available
+  - Key: UI.Recycler.Hub
+    Value: List examples
+  - Key: UI.Recycler.Catalogue
+    Value: 8 examples
+  - Key: UI.Recycler.Controls
+    Value: Controls
+  - Key: UI.Recycler.Count
+    Value: "Items  \xB7  {0}"
+  - Key: UI.Recycler.Linear.Title
+    Value: Linear list
+  - Key: UI.Recycler.Linear.Description
+    Value: Vertical scrolling with fixed-height rows
+  - Key: UI.Recycler.Grid.Title
+    Value: Item grid
+  - Key: UI.Recycler.Grid.Description
+    Value: Two columns of inventory slots
+  - Key: UI.Recycler.Chat.Title
+    Value: Chat thread
+  - Key: UI.Recycler.Chat.Description
+    Value: Bubbles that grow with each message
+  - Key: UI.Recycler.Mixed.Title
+    Value: Mixed list
+  - Key: UI.Recycler.Mixed.Description
+    Value: Three row sizes in one feed
+  - Key: UI.Recycler.Group.Title
+    Value: Grouped list
+  - Key: UI.Recycler.Group.Description
+    Value: Select a group to show or hide its tasks
+  - Key: UI.Recycler.Loop.Title
+    Value: Looping list
+  - Key: UI.Recycler.Loop.Description
+    Value: Continuous scrolling in either direction
+  - Key: UI.Recycler.Page.Title
+    Value: Paged gallery
+  - Key: UI.Recycler.Page.Description
+    Value: Swipe between centered covers
+  - Key: UI.Recycler.Circle.Title
+    Value: Radial list
+  - Key: UI.Recycler.Circle.Description
+    Value: Drag to rotate the ring of nodes
+  - Key: UI.Recycler.Action.Append
+    Value: Append item
+  - Key: UI.Recycler.Action.Prepend
+    Value: Insert at top
+  - Key: UI.Recycler.Action.Top
+    Value: Scroll to top
+  - Key: UI.Recycler.Action.AppendFour
+    Value: Add four slots
+  - Key: UI.Recycler.Action.Remove
+    Value: Remove last slot
+  - Key: UI.Recycler.Action.Middle
+    Value: Scroll to middle
+  - Key: UI.Recycler.Action.Send
+    Value: Send message
+  - Key: UI.Recycler.Action.History
+    Value: Load older messages
+  - Key: UI.Recycler.Action.Resize
+    Value: Extend first message
+  - Key: UI.Recycler.Action.Short
+    Value: Add short row
+  - Key: UI.Recycler.Action.Tall
+    Value: Add tall row
+  - Key: UI.Recycler.Action.Refresh
+    Value: Refresh first row
+  - Key: UI.Recycler.Action.Expand
+    Value: Expand first group
+  - Key: UI.Recycler.Action.Collapse
+    Value: Collapse first group
+  - Key: UI.Recycler.Action.AddTask
+    Value: Add task
+  - Key: UI.Recycler.Action.First
+    Value: Go to first item
+  - Key: UI.Recycler.Action.Center
+    Value: Center first item
+  - Key: UI.Recycler.Action.Next
+    Value: Next page
+  - Key: UI.Recycler.Action.Previous
+    Value: Previous page
+  - Key: UI.Recycler.Action.FirstPage
+    Value: First page
+  - Key: UI.Recycler.Action.Fourth
+    Value: Go to fourth node
+  - Key: UI.Recycler.Action.Stop
+    Value: Stop rotation
+  - Key: UI.Recycler.Data.Record
+    Value: Entry
+  - Key: UI.Recycler.Data.Slot
+    Value: Slot
+  - Key: UI.Recycler.Data.Cover
+    Value: Cover
+  - Key: UI.Recycler.Data.Short
+    Value: Short row
+  - Key: UI.Recycler.Data.Medium
+    Value: Medium row
+  - Key: UI.Recycler.Data.Tall
+    Value: Tall row
+  - Key: UI.Recycler.Data.Message
+    Value: Message
+  - Key: UI.Recycler.Data.Note
+    Value: Observation received.
+  - Key: UI.Recycler.Data.Update
+    Value: Awaiting the next update.
+  - Key: UI.Recycler.Data.Daily
+    Value: Daily tasks
+  - Key: UI.Recycler.Data.World
+    Value: World tasks
+  - Key: UI.Recycler.Data.Story
+    Value: Story tasks
+  - Key: UI.Recycler.Data.Task0
+    Value: Find Keqing
+  - Key: UI.Recycler.Data.Task1
+    Value: Visit the master
+  - Key: UI.Recycler.Data.Task2
+    Value: Gather ten Qingxin flowers for Ganyu
+  - Key: UI.Recycler.Data.Task3
+    Value: Collect three Philanemo mushrooms
+  - Key: UI.Recycler.Data.Task4
+    Value: Defeat a Hilichurl shooter
+  - Key: UI.Recycler.Data.Task5
+    Value: "Join Furina\u2019s stage play"
+  - Key: UI.Recycler.Data.Task6
+    Value: Investigate the ancient remains
+  - Key: UI.Recycler.Data.Task7
+    Value: Find the missing score
+  - Key: UI.Recycler.Data.NewTask
+    Value: Investigate the ley line anomaly
 --- !u!114 &11410003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -523,11 +1306,25 @@ MonoBehaviour:
   - Key: UI.Home.FooterHint
     Value: "\u30DC\u30BF\u30F3\u3067 UI \u30ED\u30B8\u30C3\u30AF\u3092\u30C6\u30B9\u30C8/
       ESC \u3067\u623B\u308B"
+  - Key: UI.Home.Menu.Credits
+    Value: "\u30AF\u30EC\u30B8\u30C3\u30C8"
+  - Key: UI.Home.Menu.Options
+    Value: "\u30AA\u30D7\u30B7\u30E7\u30F3"
+  - Key: UI.Home.Menu.Quit
+    Value: "\u30B2\u30FC\u30E0\u7D42\u4E86"
+  - Key: UI.Home.Menu.Shop
+    Value: "\u30B7\u30E7\u30C3\u30D7"
+  - Key: UI.Home.Menu.StartNewGame
+    Value: "\u306F\u3058\u3081\u304B\u3089"
   - Key: UI.Home.NoticeContent
     Value: "\u30C6\u30B9\u30C8\u7528\u30E1\u30A4\u30F3\u753B\u9762\u3078\u3088\u3046\u3053\u305D\u3002\u53F3\u4E0A\u306E\u30DC\u30BF\u30F3\u304B\u3089\u30B7\u30E7\u30C3\u30D7\u3001\u30D0\u30C3\u30B0\u3001\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3001\u30C6\u30B9\u30C8\u30D2\u30F3\u30C8\u3092\u958B\u3051\u307E\u3059\u3002\n\n\u3053\u306E\u753B\u9762\u306FUI
       \u30D5\u30EC\u30FC\u30E0\u30EF\u30FC\u30AF\u3001\u30DC\u30BF\u30F3\u30D0\u30A4\u30F3\u30C9\u3001\u30C7\u30D5\u30A9\u30EB\u30C8\u9077\u79FB\u30A2\u30CB\u30E1\u30FC\u30B7\u30E7\u30F3\u306E\u78BA\u8A8D\u7528\u3067\u3059\u3002"
   - Key: UI.Home.NoticeTitle
     Value: "\u30DF\u30C3\u30B7\u30E7\u30F3\u544A\u77E5"
+  - Key: UI.Home.Status.ActiveUser
+    Value: "\u30A2\u30AF\u30C6\u30A3\u30D6\u30E6\u30FC\u30B6\u30FC\uFF1A{0}"
+  - Key: UI.Home.Status.Version
+    Value: '{0}({1})'
   - Key: UI.Shop.ButtonClose
     Value: "\u7D42\u4E86"
   - Key: UI.Shop.Category.Item.Description
@@ -645,3 +1442,295 @@ MonoBehaviour:
     Value: "\u88C5\u5099"
   - Key: UI.Shop.Title
     Value: "\u30B7\u30E7\u30C3\u30D7"
+  - Key: UI.Common.Back
+    Value: "\u623B\u308B"
+  - Key: UI.Credits.Roll
+    Value: "<size=78><b>AlicizaX</b></size>\nUnity \u5411\u3051\u306E\u30E2\u30B8\u30E5\u30FC\u30EB\u578B\u30B2\u30FC\u30E0\u958B\u767A\u30D5\u30EC\u30FC\u30E0\u30EF\u30FC\u30AF\u3067\u3059\u3002\n\n\n<size=40><color=#E8B86B><b>UI
+      \u3068\u64CD\u4F5C</b></color></size>\n\u30A6\u30A3\u30F3\u30C9\u30A6\u3068\u30A6\u30A3\u30B8\u30A7\u30C3\u30C8\u3092\u5171\u901A\u306E\u30E9\u30A4\u30D5\u30B5\u30A4\u30AF\u30EB\u3067\u7BA1\u7406\u3057\u3001\n\u30AD\u30FC\u30DC\u30FC\u30C9\u3068\u30B3\u30F3\u30C8\u30ED\u30FC\u30E9\u30FC\u3067\u64CD\u4F5C\u3067\u304D\u307E\u3059\u3002\n\n\n<size=40><color=#E8B86B><b>\u30A2\u30BB\u30C3\u30C8\u3068\u30ED\u30FC\u30AB\u30E9\u30A4\u30BA</b></color></size>\n\u30A2\u30BB\u30C3\u30C8\u306E\u66F4\u65B0\u3068\u591A\u8A00\u8A9E\u5BFE\u5FDC\u3067\u3001\n\u30B2\u30FC\u30E0\u30B3\u30F3\u30C6\u30F3\u30C4\u3092\u7D99\u7D9A\u7684\u306B\u914D\u4FE1\u3067\u304D\u307E\u3059\u3002"
+  - Key: UI.Settings.General
+    Value: "\u4E00\u822C"
+  - Key: UI.Settings.Accessibility
+    Value: "\u30A2\u30AF\u30BB\u30B7\u30D3\u30EA\u30C6\u30A3"
+  - Key: UI.Settings.Display
+    Value: "\u753B\u9762"
+  - Key: UI.Settings.Audio
+    Value: "\u30AA\u30FC\u30C7\u30A3\u30AA"
+  - Key: UI.Settings.Controls
+    Value: "\u64CD\u4F5C"
+  - Key: UI.Settings.Reset
+    Value: "\u521D\u671F\u8A2D\u5B9A\u306B\u623B\u3059"
+  - Key: UI.Settings.Applied
+    Value: "\u3059\u3050\u306B\u53CD\u6620"
+  - Key: UI.Settings.Preview
+    Value: "\u30B5\u30F3\u30D7\u30EB\u8A2D\u5B9A"
+  - Key: UI.Settings.PreviewHint
+    Value: "\u3053\u306E\u30B5\u30F3\u30D7\u30EB\u3092\u5909\u66F4\u3059\u308B\u3068\u3001\u8A2D\u5B9A\u753B\u9762\u306E\u8868\u793A\u5024\u304C\u5909\u308F\u308A\u307E\u3059\u3002"
+  - Key: UI.Settings.ChangingLanguage
+    Value: "\u8A00\u8A9E\u3092\u5207\u308A\u66FF\u3048\u3066\u3044\u307E\u3059\u2026"
+  - Key: UI.Settings.On
+    Value: "\u30AA\u30F3"
+  - Key: UI.Settings.Off
+    Value: "\u30AA\u30D5"
+  - Key: UI.Settings.Relaxed
+    Value: "\u30EA\u30E9\u30C3\u30AF\u30B9"
+  - Key: UI.Settings.Standard
+    Value: "\u6A19\u6E96"
+  - Key: UI.Settings.Hard
+    Value: "\u30C1\u30E3\u30EC\u30F3\u30B8"
+  - Key: UI.Settings.Small
+    Value: "\u5C0F"
+  - Key: UI.Settings.Medium
+    Value: "\u4E2D"
+  - Key: UI.Settings.Large
+    Value: "\u5927"
+  - Key: UI.Settings.Low
+    Value: "\u4F4E"
+  - Key: UI.Settings.High
+    Value: "\u9AD8"
+  - Key: UI.Settings.Windowed
+    Value: "\u30A6\u30A3\u30F3\u30C9\u30A6"
+  - Key: UI.Settings.Borderless
+    Value: "\u30DC\u30FC\u30C0\u30FC\u30EC\u30B9"
+  - Key: UI.Settings.Fullscreen
+    Value: "\u30D5\u30EB\u30B9\u30AF\u30EA\u30FC\u30F3"
+  - Key: UI.Settings.Unlimited
+    Value: "\u7121\u5236\u9650"
+  - Key: UI.Settings.Night
+    Value: "\u30CA\u30A4\u30C8"
+  - Key: UI.Settings.Wide
+    Value: "\u30EF\u30A4\u30C9"
+  - Key: UI.Settings.Language
+    Value: "\u8A00\u8A9E"
+  - Key: UI.Settings.LanguageHelp
+    Value: "\u30E1\u30CB\u30E5\u30FC\u3068\u30ED\u30FC\u30AB\u30E9\u30A4\u30BA\u6E08\u307F\u306E\u30B2\u30FC\u30E0\u5185\u5BB9\u306E\u8A00\u8A9E\u3092\u5207\u308A\u66FF\u3048\u307E\u3059\u3002"
+  - Key: UI.Settings.PauseFocus
+    Value: "\u975E\u30A2\u30AF\u30C6\u30A3\u30D6\u6642\u306B\u4E00\u6642\u505C\u6B62"
+  - Key: UI.Settings.PauseFocusHelp
+    Value: "\u4ED6\u306E\u30A6\u30A3\u30F3\u30C9\u30A6\u306B\u5207\u308A\u66FF\u3048\u305F\u3068\u304D\u306B\u30B2\u30FC\u30E0\u3092\u4E00\u6642\u505C\u6B62\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.Hints
+    Value: "\u30B2\u30FC\u30E0\u306E\u30D2\u30F3\u30C8"
+  - Key: UI.Settings.HintsHelp
+    Value: "\u63A2\u7D22\u4E2D\u306B\u64CD\u4F5C\u306E\u30D2\u30F3\u30C8\u3092\u8868\u793A\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.Difficulty
+    Value: "\u96E3\u6613\u5EA6"
+  - Key: UI.Settings.DifficultyHelp
+    Value: "\u81EA\u5206\u306B\u5408\u3063\u305F\u96E3\u6613\u5EA6\u3092\u9078\u3073\u307E\u3059\u3002"
+  - Key: UI.Settings.Markers
+    Value: "\u76EE\u6A19\u30DE\u30FC\u30AB\u30FC"
+  - Key: UI.Settings.MarkersHelp
+    Value: "\u73FE\u5728\u306E\u76EE\u6A19\u306E\u4F4D\u7F6E\u3092\u753B\u9762\u306B\u8868\u793A\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.Prompts
+    Value: "\u30A4\u30F3\u30BF\u30E9\u30AF\u30B7\u30E7\u30F3\u8868\u793A"
+  - Key: UI.Settings.PromptsHelp
+    Value: "\u64CD\u4F5C\u3067\u304D\u308B\u5BFE\u8C61\u306B\u8FD1\u3065\u3044\u305F\u3068\u304D\u306B\u30D2\u30F3\u30C8\u3092\u8868\u793A\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.SaveNotice
+    Value: "\u30AA\u30FC\u30C8\u30BB\u30FC\u30D6\u8868\u793A"
+  - Key: UI.Settings.SaveNoticeHelp
+    Value: "\u30AA\u30FC\u30C8\u30BB\u30FC\u30D6\u4E2D\u306B\u30A4\u30F3\u30B8\u30B1\u30FC\u30BF\u30FC\u3092\u8868\u793A\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.SkipIntro
+    Value: "\u30AA\u30FC\u30D7\u30CB\u30F3\u30B0\u3092\u30B9\u30AD\u30C3\u30D7"
+  - Key: UI.Settings.SkipIntroHelp
+    Value: "\u30CB\u30E5\u30FC\u30B2\u30FC\u30E0\u958B\u59CB\u6642\u306B\u30AA\u30FC\u30D7\u30CB\u30F3\u30B0\u3092\u30B9\u30AD\u30C3\u30D7\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.Subtitles
+    Value: "\u5B57\u5E55"
+  - Key: UI.Settings.SubtitlesHelp
+    Value: "\u4F1A\u8A71\u306E\u5B57\u5E55\u3092\u8868\u793A\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.TextSize
+    Value: "\u5B57\u5E55\u30B5\u30A4\u30BA"
+  - Key: UI.Settings.TextSizeHelp
+    Value: "\u4F1A\u8A71\u5B57\u5E55\u306E\u6587\u5B57\u30B5\u30A4\u30BA\u3092\u8ABF\u6574\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.SubtitleBackdrop
+    Value: "\u5B57\u5E55\u306E\u80CC\u666F"
+  - Key: UI.Settings.SubtitleBackdropHelp
+    Value: "\u5B57\u5E55\u306E\u5F8C\u308D\u306B\u6697\u3044\u80CC\u666F\u3092\u8868\u793A\u3057\u3001\u8AAD\u307F\u3084\u3059\u304F\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.ReducedMotion
+    Value: "\u30E2\u30FC\u30B7\u30E7\u30F3\u3092\u8EFD\u6E1B"
+  - Key: UI.Settings.ReducedMotionHelp
+    Value: "\u30AB\u30E1\u30E9\u306E\u52D5\u304D\u3084\u753B\u9762\u30A2\u30CB\u30E1\u30FC\u30B7\u30E7\u30F3\u3092\u6291\u3048\u307E\u3059\u3002"
+  - Key: UI.Settings.Brightness
+    Value: "\u660E\u308B\u3055"
+  - Key: UI.Settings.BrightnessHelp
+    Value: "\u30B7\u30FC\u30F3\u5168\u4F53\u306E\u660E\u308B\u3055\u3092\u8ABF\u6574\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.Quality
+    Value: "\u30B0\u30E9\u30D5\u30A3\u30C3\u30AF\u54C1\u8CEA"
+  - Key: UI.Settings.QualityHelp
+    Value: "\u63CF\u753B\u306E\u7D30\u304B\u3055\u3068\u30D1\u30D5\u30A9\u30FC\u30DE\u30F3\u30B9\u306E\u30D0\u30E9\u30F3\u30B9\u3092\u9078\u3073\u307E\u3059\u3002"
+  - Key: UI.Settings.ScreenMode
+    Value: "\u753B\u9762\u30E2\u30FC\u30C9"
+  - Key: UI.Settings.ScreenModeHelp
+    Value: "\u30A6\u30A3\u30F3\u30C9\u30A6\u8868\u793A\u307E\u305F\u306F\u30D5\u30EB\u30B9\u30AF\u30EA\u30FC\u30F3\u8868\u793A\u3092\u9078\u3073\u307E\u3059\u3002"
+  - Key: UI.Settings.FrameLimit
+    Value: "\u30D5\u30EC\u30FC\u30E0\u30EC\u30FC\u30C8\u4E0A\u9650"
+  - Key: UI.Settings.FrameLimitHelp
+    Value: "1 \u79D2\u3042\u305F\u308A\u306E\u6700\u5927\u63CF\u753B\u30D5\u30EC\u30FC\u30E0\u6570\u3092\u5236\u9650\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.MasterVolume
+    Value: "\u30DE\u30B9\u30BF\u30FC\u97F3\u91CF"
+  - Key: UI.Settings.MasterVolumeHelp
+    Value: "\u30B2\u30FC\u30E0\u5168\u4F53\u306E\u97F3\u91CF\u3092\u8ABF\u6574\u3057\u307E\u3059\u30020%
+      \u3067\u30DF\u30E5\u30FC\u30C8\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.DynamicRange
+    Value: "\u30C0\u30A4\u30CA\u30DF\u30C3\u30AF\u30EC\u30F3\u30B8"
+  - Key: UI.Settings.DynamicRangeHelp
+    Value: "\u5C0F\u3055\u3044\u97F3\u3068\u5927\u304D\u3044\u97F3\u306E\u97F3\u91CF\u5DEE\u3092\u9078\u3073\u307E\u3059\u3002"
+  - Key: UI.Settings.Sensitivity
+    Value: "\u8996\u70B9\u611F\u5EA6"
+  - Key: UI.Settings.SensitivityHelp
+    Value: "\u8996\u70B9\u64CD\u4F5C\u306B\u5BFE\u3059\u308B\u30AB\u30E1\u30E9\u306E\u53CD\u5FDC\u901F\u5EA6\u3092\u8ABF\u6574\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.InvertY
+    Value: "\u4E0A\u4E0B\u53CD\u8EE2"
+  - Key: UI.Settings.InvertYHelp
+    Value: "\u4E0A\u4E0B\u306E\u8996\u70B9\u64CD\u4F5C\u3092\u53CD\u8EE2\u3057\u307E\u3059\u3002"
+  - Key: UI.Settings.Vibration
+    Value: "\u30B3\u30F3\u30C8\u30ED\u30FC\u30E9\u30FC\u306E\u632F\u52D5"
+  - Key: UI.Settings.VibrationHelp
+    Value: "\u30B3\u30F3\u30C8\u30ED\u30FC\u30E9\u30FC\u4F7F\u7528\u6642\u306E\u632F\u52D5\u3092\u6709\u52B9\u306B\u3057\u307E\u3059\u3002"
+  - Key: UI.Alert.Confirm
+    Value: "\u6C7A\u5B9A"
+  - Key: UI.Alert.Cancel
+    Value: "\u30AD\u30E3\u30F3\u30BB\u30EB"
+  - Key: UI.Settings.ResetQuestion
+    Value: "\u8A2D\u5B9A\u3092\u521D\u671F\u5316\u3057\u307E\u3059\u304B\uFF1F"
+  - Key: UI.Settings.ResetDescription
+    Value: "\u8A00\u8A9E\u3068\u30DE\u30B9\u30BF\u30FC\u97F3\u91CF\u3092\u542B\u3080\u3059\u3079\u3066\u306E\u8A2D\u5B9A\u304C\u521D\u671F\u5024\u306B\u623B\u308A\u307E\u3059\u3002"
+  - Key: UI.Shop.All
+    Value: "\u3059\u3079\u3066"
+  - Key: UI.Shop.Balance
+    Value: "\u30AF\u30EC\u30B8\u30C3\u30C8"
+  - Key: UI.Shop.Purchase
+    Value: "\u8CFC\u5165"
+  - Key: UI.Shop.Owned
+    Value: "\u6240\u6301\u6570  {0}"
+  - Key: UI.Shop.Count
+    Value: "\u5546\u54C1 {0} \u70B9"
+  - Key: UI.Shop.UnitPrice
+    Value: "\u5358\u4FA1"
+  - Key: UI.Buy.ShortFunds
+    Value: "\u30AF\u30EC\u30B8\u30C3\u30C8\u4E0D\u8DB3"
+  - Key: UI.Shop.Empty
+    Value: "\u8CA9\u58F2\u4E2D\u306E\u5546\u54C1\u306F\u3042\u308A\u307E\u305B\u3093"
+  - Key: UI.Recycler.Hub
+    Value: "\u30EA\u30B9\u30C8\u30B5\u30F3\u30D7\u30EB"
+  - Key: UI.Recycler.Catalogue
+    Value: "8 \u7A2E\u985E\u306E\u30B5\u30F3\u30D7\u30EB"
+  - Key: UI.Recycler.Controls
+    Value: "\u64CD\u4F5C"
+  - Key: UI.Recycler.Count
+    Value: "\u30C7\u30FC\u30BF\u4EF6\u6570  \xB7  {0}"
+  - Key: UI.Recycler.Linear.Title
+    Value: "\u30EA\u30CB\u30A2\u30EA\u30B9\u30C8"
+  - Key: UI.Recycler.Linear.Description
+    Value: "\u540C\u3058\u9AD8\u3055\u306E\u884C\u3092\u7E26\u306B\u30B9\u30AF\u30ED\u30FC\u30EB"
+  - Key: UI.Recycler.Grid.Title
+    Value: "\u30B0\u30EA\u30C3\u30C9"
+  - Key: UI.Recycler.Grid.Description
+    Value: "\u30A2\u30A4\u30C6\u30E0\u30922\u5217\u306B\u914D\u7F6E"
+  - Key: UI.Recycler.Chat.Title
+    Value: "\u30C1\u30E3\u30C3\u30C8"
+  - Key: UI.Recycler.Chat.Description
+    Value: "\u672C\u6587\u306B\u5408\u308F\u305B\u3066\u4F38\u3073\u308B\u5439\u304D\u51FA\u3057"
+  - Key: UI.Recycler.Mixed.Title
+    Value: "\u6DF7\u5408\u30EA\u30B9\u30C8"
+  - Key: UI.Recycler.Mixed.Description
+    Value: "\u9AD8\u3055\u306E\u7570\u306A\u308B3\u7A2E\u985E\u306E\u884C\u3092\u6DF7\u5728"
+  - Key: UI.Recycler.Group.Title
+    Value: "\u30B0\u30EB\u30FC\u30D7\u30EA\u30B9\u30C8"
+  - Key: UI.Recycler.Group.Description
+    Value: "\u898B\u51FA\u3057\u3067\u30BF\u30B9\u30AF\u3092\u958B\u9589"
+  - Key: UI.Recycler.Loop.Title
+    Value: "\u30EB\u30FC\u30D7\u30EA\u30B9\u30C8"
+  - Key: UI.Recycler.Loop.Description
+    Value: "\u5148\u982D\u3068\u672B\u5C3E\u3092\u3064\u306A\u3044\u3067\u30B9\u30AF\u30ED\u30FC\u30EB"
+  - Key: UI.Recycler.Page.Title
+    Value: "\u30DA\u30FC\u30B8\u30AE\u30E3\u30E9\u30EA\u30FC"
+  - Key: UI.Recycler.Page.Description
+    Value: "\u6A2A\u306B\u9001\u3063\u3066\u8868\u7D19\u3092\u4E2D\u592E\u306B\u8868\u793A"
+  - Key: UI.Recycler.Circle.Title
+    Value: "\u5186\u5F62\u30EA\u30B9\u30C8"
+  - Key: UI.Recycler.Circle.Description
+    Value: "\u30C9\u30E9\u30C3\u30B0\u3067\u30CE\u30FC\u30C9\u3092\u56DE\u8EE2"
+  - Key: UI.Recycler.Action.Append
+    Value: "\u672B\u5C3E\u306B\u8FFD\u52A0"
+  - Key: UI.Recycler.Action.Prepend
+    Value: "\u5148\u982D\u306B\u633F\u5165"
+  - Key: UI.Recycler.Action.Top
+    Value: "\u5148\u982D\u306B\u623B\u308B"
+  - Key: UI.Recycler.Action.AppendFour
+    Value: "4\u67A0\u8FFD\u52A0"
+  - Key: UI.Recycler.Action.Remove
+    Value: "\u672B\u5C3E\u306E\u67A0\u3092\u524A\u9664"
+  - Key: UI.Recycler.Action.Middle
+    Value: "\u4E2D\u592E\u3078\u79FB\u52D5"
+  - Key: UI.Recycler.Action.Send
+    Value: "\u30E1\u30C3\u30BB\u30FC\u30B8\u3092\u9001\u4FE1"
+  - Key: UI.Recycler.Action.History
+    Value: "\u5C65\u6B74\u3092\u8AAD\u307F\u8FBC\u3080"
+  - Key: UI.Recycler.Action.Resize
+    Value: "\u5148\u982D\u306E\u672C\u6587\u3092\u5EF6\u9577"
+  - Key: UI.Recycler.Action.Short
+    Value: "\u77ED\u3044\u884C\u3092\u8FFD\u52A0"
+  - Key: UI.Recycler.Action.Tall
+    Value: "\u9577\u3044\u884C\u3092\u8FFD\u52A0"
+  - Key: UI.Recycler.Action.Refresh
+    Value: "\u5148\u982D\u306E\u884C\u3092\u66F4\u65B0"
+  - Key: UI.Recycler.Action.Expand
+    Value: "\u6700\u521D\u306E\u30B0\u30EB\u30FC\u30D7\u3092\u958B\u304F"
+  - Key: UI.Recycler.Action.Collapse
+    Value: "\u6700\u521D\u306E\u30B0\u30EB\u30FC\u30D7\u3092\u9589\u3058\u308B"
+  - Key: UI.Recycler.Action.AddTask
+    Value: "\u30BF\u30B9\u30AF\u3092\u8FFD\u52A0"
+  - Key: UI.Recycler.Action.First
+    Value: "\u5148\u982D\u3078\u79FB\u52D5"
+  - Key: UI.Recycler.Action.Center
+    Value: "\u5148\u982D\u3092\u4E2D\u592E\u3078"
+  - Key: UI.Recycler.Action.Next
+    Value: "\u6B21\u306E\u30DA\u30FC\u30B8"
+  - Key: UI.Recycler.Action.Previous
+    Value: "\u524D\u306E\u30DA\u30FC\u30B8"
+  - Key: UI.Recycler.Action.FirstPage
+    Value: "\u6700\u521D\u306E\u30DA\u30FC\u30B8"
+  - Key: UI.Recycler.Action.Fourth
+    Value: "4\u756A\u76EE\u3078\u79FB\u52D5"
+  - Key: UI.Recycler.Action.Stop
+    Value: "\u56DE\u8EE2\u3092\u6B62\u3081\u308B"
+  - Key: UI.Recycler.Data.Record
+    Value: "\u8A18\u9332"
+  - Key: UI.Recycler.Data.Slot
+    Value: "\u30B9\u30ED\u30C3\u30C8"
+  - Key: UI.Recycler.Data.Cover
+    Value: "\u8868\u7D19"
+  - Key: UI.Recycler.Data.Short
+    Value: "\u77ED\u3044\u884C"
+  - Key: UI.Recycler.Data.Medium
+    Value: "\u4E2D\u304F\u3089\u3044\u306E\u884C"
+  - Key: UI.Recycler.Data.Tall
+    Value: "\u9577\u3044\u884C"
+  - Key: UI.Recycler.Data.Message
+    Value: "\u30E1\u30C3\u30BB\u30FC\u30B8"
+  - Key: UI.Recycler.Data.Note
+    Value: "\u89B3\u6E2C\u8A18\u9332\u3092\u53D7\u4FE1\u3002"
+  - Key: UI.Recycler.Data.Update
+    Value: "\u6B21\u306E\u66F4\u65B0\u3092\u5F85\u6A5F\u4E2D\u3002"
+  - Key: UI.Recycler.Data.Daily
+    Value: "\u30C7\u30A4\u30EA\u30FC\u4EFB\u52D9"
+  - Key: UI.Recycler.Data.World
+    Value: "\u4E16\u754C\u4EFB\u52D9"
+  - Key: UI.Recycler.Data.Story
+    Value: "\u4F1D\u8AAC\u4EFB\u52D9"
+  - Key: UI.Recycler.Data.Task0
+    Value: "\u523B\u6674\u3092\u63A2\u3059"
+  - Key: UI.Recycler.Data.Task1
+    Value: "\u5E2B\u5320\u306B\u4F1A\u3046"
+  - Key: UI.Recycler.Data.Task2
+    Value: "\u7518\u96E8\u306E\u305F\u3081\u306B\u6E05\u5FC3\u309210\u8F2A\u96C6\u3081\u308B"
+  - Key: UI.Recycler.Data.Task3
+    Value: "\u6155\u98A8\u306E\u30DE\u30C3\u30B7\u30E5\u30EB\u30FC\u30E0\u30923\u500B\u96C6\u3081\u308B"
+  - Key: UI.Recycler.Data.Task4
+    Value: "\u30D2\u30EB\u30C1\u30E3\u30FC\u30EB\u306E\u5C04\u624B\u3092\u5012\u3059"
+  - Key: UI.Recycler.Data.Task5
+    Value: "\u30D5\u30EA\u30FC\u30CA\u306E\u821E\u53F0\u306B\u51FA\u6F14\u3059\u308B"
+  - Key: UI.Recycler.Data.Task6
+    Value: "\u53E4\u306E\u795E\u9AB8\u3092\u8ABF\u3079\u308B"
+  - Key: UI.Recycler.Data.Task7
+    Value: "\u5931\u308F\u308C\u305F\u697D\u8B5C\u3092\u63A2\u3059"
+  - Key: UI.Recycler.Data.NewTask
+    Value: "\u5730\u8108\u306E\u7570\u5E38\u3092\u8ABF\u3079\u308B"

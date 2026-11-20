@@ -355,7 +355,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _dontDestroyOnLoad: 1
   actions: {fileID: -944628639613478452, guid: 5a8ec89654ebcd642af04da22f4406f8, type: 3}
-  glyphDatabase: {fileID: 0}
+  glyphDatabase: {fileID: 11400000, guid: 68efae81bbd07494192f80fe96805621, type: 2}
 --- !u!4 &1865819775
 Transform:
   m_ObjectHideFlags: 0

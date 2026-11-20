@@ -32,13 +32,14 @@ namespace GameLogic.UI
 
         private static string FormatGroupTitle(RvGroupData data)
         {
-            return data.Type switch
+            string name = data.Type switch
             {
-                0 => "每日",
-                1 => "世界",
-                2 => "传说",
-                _ => "分类 " + data.Type
+                0 => LocalizationKey.UI.RECYCLER_DATA_DAILY,
+                1 => LocalizationKey.UI.RECYCLER_DATA_WORLD,
+                2 => LocalizationKey.UI.RECYCLER_DATA_STORY,
+                _ => data.Type.ToString()
             };
+            return (data.Expanded ? "−    " : "+    ") + name;
         }
     }
 }

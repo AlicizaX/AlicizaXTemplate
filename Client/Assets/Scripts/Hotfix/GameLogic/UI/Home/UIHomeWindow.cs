@@ -1,118 +1,119 @@
-using System.Collections.Generic;
+using System;
 using AlicizaX;
+using AlicizaX.Input;
 using AlicizaX.Localization.Runtime;
 using AlicizaX.UI.Runtime;
 using Cysharp.Threading.Tasks;
 using Game.UI;
-using TMPro;
 using UnityEngine;
+using UnityEngine.Video;
 
 namespace GameLogic.UI
 {
+    /// <summary>
+    /// 主界面窗口。按参考稿重建：动态海雾背景 + 标题 Logo + 纵向菜单 + 右上状态区。
+    /// </summary>
     [Window(UILayer.UI, 30)]
     public class UIHomeWindow : UIWindow<ui_UIHomeWindow>
     {
-        private string currentLanguage;
-        private UITestAWidget _aWidget;
+        /// <summary>构建号，正式版本请改为打包时注入的真实构建号。</summary>
+        private const int BuildNumber = 34791;
+
+        private VideoPlayer _backgroundVideo;
+        private Texture _backgroundTexture;
+        private Material _backgroundMaterial;
+        private UICreditsWidget _credits;
+
+        /// <summary>右上角显示的用户名，业务层可在打开窗口前覆盖。</summary>
+        public string ActiveUserName { get; set; } = Environment.UserName;
 
         protected override void OnInitialize()
         {
-            baseui.BtnShop.onClick.AddListener(OnBtnShopClick);
-            baseui.BtnBag.onClick.AddListener(OnBtnBagClick);
-            baseui.BtnRole.onClick.AddListener(OnBtnRoleClick);
-            baseui.BtnTestTips.onClick.AddListener(OnBtnTestTipsClick);
-            baseui.BtnExit.onClick.AddListener(OnBtnExitClick);
-            baseui.DropdownLanguages.onValueChanged.AddListener(OnDropdownLanguageChange);
-            List<TMP_Dropdown.OptionData> optionDatas = new List<TMP_Dropdown.OptionData>();
+            var background = baseui.RImgAtmosphere;
+            _backgroundVideo = background.GetComponent<VideoPlayer>();
+            _backgroundTexture = background.texture;
+            _backgroundMaterial = background.material;
 
-            _aWidget=CreateWidgetSync<UITestAWidget>(baseui.RectTransform,false);
-
-            currentLanguage = LocalizationKit.CurrentLanguage;
-
-            foreach (var language in LocalizationKit.SupportedLanguages)
-            {
-                optionDatas.Add(new TMP_Dropdown.OptionData(LocalizationKit.Settings.DisplayName(language)));
-            }
-
-            baseui.DropdownLanguages.options = optionDatas;
-            baseui.DropdownLanguages.SetValueWithoutNotify(Mathf.Max(0, LanguageTypes.StringToIndex(currentLanguage)));
-        }
-
-        private void OnDropdownLanguageChange(int arg0)
-        {
-            var selectedLanguage = LocalizationKit.SupportedLanguages[arg0];
-            if (currentLanguage == selectedLanguage) return;
-            SwitchLanguageAsync(selectedLanguage).Forget();
-        }
-
-        private async UniTask SwitchLanguageAsync(string selectedLanguage)
-        {
-            baseui.DropdownLanguages.interactable = false;
-            try
-            {
-                await LocalizationKit.SetLanguageAsync(selectedLanguage);
-            }
-            catch (System.Exception error)
-            {
-                Debug.LogException(error);
-            }
-            finally
-            {
-                currentLanguage = LocalizationKit.CurrentLanguage;
-                if (baseui.DropdownLanguages != null)
-                {
-                    baseui.DropdownLanguages.SetValueWithoutNotify(Mathf.Max(0, LanguageTypes.StringToIndex(currentLanguage)));
-                    baseui.DropdownLanguages.interactable = true;
-                }
-            }
-        }
-
-        private void OnBtnShopClick()
-        {
-            GameApp.UI.ShowUI<UIShopWindow>();
-            Log.Info("打开商店");
-        }
-
-        private void OnBtnBagClick()
-        {
-            GameApp.UI.ShowUI<UIRecyclerViewTestHubWindow>();
-        }
-
-        private void OnBtnRoleClick()
-        {
-            Log.Info("点击角色属性按钮");
-            _aWidget.Open();
-        }
-
-        private void OnBtnTestTipsClick()
-        {
-            Log.Info("点击测试提示按钮");
-            _aWidget.Close();
-        }
-
-        private void OnBtnExitClick()
-        {
-            Log.Info("Quit Game");
+            baseui.BtnStartNewGame.onClick.AddListener(() => GameApp.UI.ShowUI<UIRecyclerViewTestHubWindow>().Forget());
+            baseui.BtnQuit.onClick.AddListener(() => Log.Info("[UIHomeWindow] menu selected: Quit"));
+            baseui.BtnShop.onClick.AddListener(() => GameApp.UI.ShowUI<UIShopWindow>().Forget());
+            baseui.BtnCredits.onClick.AddListener(OpenCredits);
+            baseui.BtnOptions.onClick.AddListener(OpenOptions);
         }
 
         protected override void OnOpen()
         {
-            Debug.Log("HomeOpen");
-        }
+            LocalizationKit.Changed += OnLanguageChanged;
+            RefreshStatus();
 
-        protected override void OnRefresh()
-        {
-            Debug.Log("OnRefresh");
+            if (_backgroundVideo != null)
+            {
+                _backgroundVideo.frameReady += OnBackgroundFirstFrame;
+                _backgroundVideo.sendFrameReadyEvents = true;
+                _backgroundVideo.Play();
+            }
         }
 
         protected override void OnClose()
         {
-            Debug.Log("HomeOnClose");
+            LocalizationKit.Changed -= OnLanguageChanged;
+            _credits?.Close();
+
+            if (_backgroundVideo != null)
+            {
+                _backgroundVideo.frameReady -= OnBackgroundFirstFrame;
+                _backgroundVideo.sendFrameReadyEvents = false;
+                baseui.RImgAtmosphere.texture = _backgroundTexture;
+                baseui.RImgAtmosphere.material = _backgroundMaterial;
+                _backgroundVideo.Stop();
+            }
+        }
+
+        private void OnBackgroundFirstFrame(VideoPlayer player, long frame)
+        {
+            player.frameReady -= OnBackgroundFirstFrame;
+            player.sendFrameReadyEvents = false;
+            baseui.RImgAtmosphere.texture = player.texture;
+            baseui.RImgAtmosphere.material = null;
         }
 
         protected override void OnDestroy()
         {
-            Debug.Log("HomeOnDestroy");
+            LocalizationKit.Changed -= OnLanguageChanged;
         }
+
+        private void OpenCredits()
+        {
+            if (_credits == null)
+            {
+                _credits = CreateWidgetSync<UICreditsWidget>(baseui.transform, visible: false);
+                if (_credits == null) return;
+                _credits.Closed += RestoreHomeContent;
+            }
+
+            baseui.RectContent.gameObject.SetActive(false);
+            _credits.Open();
+        }
+
+        private void OpenOptions() => GameApp.UI.ShowUI<UIOptionsWindow>().Forget();
+
+        private void RestoreHomeContent()
+        {
+            baseui.RectContent.gameObject.SetActive(true);
+            if (State == UIState.Opened && UXInput.Watch?.IsNavigationInput == true)
+            {
+                baseui.BtnCredits.Select();
+            }
+        }
+
+        // ------------------------------------------------------------------ status
+        private void OnLanguageChanged(string language) => RefreshStatus();
+
+        private void RefreshStatus()
+        {
+            baseui.TextVersion.SetText(LocalizationKey.UI.HOME_STATUS_VERSION(Application.version, BuildNumber));
+            baseui.TextActiveUser.SetText(LocalizationKey.UI.HOME_STATUS_ACTIVEUSER(ActiveUserName));
+        }
+
     }
 }

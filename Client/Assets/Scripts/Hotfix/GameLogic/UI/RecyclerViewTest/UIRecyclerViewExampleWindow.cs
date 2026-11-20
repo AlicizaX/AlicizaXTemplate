@@ -6,6 +6,7 @@ using Game.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Strings = LocalizationKey.UI;
 
 namespace GameLogic.UI
 {
@@ -24,14 +25,6 @@ namespace GameLogic.UI
     [Window(UILayer.UI, 0)]
     public sealed class UIRecyclerViewExampleWindow : UIWindow<ui_UIRecyclerViewExampleWindow>
     {
-        private static readonly Color[] Palette =
-        {
-            new(0.16f, 0.42f, 0.48f, 1f),
-            new(0.22f, 0.36f, 0.22f, 1f),
-            new(0.42f, 0.32f, 0.16f, 1f),
-            new(0.32f, 0.22f, 0.42f, 1f)
-        };
-
         private RecyclerViewExampleKind _kind;
         private UGList<RvTextData> _linearList;
         private UGList<RvTextData> _gridList;
@@ -100,7 +93,6 @@ namespace GameLogic.UI
         private void ShowExample()
         {
             HideAllLists();
-            SetTitle(_kind.ToString());
             switch (_kind)
             {
                 case RecyclerViewExampleKind.Linear:
@@ -128,6 +120,8 @@ namespace GameLogic.UI
                     ShowCircle();
                     break;
             }
+
+            RefreshStatus();
         }
 
         private void HideAllLists()
@@ -153,17 +147,19 @@ namespace GameLogic.UI
         private void ShowLinear()
         {
             SetListActive(baseui.ScrollViewLinear, true);
-            _linearList.SetData(CreateTextItems(40));
-            SetActions("追加", "顶部插入", "滚到顶部");
-            SetStatus("Linear 定高列表。");
+            _linearList.SetData(CreateTextItems(40, Strings.RECYCLER_DATA_RECORD));
+            SetPresentation(
+                Strings.RECYCLER_LINEAR_TITLE, Strings.RECYCLER_LINEAR_DESCRIPTION,
+                Strings.RECYCLER_ACTION_APPEND, Strings.RECYCLER_ACTION_PREPEND, Strings.RECYCLER_ACTION_TOP);
         }
 
         private void ShowGrid()
         {
             SetListActive(baseui.ScrollViewGrid, true);
-            _gridList.SetData(CreateTextItems(80));
-            SetActions("追加", "删末尾", "滚到中间");
-            SetStatus("Grid 2 列背包格。");
+            _gridList.SetData(CreateTextItems(80, Strings.RECYCLER_DATA_SLOT));
+            SetPresentation(
+                Strings.RECYCLER_GRID_TITLE, Strings.RECYCLER_GRID_DESCRIPTION,
+                Strings.RECYCLER_ACTION_APPENDFOUR, Strings.RECYCLER_ACTION_REMOVE, Strings.RECYCLER_ACTION_MIDDLE);
         }
 
         private void ShowChat()
@@ -171,16 +167,18 @@ namespace GameLogic.UI
             SetListActive(baseui.ScrollViewChat, true);
             _chatList.SetData(CreateChatItems(20));
             _chatList.StickToEnd();
-            SetActions("发消息", "加载历史", "改高首条");
-            SetStatus("Chat 左右气泡。贴底发消息，顶部插入历史。");
+            SetPresentation(
+                Strings.RECYCLER_CHAT_TITLE, Strings.RECYCLER_CHAT_DESCRIPTION,
+                Strings.RECYCLER_ACTION_SEND, Strings.RECYCLER_ACTION_HISTORY, Strings.RECYCLER_ACTION_RESIZE);
         }
 
         private void ShowMixed()
         {
             SetListActive(baseui.ScrollViewMixed, true);
             _mixedList.SetData(CreateMixedItems(30));
-            SetActions("追加短项", "追加长项", "刷新第1条");
-            SetStatus("Mixed 多模板。短/中/长三种格子。");
+            SetPresentation(
+                Strings.RECYCLER_MIXED_TITLE, Strings.RECYCLER_MIXED_DESCRIPTION,
+                Strings.RECYCLER_ACTION_SHORT, Strings.RECYCLER_ACTION_TALL, Strings.RECYCLER_ACTION_REFRESH);
         }
 
         private void ShowGroup()
@@ -188,38 +186,37 @@ namespace GameLogic.UI
             SetListActive(baseui.ScrollViewGroup, true);
             _groupList.SetData(CreateGroupItems());
             _groupList.Expand(0);
-            SetActions("展开第1组", "折叠第1组", "追加子项");
-            SetStatus("Group 任务列表。点分类头展开/折叠。");
+            SetPresentation(
+                Strings.RECYCLER_GROUP_TITLE, Strings.RECYCLER_GROUP_DESCRIPTION,
+                Strings.RECYCLER_ACTION_EXPAND, Strings.RECYCLER_ACTION_COLLAPSE, Strings.RECYCLER_ACTION_ADDTASK);
         }
 
         private void ShowLoop()
         {
             SetListActive(baseui.ScrollViewLoop, true);
-            _loopList.SetData(CreateTextItems(12));
-            SetActions("追加", "滚到第0条", "滚到中心");
-            SetStatus("Loop 循环。滑过边缘会重锚。");
+            _loopList.SetData(CreateTextItems(12, Strings.RECYCLER_DATA_RECORD));
+            SetPresentation(
+                Strings.RECYCLER_LOOP_TITLE, Strings.RECYCLER_LOOP_DESCRIPTION,
+                Strings.RECYCLER_ACTION_APPEND, Strings.RECYCLER_ACTION_FIRST, Strings.RECYCLER_ACTION_CENTER);
         }
 
         private void ShowPage()
         {
             SetListActive(baseui.ScrollViewPage, true);
-            List<RvTextData> covers = new List<RvTextData>(8);
-            for (int i = 0; i < 8; i++)
-            {
-                covers.Add(NextTextItem("Cover"));
-            }
-
-            _pageList.SetData(covers);
-            SetActions("下一项", "上一项", "回到第0条");
-            SetStatus("Page 翻页。近大远小。");
+            _pageList.SetData(CreateTextItems(8, Strings.RECYCLER_DATA_COVER));
+            _pageList.ScrollToIndex(0, false);
+            SetPresentation(
+                Strings.RECYCLER_PAGE_TITLE, Strings.RECYCLER_PAGE_DESCRIPTION,
+                Strings.RECYCLER_ACTION_NEXT, Strings.RECYCLER_ACTION_PREVIOUS, Strings.RECYCLER_ACTION_FIRSTPAGE);
         }
 
         private void ShowCircle()
         {
             SetListActive(baseui.ScrollViewCircle, true);
-            _circleList.SetData(CreateTextItems(10));
-            SetActions("追加", "滚到第3条", "停滚");
-            SetStatus("Circle 环形。可连续旋转。");
+            _circleList.SetData(CreateTextItems(10, string.Empty));
+            SetPresentation(
+                Strings.RECYCLER_CIRCLE_TITLE, Strings.RECYCLER_CIRCLE_DESCRIPTION,
+                Strings.RECYCLER_ACTION_APPEND, Strings.RECYCLER_ACTION_FOURTH, Strings.RECYCLER_ACTION_STOP);
         }
 
         private void OnActionA()
@@ -227,36 +224,33 @@ namespace GameLogic.UI
             switch (_kind)
             {
                 case RecyclerViewExampleKind.Linear:
-                    _linearList.Add(NextTextItem("Append"));
+                    _linearList.Add(NextTextItem(Strings.RECYCLER_DATA_RECORD));
                     break;
                 case RecyclerViewExampleKind.Grid:
-                    _gridList.Add(NextTextItem("Append"));
-                    _gridList.Add(NextTextItem("Append"));
-                    _gridList.Add(NextTextItem("Append"));
-                    _gridList.Add(NextTextItem("Append"));
+                    _gridList.AddRange(CreateTextItems(4, Strings.RECYCLER_DATA_SLOT));
                     break;
                 case RecyclerViewExampleKind.Chat:
                     bool pin = _chatList.IsAtEnd;
-                    _chatList.Add(NextChatItem("Send"));
+                    _chatList.Add(NextChatItem());
                     if (pin)
                     {
                         _chatList.StickToEnd();
                     }
                     break;
                 case RecyclerViewExampleKind.Mixed:
-                    _mixedList.Add(new RvMixedData { TemplateId = 0, Text = "Short " + ++_seq });
+                    _mixedList.Add(new RvMixedData { TemplateId = 0, Text = Strings.RECYCLER_DATA_SHORT + "  " + ++_seq });
                     break;
                 case RecyclerViewExampleKind.Group:
                     _groupList.Expand(0);
                     break;
                 case RecyclerViewExampleKind.Loop:
-                    _loopList.Add(NextTextItem("Loop"));
+                    _loopList.Add(NextTextItem(Strings.RECYCLER_DATA_RECORD));
                     break;
                 case RecyclerViewExampleKind.Page:
                     _pageList.ScrollToIndex(Mathf.Min(_pageList.ScrollDataIndex + 1, _pageList.DataCount - 1), true);
                     break;
                 case RecyclerViewExampleKind.Circle:
-                    _circleList.Add(NextTextItem("Circle"));
+                    _circleList.Add(NextTextItem(string.Empty));
                     break;
             }
 
@@ -268,7 +262,7 @@ namespace GameLogic.UI
             switch (_kind)
             {
                 case RecyclerViewExampleKind.Linear:
-                    _linearList.Insert(0, NextTextItem("Prepend"));
+                    _linearList.Insert(0, NextTextItem(Strings.RECYCLER_DATA_RECORD));
                     break;
                 case RecyclerViewExampleKind.Grid:
                     if (_gridList.DataCount > 0)
@@ -279,12 +273,12 @@ namespace GameLogic.UI
                 case RecyclerViewExampleKind.Chat:
                     _chatList.InsertRange(0, new[]
                     {
-                        NextChatItem("History A"),
-                        NextChatItem("History B")
+                        NextChatItem(),
+                        NextChatItem()
                     });
                     break;
                 case RecyclerViewExampleKind.Mixed:
-                    _mixedList.Add(new RvMixedData { TemplateId = 2, Text = "Tall " + ++_seq });
+                    _mixedList.Add(new RvMixedData { TemplateId = 2, Text = Strings.RECYCLER_DATA_TALL + "  " + ++_seq });
                     break;
                 case RecyclerViewExampleKind.Group:
                     _groupList.Collapse(0);
@@ -317,16 +311,17 @@ namespace GameLogic.UI
                     if (_chatList.DataCount > 0)
                     {
                         RvChatData first = _chatList.GetItem(0);
-                        first.Text += "\nresized";
+                        first.Text += "\n" + Strings.RECYCLER_DATA_UPDATE;
                         first.DeclaredLength += 36f;
                         _chatList.RefreshItem(0, true);
                     }
                     break;
                 case RecyclerViewExampleKind.Mixed:
-                    _mixedList.RefreshItem(1, true);
+                    _mixedList.GetItem(0).Text = Strings.RECYCLER_DATA_SHORT + "  " + ++_seq;
+                    _mixedList.RefreshItem(0, true);
                     break;
                 case RecyclerViewExampleKind.Group:
-                    _groupList.Add(new RvGroupData { TemplateId = 1, Type = 1, Text = "调查附近的地脉异常 " + ++_seq });
+                    _groupList.Add(new RvGroupData { TemplateId = 1, Type = 1, Text = Strings.RECYCLER_DATA_NEWTASK + "  " + ++_seq });
                     break;
                 case RecyclerViewExampleKind.Loop:
                     _loopList.ScrollToCenter(0, 0f, true);
@@ -346,25 +341,25 @@ namespace GameLogic.UI
         {
             int count = _kind switch
             {
-                RecyclerViewExampleKind.Chat => _chatList != null ? _chatList.DataCount : 0,
-                RecyclerViewExampleKind.Mixed => _mixedList != null ? _mixedList.DataCount : 0,
-                RecyclerViewExampleKind.Group => _groupList != null ? _groupList.DataCount : 0,
-                RecyclerViewExampleKind.Loop => _loopList != null ? _loopList.DataCount : 0,
-                RecyclerViewExampleKind.Linear => _linearList != null ? _linearList.DataCount : 0,
-                RecyclerViewExampleKind.Grid => _gridList != null ? _gridList.DataCount : 0,
-                RecyclerViewExampleKind.Page => _pageList != null ? _pageList.DataCount : 0,
-                RecyclerViewExampleKind.Circle => _circleList != null ? _circleList.DataCount : 0,
+                RecyclerViewExampleKind.Chat => _chatList.DataCount,
+                RecyclerViewExampleKind.Mixed => _mixedList.DataCount,
+                RecyclerViewExampleKind.Group => _groupList.DataCount,
+                RecyclerViewExampleKind.Loop => _loopList.DataCount,
+                RecyclerViewExampleKind.Linear => _linearList.DataCount,
+                RecyclerViewExampleKind.Grid => _gridList.DataCount,
+                RecyclerViewExampleKind.Page => _pageList.DataCount,
+                RecyclerViewExampleKind.Circle => _circleList.DataCount,
                 _ => 0
             };
-            SetStatus(_kind + "  count=" + count);
+            baseui.TextStatus.SetText(Strings.RECYCLER_COUNT(count));
         }
 
-        private List<RvTextData> CreateTextItems(int count)
+        private List<RvTextData> CreateTextItems(int count, string label)
         {
             List<RvTextData> items = new List<RvTextData>(count);
             for (int i = 0; i < count; i++)
             {
-                items.Add(NextTextItem("Item"));
+                items.Add(NextTextItem(label));
             }
 
             return items;
@@ -375,7 +370,7 @@ namespace GameLogic.UI
             List<RvChatData> items = new List<RvChatData>(count);
             for (int i = 0; i < count; i++)
             {
-                items.Add(NextChatItem("Msg"));
+                items.Add(NextChatItem());
             }
 
             return items;
@@ -390,12 +385,12 @@ namespace GameLogic.UI
                 items.Add(new RvMixedData
                 {
                     TemplateId = templateId,
-                    Text = templateId switch
+                    Text = (templateId switch
                     {
-                        1 => "Medium " + i,
-                        2 => "Tall " + i,
-                        _ => "Short " + i
-                    }
+                        1 => Strings.RECYCLER_DATA_MEDIUM,
+                        2 => Strings.RECYCLER_DATA_TALL,
+                        _ => Strings.RECYCLER_DATA_SHORT
+                    }) + "  " + ++_seq
                 });
             }
 
@@ -406,14 +401,14 @@ namespace GameLogic.UI
         {
             return new List<RvGroupData>
             {
-                new() { TemplateId = 1, Type = 0, Text = "寻找刻晴" },
-                new() { TemplateId = 1, Type = 0, Text = "拜访师父" },
-                new() { TemplateId = 1, Type = 1, Text = "为甘雨采摘10朵清心" },
-                new() { TemplateId = 1, Type = 1, Text = "收集3份慕风蘑菇" },
-                new() { TemplateId = 1, Type = 1, Text = "击败丘丘人射手" },
-                new() { TemplateId = 1, Type = 2, Text = "参演芙宁娜的舞台剧" },
-                new() { TemplateId = 1, Type = 2, Text = "调查旧日的神骸" },
-                new() { TemplateId = 1, Type = 2, Text = "寻找散失的乐谱" }
+                new() { TemplateId = 1, Type = 0, Text = Strings.RECYCLER_DATA_TASK0 },
+                new() { TemplateId = 1, Type = 0, Text = Strings.RECYCLER_DATA_TASK1 },
+                new() { TemplateId = 1, Type = 1, Text = Strings.RECYCLER_DATA_TASK2 },
+                new() { TemplateId = 1, Type = 1, Text = Strings.RECYCLER_DATA_TASK3 },
+                new() { TemplateId = 1, Type = 1, Text = Strings.RECYCLER_DATA_TASK4 },
+                new() { TemplateId = 1, Type = 2, Text = Strings.RECYCLER_DATA_TASK5 },
+                new() { TemplateId = 1, Type = 2, Text = Strings.RECYCLER_DATA_TASK6 },
+                new() { TemplateId = 1, Type = 2, Text = Strings.RECYCLER_DATA_TASK7 }
             };
         }
 
@@ -422,19 +417,18 @@ namespace GameLogic.UI
             int id = ++_seq;
             return new RvTextData
             {
-                Title = prefix + " " + id,
-                Color = Palette[id % Palette.Length]
+                Title = string.IsNullOrEmpty(prefix) ? id.ToString("00") : $"{prefix}  {id:00}"
             };
         }
 
-        private RvChatData NextChatItem(string prefix)
+        private RvChatData NextChatItem()
         {
             int id = ++_seq;
-            StringBuilder builder = new StringBuilder(prefix).Append(' ').Append(id);
+            StringBuilder builder = new StringBuilder(Strings.RECYCLER_DATA_MESSAGE).Append(' ').Append(id);
             int lines = 1 + id % 3;
             for (int i = 1; i < lines; i++)
             {
-                builder.Append('\n').Append("line ").Append(i);
+                builder.Append('\n').Append(i == 1 ? Strings.RECYCLER_DATA_NOTE : Strings.RECYCLER_DATA_UPDATE);
             }
 
             return new RvChatData
@@ -445,8 +439,10 @@ namespace GameLogic.UI
             };
         }
 
-        private void SetActions(string actionA, string actionB, string actionC)
+        private void SetPresentation(string title, string description, string actionA, string actionB, string actionC)
         {
+            baseui.TextTitle.SetText(title);
+            baseui.TextDescription.SetText(description);
             SetButtonText(baseui.BtnActionA, actionA);
             SetButtonText(baseui.BtnActionB, actionB);
             SetButtonText(baseui.BtnActionC, actionC);
@@ -463,22 +459,6 @@ namespace GameLogic.UI
             if (label != null)
             {
                 label.text = text;
-            }
-        }
-
-        private void SetTitle(string title)
-        {
-            if (baseui.TextTitle != null)
-            {
-                baseui.TextTitle.text = title;
-            }
-        }
-
-        private void SetStatus(string status)
-        {
-            if (baseui.TextStatus != null)
-            {
-                baseui.TextStatus.text = status;
             }
         }
     }
