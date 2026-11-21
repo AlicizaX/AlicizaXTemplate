@@ -34,6 +34,8 @@ namespace GameLogic.UI
         private UGMixedList<RvMixedData> _mixedList;
         private UGGroupList<RvGroupData> _groupList;
         private UGLoopList<RvTextData> _loopList;
+        // 当前列表的导航控制器；按钮把列表滚到某项时同步焦点，回到列表时从可见项继续。
+        private RecyclerViewNavigationController _navigation;
         private bool _listsBound;
         private int _seq;
         private static UIRecyclerViewExampleWindow _current;
@@ -121,32 +123,32 @@ namespace GameLogic.UI
                     break;
             }
 
+            // 焦点进入当前列表；聊天停在最新一条。
+            _navigation.RestoreFocus(_kind == RecyclerViewExampleKind.Chat ? _chatList.DataCount - 1 : 0);
             RefreshStatus();
         }
 
         private void HideAllLists()
         {
-            SetListActive(baseui.ScrollViewLinear, false);
-            SetListActive(baseui.ScrollViewGrid, false);
-            SetListActive(baseui.ScrollViewChat, false);
-            SetListActive(baseui.ScrollViewMixed, false);
-            SetListActive(baseui.ScrollViewGroup, false);
-            SetListActive(baseui.ScrollViewLoop, false);
-            SetListActive(baseui.ScrollViewPage, false);
-            SetListActive(baseui.ScrollViewCircle, false);
+            baseui.ScrollViewLinear.gameObject.SetActive(false);
+            baseui.ScrollViewGrid.gameObject.SetActive(false);
+            baseui.ScrollViewChat.gameObject.SetActive(false);
+            baseui.ScrollViewMixed.gameObject.SetActive(false);
+            baseui.ScrollViewGroup.gameObject.SetActive(false);
+            baseui.ScrollViewLoop.gameObject.SetActive(false);
+            baseui.ScrollViewPage.gameObject.SetActive(false);
+            baseui.ScrollViewCircle.gameObject.SetActive(false);
         }
 
-        private static void SetListActive(RecyclerView list, bool active)
+        private void ActivateList(RecyclerView list)
         {
-            if (list != null)
-            {
-                list.gameObject.SetActive(active);
-            }
+            list.gameObject.SetActive(true);
+            _navigation = list.GetComponent<RecyclerViewNavigationController>();
         }
 
         private void ShowLinear()
         {
-            SetListActive(baseui.ScrollViewLinear, true);
+            ActivateList(baseui.ScrollViewLinear);
             _linearList.SetData(CreateTextItems(40, Strings.RECYCLER_DATA_RECORD));
             SetPresentation(
                 Strings.RECYCLER_LINEAR_TITLE, Strings.RECYCLER_LINEAR_DESCRIPTION,
@@ -155,7 +157,7 @@ namespace GameLogic.UI
 
         private void ShowGrid()
         {
-            SetListActive(baseui.ScrollViewGrid, true);
+            ActivateList(baseui.ScrollViewGrid);
             _gridList.SetData(CreateTextItems(80, Strings.RECYCLER_DATA_SLOT));
             SetPresentation(
                 Strings.RECYCLER_GRID_TITLE, Strings.RECYCLER_GRID_DESCRIPTION,
@@ -164,7 +166,7 @@ namespace GameLogic.UI
 
         private void ShowChat()
         {
-            SetListActive(baseui.ScrollViewChat, true);
+            ActivateList(baseui.ScrollViewChat);
             _chatList.SetData(CreateChatItems(20));
             _chatList.StickToEnd();
             SetPresentation(
@@ -174,7 +176,7 @@ namespace GameLogic.UI
 
         private void ShowMixed()
         {
-            SetListActive(baseui.ScrollViewMixed, true);
+            ActivateList(baseui.ScrollViewMixed);
             _mixedList.SetData(CreateMixedItems(30));
             SetPresentation(
                 Strings.RECYCLER_MIXED_TITLE, Strings.RECYCLER_MIXED_DESCRIPTION,
@@ -183,7 +185,7 @@ namespace GameLogic.UI
 
         private void ShowGroup()
         {
-            SetListActive(baseui.ScrollViewGroup, true);
+            ActivateList(baseui.ScrollViewGroup);
             _groupList.SetData(CreateGroupItems());
             _groupList.Expand(0);
             SetPresentation(
@@ -193,7 +195,7 @@ namespace GameLogic.UI
 
         private void ShowLoop()
         {
-            SetListActive(baseui.ScrollViewLoop, true);
+            ActivateList(baseui.ScrollViewLoop);
             _loopList.SetData(CreateTextItems(12, Strings.RECYCLER_DATA_RECORD));
             SetPresentation(
                 Strings.RECYCLER_LOOP_TITLE, Strings.RECYCLER_LOOP_DESCRIPTION,
@@ -202,7 +204,7 @@ namespace GameLogic.UI
 
         private void ShowPage()
         {
-            SetListActive(baseui.ScrollViewPage, true);
+            ActivateList(baseui.ScrollViewPage);
             _pageList.SetData(CreateTextItems(8, Strings.RECYCLER_DATA_COVER));
             _pageList.ScrollToIndex(0, false);
             SetPresentation(
@@ -212,7 +214,7 @@ namespace GameLogic.UI
 
         private void ShowCircle()
         {
-            SetListActive(baseui.ScrollViewCircle, true);
+            ActivateList(baseui.ScrollViewCircle);
             _circleList.SetData(CreateTextItems(10, string.Empty));
             SetPresentation(
                 Strings.RECYCLER_CIRCLE_TITLE, Strings.RECYCLER_CIRCLE_DESCRIPTION,
@@ -247,7 +249,9 @@ namespace GameLogic.UI
                     _loopList.Add(NextTextItem(Strings.RECYCLER_DATA_RECORD));
                     break;
                 case RecyclerViewExampleKind.Page:
-                    _pageList.ScrollToIndex(Mathf.Min(_pageList.ScrollDataIndex + 1, _pageList.DataCount - 1), true);
+                    int nextPage = Mathf.Min(_pageList.ScrollDataIndex + 1, _pageList.DataCount - 1);
+                    _pageList.ScrollToIndex(nextPage, true);
+                    _navigation.SetFocus(nextPage, scroll: false);
                     break;
                 case RecyclerViewExampleKind.Circle:
                     _circleList.Add(NextTextItem(string.Empty));
@@ -285,12 +289,16 @@ namespace GameLogic.UI
                     break;
                 case RecyclerViewExampleKind.Loop:
                     _loopList.ScrollToIndex(0, true);
+                    _navigation.SetFocus(0, scroll: false);
                     break;
                 case RecyclerViewExampleKind.Page:
-                    _pageList.ScrollToIndex(Mathf.Max(_pageList.ScrollDataIndex - 1, 0), true);
+                    int previousPage = Mathf.Max(_pageList.ScrollDataIndex - 1, 0);
+                    _pageList.ScrollToIndex(previousPage, true);
+                    _navigation.SetFocus(previousPage, scroll: false);
                     break;
                 case RecyclerViewExampleKind.Circle:
                     _circleList.ScrollToIndex(3, true);
+                    _navigation.SetFocus(3, scroll: false);
                     break;
             }
 
@@ -303,9 +311,12 @@ namespace GameLogic.UI
             {
                 case RecyclerViewExampleKind.Linear:
                     _linearList.ScrollToIndex(0, true);
+                    _navigation.SetFocus(0, scroll: false);
                     break;
                 case RecyclerViewExampleKind.Grid:
-                    _gridList.ScrollToIndex(_gridList.DataCount / 2, true);
+                    int middle = _gridList.DataCount / 2;
+                    _gridList.ScrollToIndex(middle, true);
+                    _navigation.SetFocus(middle, scroll: false);
                     break;
                 case RecyclerViewExampleKind.Chat:
                     if (_chatList.DataCount > 0)
@@ -325,9 +336,11 @@ namespace GameLogic.UI
                     break;
                 case RecyclerViewExampleKind.Loop:
                     _loopList.ScrollToCenter(0, 0f, true);
+                    _navigation.SetFocus(0, scroll: false);
                     break;
                 case RecyclerViewExampleKind.Page:
                     _pageList.ScrollToIndex(0, false);
+                    _navigation.SetFocus(0, scroll: false);
                     break;
                 case RecyclerViewExampleKind.Circle:
                     _circleList.StopScroll();

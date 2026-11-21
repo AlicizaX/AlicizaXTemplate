@@ -1,34 +1,26 @@
 using AlicizaX.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace GameLogic.UI
 {
-    public sealed class RvGroupItemViewHolder : ViewHolder<RvGroupData>, IPointerClickHandler
+    public sealed class RvGroupItemViewHolder : InteractiveViewHolder<RvGroupData>
     {
         [SerializeField] private TextMeshProUGUI title;
+        [SerializeField] private GameObject focusFrame;
+
+        // 点击与提交都交给 GroupAdapter.Activate：组头展开/收起，子项才设为业务选中。
+        protected override bool SelectOnActivate => false;
 
         protected override void OnBind(RvGroupData data, int index)
         {
-            if (title == null)
-            {
-                return;
-            }
-
             title.text = data.TemplateId == 0 ? FormatGroupTitle(data) : data.Text;
+            focusFrame.SetActive(false);
         }
 
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            if (CurrentData != null && CurrentData.TemplateId == 0)
-            {
-                UIRecyclerViewExampleWindow.ActivateGroup(CurrentIndex);
-                return;
-            }
+        protected override void OnNavigationFocused(bool focused) => focusFrame.SetActive(focused);
 
-            SetSelect();
-        }
+        protected override void OnItemClick(RvGroupData data, int index) => UIRecyclerViewExampleWindow.ActivateGroup(index);
 
         private static string FormatGroupTitle(RvGroupData data)
         {

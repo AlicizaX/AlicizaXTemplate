@@ -4,16 +4,17 @@ using UnityEngine;
 
 namespace GameLogic.UI
 {
-    public sealed class RvMixedItemViewHolder : ViewHolder<RvMixedData>
+    public sealed class RvMixedItemViewHolder : NavigationViewHolder<RvMixedData>
     {
         [SerializeField] private TextMeshProUGUI title;
+        [SerializeField] private GameObject focusFrame;
 
         protected override void OnBind(RvMixedData data, int index)
         {
-            if (title != null)
-            {
-                title.text = data.Text;
-            }
+            title.text = data.Text;
+            focusFrame.SetActive(false);
         }
+
+        protected override void OnNavigationFocused(bool focused) => focusFrame.SetActive(focused);
     }
 }

@@ -5,10 +5,11 @@ using UnityEngine.UI;
 
 namespace GameLogic.UI
 {
-    public sealed class RvChatItemViewHolder : ViewHolder<RvChatData>
+    public sealed class RvChatItemViewHolder : NavigationViewHolder<RvChatData>
     {
         [SerializeField] private Image background;
         [SerializeField] private TextMeshProUGUI message;
+        [SerializeField] private GameObject focusFrame;
 
         protected override void OnBind(RvChatData data, int index)
         {
@@ -74,7 +75,10 @@ namespace GameLogic.UI
             }
 
             data.DeclaredLength = bubbleHeight;
+            focusFrame.SetActive(false);
             RequestResize();
         }
+
+        protected override void OnNavigationFocused(bool focused) => focusFrame.SetActive(focused);
     }
 }
