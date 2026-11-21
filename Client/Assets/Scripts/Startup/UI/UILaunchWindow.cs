@@ -9,6 +9,9 @@ using UnityEngine.InputSystem.LowLevel;
 
 namespace Unity.Startup.Procedure
 {
+    /// <summary>
+    /// 启动界面：只订阅启动事件做展示，玩家按任意键后发布 <see cref="LaunchStartRequestedEvent"/>。
+    /// </summary>
     [Window(UILayer.Top)]
     public sealed class UILaunchWindow : UIWindow<ui_UILaunchWindow>
     {
@@ -22,8 +25,8 @@ namespace Unity.Startup.Procedure
         protected override void OnInitialize()
         {
             _startPrompt = baseui.ObjStartPrompt.GetComponent<TMP_Text>();
-            EventProxy.AddUIEvent<AssetDownloadProgressUpdateEventArgs>(OnDownloadProgress);
             EventProxy.AddUIEvent<LaunchStateChangedEvent>(OnLaunchStateChanged);
+            EventProxy.AddUIEvent<LaunchDownloadProgressEvent>(OnDownloadProgress);
         }
 
         protected override void OnUpdate(float deltaTime)
@@ -49,15 +52,12 @@ namespace Unity.Startup.Procedure
 
         private void SetStatus(string status) => baseui.TextStatus.text = status;
 
-        private void OnLaunchStateChanged(in LaunchStateChangedEvent update)
+        private void OnLaunchStateChanged(in LaunchStateChangedEvent e)
         {
-            switch (update.State)
+            switch (e.State)
             {
                 case LaunchState.Checking:
                     SetStatus(UpdateLocalizationKey.Bootstrap.UPDATE_CHECKING);
-                    break;
-                case LaunchState.NetworkUnavailable:
-                    SetStatus(UpdateLocalizationKey.Bootstrap.UPDATE_NETWORKERROR);
                     break;
                 case LaunchState.Ready:
                     baseui.ObjUpdate.SetActive(false);
@@ -66,6 +66,19 @@ namespace Unity.Startup.Procedure
                     baseui.ObjStartPrompt.SetActive(true);
                     InputSystem.onEvent += OnInputEvent;
                     break;
+            }
+        }
+
+        private void OnDownloadProgress(in LaunchDownloadProgressEvent e)
+        {
+            float progress = e.Progress;
+            baseui.ImgFill.fillAmount = progress;
+            SetStatus(UpdateLocalizationKey.Bootstrap.UPDATE_DOWNLOADING(e.CurrentCount, e.TotalCount, progress * 100f));
+            if (e.TotalBytes > 0)
+            {
+                baseui.TextDetail.text = UpdateLocalizationKey.Bootstrap.UPDATE_SIZE(
+                    (e.CurrentBytes / BytesPerMegabyte).ToString("0.0"),
+                    (e.TotalBytes / BytesPerMegabyte).ToString("0.0"));
             }
         }
 
@@ -83,29 +96,6 @@ namespace Unity.Startup.Procedure
                 _startPressed = true;
                 return;
             }
-        }
-
-        private void OnDownloadProgress(in AssetDownloadProgressUpdateEventArgs update)
-        {
-            float progress = update.TotalDownloadSizeBytes > 0
-                ? (float)((double)update.CurrentDownloadSizeBytes / update.TotalDownloadSizeBytes)
-                : update.CurrentDownloadCount / (float)Mathf.Max(1, update.TotalDownloadCount);
-
-            progress = Mathf.Clamp01(progress);
-            SetProgress(progress);
-            SetStatus(UpdateLocalizationKey.Bootstrap.UPDATE_DOWNLOADING(
-                update.CurrentDownloadCount, update.TotalDownloadCount, progress * 100f));
-            if (update.TotalDownloadSizeBytes > 0)
-            {
-                baseui.TextDetail.text = UpdateLocalizationKey.Bootstrap.UPDATE_SIZE(
-                    (update.CurrentDownloadSizeBytes / BytesPerMegabyte).ToString("0.0"),
-                    (update.TotalDownloadSizeBytes / BytesPerMegabyte).ToString("0.0"));
-            }
-        }
-
-        private void SetProgress(float progress)
-        {
-            baseui.ImgFill.fillAmount = progress;
         }
     }
 }

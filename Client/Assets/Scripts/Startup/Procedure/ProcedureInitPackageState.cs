@@ -1,96 +1,60 @@
-﻿using Cysharp.Threading.Tasks;
+using System;
+using System.Threading;
 using AlicizaX;
+using Cysharp.Threading.Tasks;
 using YooAsset;
 
 namespace Unity.Startup.Procedure
 {
-    internal sealed class ProcedureInitPackageState : ProcedureBase
+    /// <summary>
+    /// 初始化资源包：初始化 YooAsset 包，请求资源版本并加载对应清单。
+    /// </summary>
+    internal sealed class ProcedureInitPackageState : AsyncProcedureBase
     {
-        private int maxFailedCount = 0;
-        private const int MAX_FAILED_TRYCOUNT = 3;
+        private readonly LaunchContext _context;
 
-        protected override void OnEnter()
+        public ProcedureInitPackageState(LaunchContext context) => _context = context;
+
+        protected override async UniTask RunAsync(CancellationToken cancellationToken)
         {
-            InitPackageAsync().Forget();
-        }
+            string hostUrl = _context.CdnUrl;
+            bool initialized = await GameApp.ResourcePackage.InitPackageAsync(string.Empty, hostUrl, hostUrl)
+                .AttachExternalCancellation(cancellationToken);
+            if (!initialized) throw new InvalidOperationException("Initialize resource package failed.");
 
-        private async UniTask InitPackageAsync()
-        {
-            string hostUrl = string.Empty;
-            if (GameApp.ResourcePackage.PlayMode == EPlayMode.HostPlayMode || GameApp.ResourcePackage.PlayMode == EPlayMode.WebPlayMode)
-            {
-                hostUrl = StartupSetting.CDNUrl;
-            }
+            await RetryAsync(UpdatePackageVersionAsync, cancellationToken);
+            await RetryAsync(LoadPackageManifestAsync, cancellationToken);
 
-            await GameApp.ResourcePackage.InitPackageAsync(string.Empty, hostUrl, hostUrl);
-            await UniTask.DelayFrame();
-            UpdateStaticVersion().Forget();
-        }
-
-        private async UniTask UpdateStaticVersion()
-        {
-            var buildInOperation = GameApp.ResourcePackage.RequestPackageVersionAsync();
-            await buildInOperation.ToUniTask();
-
-            if (buildInOperation.Status == EOperationStatus.Succeeded)
-            {
-                //更新成功
-                string packageVersion = buildInOperation.PackageVersion;
-                GameApp.ResourcePackage.PackageVersion = packageVersion;
-
-                Log.Info($"Updated package Version : {packageVersion}");
-                maxFailedCount = 0;
-                UpdateManifest().Forget();
-            }
+            if (GameApp.ResourcePackage.PlayMode == EPlayMode.OfflinePlayMode)
+                SwitchProcedure<ProcedureClearCacheState>();
             else
-            {
-                maxFailedCount++;
-                //更新失败
-                Log.Error(buildInOperation.Error);
-
-                if (maxFailedCount <= MAX_FAILED_TRYCOUNT)
-                {
-                    await UniTask.Delay(3000);
-                    UpdateStaticVersion().Forget();
-                    Log.Info($"Retry Update Static Version...{maxFailedCount}");
-                }
-            }
-        }
-
-
-        private async UniTask UpdateManifest()
-        {
-            LoadPackageManifestOperation buildInOperation;
-            string packageVersion = "Simulate";
-            if (GameApp.ResourcePackage.PlayMode != EPlayMode.EditorSimulateMode)
-            {
-                packageVersion = GameApp.ResourcePackage.PackageVersion;
-            }
-
-            buildInOperation = GameApp.ResourcePackage.LoadPackageManifestAsync(packageVersion);
-            await buildInOperation.ToUniTask();
-
-            if (buildInOperation.Status == EOperationStatus.Succeeded)
-            {
-                if (GameApp.ResourcePackage.PlayMode == EPlayMode.OfflinePlayMode)
-                {
-                    SwitchProcedure<ProcedurePatchDoneState>();
-                    return;
-                }
-
                 SwitchProcedure<ProcedureDownloadBundleState>();
-            }
-            else
-            {
-                maxFailedCount++;
-                Log.Error(buildInOperation.Error);
-                if (maxFailedCount <= MAX_FAILED_TRYCOUNT)
-                {
-                    await UniTask.Delay(3000);
-                    UpdateManifest().Forget();
-                    Log.Info($"Retry Update Manifest Version...{maxFailedCount}");
-                }
-            }
+        }
+
+        private static async UniTask UpdatePackageVersionAsync(CancellationToken cancellationToken)
+        {
+            RequestPackageVersionOperation operation = GameApp.ResourcePackage.RequestPackageVersionAsync();
+            await operation.ToUniTask(cancellationToken: cancellationToken);
+            EnsureSucceeded(operation);
+
+            GameApp.ResourcePackage.PackageVersion = operation.PackageVersion;
+            Log.Info($"Package version: {operation.PackageVersion}");
+        }
+
+        private static async UniTask LoadPackageManifestAsync(CancellationToken cancellationToken)
+        {
+            string packageVersion = GameApp.ResourcePackage.PlayMode == EPlayMode.EditorSimulateMode
+                ? "Simulate"
+                : GameApp.ResourcePackage.PackageVersion;
+
+            LoadPackageManifestOperation operation = GameApp.ResourcePackage.LoadPackageManifestAsync(packageVersion);
+            await operation.ToUniTask(cancellationToken: cancellationToken);
+            EnsureSucceeded(operation);
+        }
+
+        private static void EnsureSucceeded(AsyncOperationBase operation)
+        {
+            if (operation.Status != EOperationStatus.Succeeded) throw new InvalidOperationException(operation.Error);
         }
     }
 }

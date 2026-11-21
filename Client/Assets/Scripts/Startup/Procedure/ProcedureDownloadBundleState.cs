@@ -1,78 +1,55 @@
-using AlicizaX.Resource.Runtime;
+using System;
+using System.Threading;
 using AlicizaX;
-using AlicizaX.Localization.Runtime;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using YooAsset;
 
 namespace Unity.Startup.Procedure
 {
-    internal sealed class ProcedureDownloadBundleState : ProcedureBase
+    /// <summary>
+    /// 下载补丁资源，进度通过 <see cref="LaunchDownloadProgressEvent"/> 通知界面；失败时按 RetryAsync 的规则重试。
+    /// </summary>
+    internal sealed class ProcedureDownloadBundleState : AsyncProcedureBase
     {
-        ResourceDownloaderOperation downloader;
-
-        protected override void OnEnter()
+        protected override async UniTask RunAsync(CancellationToken cancellationToken)
         {
-            CreateDownloader();
+            await RetryAsync(DownloadAsync, cancellationToken);
+            SwitchProcedure<ProcedureClearCacheState>();
         }
 
-        protected override void OnLeave()
+        private static async UniTask DownloadAsync(CancellationToken cancellationToken)
         {
-            downloader.CancelDownload();
-            downloader = null;
-        }
-
-        private void CreateDownloader()
-        {
-            downloader = AppServices.Require<IResourcePackageService>().CreateResourceDownloader();
+            ResourceDownloaderOperation downloader = GameApp.ResourcePackage.CreateResourceDownloader();
             if (downloader.TotalDownloadCount == 0)
             {
-                Log.Info(UpdateLocalizationKey.Bootstrap.UPDATE_NOASSETS);
-                SwitchProcedure<ProcedurePatchDoneState>();
-            }
-            else
-            {
-                // 发现新更新文件后，挂起流程系统
-                int totalDownloadCount = downloader.TotalDownloadCount;
-                long totalDownloadBytes = downloader.TotalDownloadBytes;
-
-                float sizeMb = totalDownloadBytes / 1048576f;
-                sizeMb = Mathf.Clamp(sizeMb, 0.1f, float.MaxValue);
-                string totalSizeMb = sizeMb.ToString("f1");
-
-                Log.Info($"一共发现了{downloader.TotalDownloadCount}个资源需要更新下载,总共需要下载文件大小为:{totalSizeMb}!");
-
-                DownloadFiles().Forget();
-            }
-        }
-
-        private async UniTask DownloadFiles()
-        {
-            // 注册下载回调
-            void DownloaderOnDownloadErrorCallback(DownloadErrorEventArgs data)
-            {
-                Log.Error($"PackagegName:{data.PackageName} FileName:{data.FileName} Error:{data.ErrorInfo}");
-                CreateDownloader();
-            }
-
-            downloader.DownloadError += DownloaderOnDownloadErrorCallback;
-            downloader.DownloadProgressChanged += OnDownloadProgressCallback;
-            downloader.StartDownload();
-            await downloader;
-
-            // 检测下载结果
-            if (downloader.Status != EOperationStatus.Succeeded)
-            {
-                Log.Error(UpdateLocalizationKey.Bootstrap.UPDATE_DOWNLOADFAILED);
+                Log.Info("No assets need to be downloaded.");
                 return;
             }
 
-            SwitchProcedure<ProcedurePatchDoneState>();
+            Log.Info($"Downloading {downloader.TotalDownloadCount} files, {Utility.File.GetBytesSize(downloader.TotalDownloadBytes)}.");
+            downloader.DownloadProgressChanged += OnDownloadProgress;
+            downloader.DownloadError += OnDownloadError;
+
+            using (cancellationToken.Register(downloader.CancelDownload))
+            {
+                downloader.StartDownload();
+                await downloader.ToUniTask();
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            if (downloader.Status != EOperationStatus.Succeeded)
+                throw new InvalidOperationException($"Download failed: {downloader.Error}");
         }
 
-        private void OnDownloadProgressCallback(DownloadProgressChangedEventArgs data)
+        private static void OnDownloadProgress(DownloadProgressChangedEventArgs e)
         {
-            EventBus.Publish(AssetDownloadProgressUpdateEventArgs.Create(data.PackageName, data.TotalDownloadCount, data.CurrentDownloadCount, data.TotalDownloadBytes, data.CurrentDownloadBytes));
+            EventBus.Publish(new LaunchDownloadProgressEvent(
+                e.CurrentDownloadCount, e.TotalDownloadCount, e.CurrentDownloadBytes, e.TotalDownloadBytes));
+        }
+
+        private static void OnDownloadError(DownloadErrorEventArgs e)
+        {
+            Log.Error($"Download failed. Package: {e.PackageName}, File: {e.FileName}, Error: {e.ErrorInfo}");
         }
     }
 }

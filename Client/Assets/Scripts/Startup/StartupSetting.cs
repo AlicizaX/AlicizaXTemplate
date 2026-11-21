@@ -1,10 +1,5 @@
-﻿using System.Collections.Generic;
-using AlicizaX;
-using Cysharp.Threading.Tasks;
-using UnityEngine;
-
 /// <summary>
-/// 模拟Http请求远端 CDN地址版本号等 包括热更入口等..
+/// 启动配置：热更入口、远端版本服务与重试策略。只放常量，运行期数据见 <see cref="Unity.Startup.Procedure.LaunchContext"/>。
 /// </summary>
 public static class StartupSetting
 {
@@ -12,31 +7,15 @@ public static class StartupSetting
     public const string EntranceClass = "GameLogic.HotfixEntry";
     public const string EntranceMethod = "Entrance";
 
-    public static readonly List<string> HotUpdateAssemblies = new List<string>()
-        { "GameLib.dll", "GameProto.dll", "GameBase.dll", "GameLogic.dll" };
+    /// <summary>热更程序集，按依赖顺序排列，也按此顺序加载。</summary>
+    public static readonly string[] HotUpdateAssemblies = { "GameLib.dll", "GameProto.dll", "GameBase.dll", "GameLogic.dll" };
 
-
-
+    /// <summary>远端版本服务，返回 JSON：{ version, cdnUrl, appDownloadUrl }。</summary>
     public const string VersionApi = "http://localhost:5000/api/Version?channel=Standlone";
-    public static string Version = string.Empty;
-    public static string CDNUrl = string.Empty;
-    public static string AppDownloadUrl = string.Empty;
 
-    [System.Serializable]
-    private class RemoteVersionInfo
-    {
-        public string version;
-        public string cdnUrl;
-        public string appDownloadUrl;
-    }
+    /// <summary>启动流程中单个操作失败后的重试次数；用完后输出警告，流程停在当前步骤。</summary>
+    public const int MaxRetryCount = 3;
 
-    public static async UniTask GetRemoteVersion()
-    {
-        var updateDataStr = await Utility.Http.Get(VersionApi);
-        var versionInfo = JsonUtility.FromJson<RemoteVersionInfo>(updateDataStr);
-        Version = versionInfo.version;
-        CDNUrl = versionInfo.cdnUrl;
-        AppDownloadUrl = versionInfo.appDownloadUrl;
-        Debug.Log(updateDataStr);
-    }
+    /// <summary>重试间隔（秒）。</summary>
+    public const float RetryIntervalSeconds = 3f;
 }
